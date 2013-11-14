@@ -8,12 +8,8 @@ class Worker : public Entity
 	private:
 		int timer;
 	public:
-		void timeStep();
-		int getState()
-        {
-            return state;
-        }
-		int getTime();
+		void timeStep();        
+		int getTimer();
 
 };
 #endif

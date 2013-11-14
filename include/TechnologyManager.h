@@ -6,11 +6,11 @@
 
 /** Manager class responsible for ensuring that all requirements are fulfilled before an action can be executed.
  * 
- * The TechnologyManager is aware of the whole tech tree of the three races 
+ * The TechnologyManager is aware of the whole Tech Tree of the three races 
  * and of the amount of resources that have to be spent for creating a specific Entity.
  * If a new Entity shall be created, request() can be called and the TechnologyManager checks if everything
  * concerning Resources and Tech in the GameState fits the requirements for its creation.
- * The TechnologyManager is notified whenever a change that concerns the Tech Tree occurs.
+ * The TechnologyManager is notified whenever a change concerning the Tech Tree occurs.
  */
 
 class TechnologyManager

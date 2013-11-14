@@ -8,31 +8,31 @@
 #include "Building.h"
 #include "Unit.h"
 
+/** Class that represents the complete state of the game, enclosing all existing Entities and the current amount of resources. */
 class GameState
 {
-	private:
-		//evtl diese hier als float.....aber eigentlich solln wirs als int modellieren
-		int Minerals;
-		int Gas;
-		int Energy;
-		int Supply;
+	private:	
+		int minerals;
+		int gas;
+		int energy;
+		int supply;
 		std::vector<Worker&> workerList;
 		std::vector<Building&> buildingList;
 		std::vector<Unit&> unitList;
 	public:
-		int getMinerals(){return Minerals;};
-		int getGas(){return Gas;}:
-		int getEnergy(){return Energy;};
-		int getSupply(){return Supply;};
+		int getMinerals(){return minerals;};
+		int getGas(){return gas;};
+		int getEnergy(){return energy;};
+		int getSupply(){return supply;};
 
-		void addMinerals(int count){Minerals += count;};
-		void subMinerals(int count){Minerals -= count;};
-		void addGas(int count){Gas += count;};
-                void subGas(int count){Gas -= count;};
-		void addEnergy(int count){Energy += count;};
-                void subEnergy(int count){Energy -= count;};
-		void addSupply(int count){Supply += count;};
-                void subSupply(int count){Supply -= count;};
+		void addMinerals(int value){minerals += value;};
+		void subMinerals(int value){minerals -= value;};
+		void addGas(int value){gas += value;};
+        void subGas(int value){gas -= value;};
+		void addEnergy(int value){energy += value;};
+        void subEnergy(int value){energy -= value;};
+		void addSupply(int value){supply += value;};
+        void subSupply(int value){supply -= value;};
 
 };
 

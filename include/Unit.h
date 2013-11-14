@@ -4,11 +4,11 @@
 #include "Entity.h"
 
 class Unit : public Entity
-{
+{   
+    private:
+        int timer;
 	public:
 		void timeStep();
-		int getState(){return state;};
-
-};
-
+        int getTimer();
+}
 #endif
