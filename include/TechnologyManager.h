@@ -19,7 +19,7 @@ class TechnologyManager
 		GameState * gameState;
 	
 	public:
-        /** Function for demanding a requirement check.
+        /** Function for demanding a requirements check.
          * @param The Entity that shall be created
          * @return true, if all requirements are fulfilled
          * @return false, else

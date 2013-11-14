@@ -30,7 +30,7 @@ class Simulation
          *
          * After calling this function all required objects, including the whole GameState, the TechnologyManager and ResourceManager, are created.
          * Next the Simulation is started by entering the first timestep and proceded 
-         * by executing all necessary actions until gameState fits to the specifed goal.
+         * by executing all necessary actions in an arbitrary amount of timesteps until the GameState fits to the specifed goal.
          */
 		void startSimulation(); 
 

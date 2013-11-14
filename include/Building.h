@@ -3,8 +3,6 @@
 
 #include <Entity.h>
 
-//for using the notify-function
-
 class Building : public Entity
 {
 	private:	
