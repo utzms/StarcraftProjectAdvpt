@@ -4,7 +4,6 @@
 #include <Entity.h>
 
 //for using the notify-function
-#include <TechnologyManager.h>
 
 class Building : public Entity
 {
