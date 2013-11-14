@@ -4,10 +4,10 @@
 #include "GameState.h"
 #include "Entity.h"
 
-/** Manager class responsible for updating the GameState at the end of each timestep.
+/** Manager class responsible for updating the resource count at the end of each timestep.
  *
  * The ResourceManager updates the resource counts according to GameState after each timestep
- * by calling the timeStep() which itself calls update().
+ * by calling the timeStep() function which itself calls update().
  * To be safe that the update is only done after all changes to the GameState took place, 
  * it is ensured that all Entities are synchronized prior to this.
  */
