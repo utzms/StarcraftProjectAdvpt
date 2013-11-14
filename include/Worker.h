@@ -6,11 +6,13 @@
 class Worker : public Entity
 {
 	private:
-		int state;
-		int myTimer;
+		int timer;
 	public:
 		void timeStep();
-		int getState(){return state;};
+		int getState()
+        {
+            return state;
+        }
 		int getTime();
 
 };

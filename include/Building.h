@@ -5,12 +5,14 @@
 
 class Building : public Entity
 {
-	private:
-		int state;
-		int myTimer;
+	private:	
+		int timer;
 	public:
 		void timeStep();
-		int getState(){return state;};
+		int getState()
+        {
+            return state;
+        }
 		int getTime();
 };
 

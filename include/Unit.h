@@ -5,8 +5,6 @@
 
 class Unit : public Entity
 {
-	private:
-		int state;
 	public:
 		void timeStep();
 		int getState(){return state;};
