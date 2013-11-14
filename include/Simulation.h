@@ -21,15 +21,14 @@
 class Simulation
 {
 	private:
-		GameState * gameState; /* State of the whole game, containing all entities and parameters */
-		ResourceManager * resourceManager; /* Object that is responsible for updating the all resources at the end of each timestep */
-        /* Manager ensuring that all technological and "financial" requirements for the desired buildung action are fulfilled */
-		TechnologyManager * technologyManager; 
-		void timeStep(); /* Calling this function precedes to the next timestep */
+		GameState * gameState; /**< State of the whole game, containing all Entities and parameters */
+		ResourceManager * resourceManager; /**< Object that is responsible for updating the all resources at the end of each timestep */
+		TechnologyManager * technologyManager; /**< Manager ensuring that all technological and "financial" requirements for the desired buildung action are fulfilled. */
+		void timeStep(); /**< Calling this function precedes to the next timestep */
 	public:
-        /** Function starting the Simulation
+        /** Function starting the Simulation.
          *
-         * After calling this function all required objects, including the whole Game State and both Managers, are created.
+         * After calling this function all required objects, including the whole GameState, the TechnologyManager and ResourceManager, are created.
          * Next the Simulation is started by entering the first timestep and proceded 
          * by executing all necessary actions until gameState fits to the specifed goal.
          */
