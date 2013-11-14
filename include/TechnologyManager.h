@@ -25,6 +25,10 @@ class TechnologyManager
          * @return false, else
          */
 		bool request(Entity entity);
+	/** Function for notifying state-changes in entities.
+	 * @param The Entity that has changed it state
+	 */
+		void notify(Entity entity);
 };
 
 #endif

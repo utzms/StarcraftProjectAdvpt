@@ -3,12 +3,15 @@
 
 #include <Entity.h>
 
+//for using the notify-function
+#include <TechnologyManager.h>
+
 class Building : public Entity
 {
 	private:	
 		int timer;
 	public:
-		void timeStep();   
+		void timeStep();
 		int getTimer();
 };
 
