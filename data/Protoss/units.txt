@@ -1,0 +1,17 @@
+Unit		Mineral		Vespene		Supply		BuildTime		BuildFrom			Requirements
+Probe			50		-			1			17				Nexus				to-be-added
+Zealot			100		-			2			38				Gateway				to-be-added
+Stalker			125		50			2			42				Gateway				to-be-added
+Sentry			50		100			2			37				Gateway				to-be-added
+Observer		25		75			1			30				RoboticsFacility	to-be-added
+Immortal		250		100			4			55				RoboticsFacility	to-be-added
+WarpPrism		200		-			2			50				RoboticsFacility	to-be-added
+Colossus		300		200			6			75				RoboticsFacility	to-be-added
+Phoenix			150		100			2			35				Stargate			to-be-added
+VoidRay			250		150			3			60				Stargate			to-be-added
+HighTemplar		50		150			2			55				Gateway				to-be-added
+DarkTemplar		125		125			2			55				Gateway				to-be-added
+Archon			-		-			4			12				HighTemplar			to-be-added
+Carrier			350		250			6			120				Stargate			to-be-added
+Mothership		400		400			8			160				Nexus				to-be-added
+

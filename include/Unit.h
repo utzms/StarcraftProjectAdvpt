@@ -1,7 +1,7 @@
 #ifndef _UNIT_H_
 #define _UNIT_H_
 
-#include "Entity.h"
+#include <Entity.h>
 
 class Unit : public Entity
 {   
@@ -10,5 +10,5 @@ class Unit : public Entity
 	public:
 		void timeStep();
         int getTimer();
-}
+};
 #endif

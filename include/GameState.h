@@ -3,10 +3,12 @@
 
 #include <vector>
 
-#include "Entity.h"
-#include "Worker.h"
-#include "Building.h"
-#include "Unit.h"
+#include <Entity.h>
+#include <Worker.h>
+#include <Building.h>
+#include <Unit.h>
+
+class Worker;
 
 /** Class that represents the complete state of the game, enclosing all existing Entities and the current amount of resources. */
 class GameState
@@ -16,9 +18,12 @@ class GameState
 		int gas;
 		int energy;
 		int supply;
-		std::vector<Worker&> workerList;
-		std::vector<Building&> buildingList;
-		std::vector<Unit&> unitList;
+		std::vector<Worker> workerList;
+		std::vector<Building> buildingList;
+		std::vector<Unit> unitList;
+//		std::vector<Worker&> workerList;	//compiler meckert
+//		std::vector<Building&> buildingList;
+//		std::vector<Unit&> unitList;
 	public:
 		int getMinerals(){return minerals;};
 		int getGas(){return gas;};
@@ -33,7 +38,6 @@ class GameState
         void subEnergy(int value){energy -= value;};
 		void addSupply(int value){supply += value;};
         void subSupply(int value){supply -= value;};
-
 };
 
 #endif

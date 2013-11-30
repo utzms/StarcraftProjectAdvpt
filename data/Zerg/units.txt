@@ -1,0 +1,16 @@
+Unit			Mineral		Vespene		Supply		BuildTime		BuildFrom		Requirements
+Larva				-		-				-		-				-					to-be-added
+Drone				50		-				1		17				Larva				to-be-added
+Overlord			100		-				-		25				Larva				to-be-added
+Zergling			50		-				1		24				Larva				to-be-added
+Queen				150		-				2		50				Hatchery			to-be-added
+Hydralisk			100		50				2		33				Larva				to-be-added
+Baneling			25		25				-		20				Zergling			to-be-added
+Overseer			50		50				-		17				Overlord			to-be-added
+Roach				75		25				2		27				Larva				to-be-added
+Infestor			100		150				2		50				Larva				to-be-added
+Mutalisk			100		100				2		33				Larva				to-be-added
+Corruptor			150		100				2		40				Larva				to-be-added
+NydusWorm			100		100				-		20				NydusNetwork		to-be-added
+Ultralisk			300		200				6		55				Larva				to-be-added
+BroodLord			150		150				2		34				Corruptor			to-be-added

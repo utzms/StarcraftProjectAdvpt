@@ -1,8 +1,8 @@
 #ifndef _TECHNOLOGYMANAGER_H_
 #define _TECHNOLOGYMANAGER_H_
 
-#include "GameState.h"
-#include "Entity.h"
+#include <GameState.h>
+#include <Entity.h>
 
 /** Manager class responsible for ensuring that all requirements are fulfilled before an action can be executed.
  * 
@@ -12,6 +12,7 @@
  * concerning Resources and Tech in the GameState fits the requirements for its creation.
  * The TechnologyManager is notified whenever a change concerning the Tech Tree occurs.
  */
+
 
 class TechnologyManager
 {
@@ -24,11 +25,11 @@ class TechnologyManager
          * @return true, if all requirements are fulfilled
          * @return false, else
          */
-		bool request(Entity entity);
+		bool request(Entity *entity);
 	/** Function for notifying state-changes in entities.
 	 * @param The Entity that has changed it state
 	 */
-		void notify(Entity entity);
+		void notify(Entity *entity);
 };
 
 #endif

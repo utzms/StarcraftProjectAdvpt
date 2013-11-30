@@ -1,10 +1,10 @@
 #ifndef _SIMULATION_H_
 #define _SIMULATION_H_
 
-#include "GameState.h"
-#include "ResourceManager.h"
-#include "TechnologyManager.h"
-#include "Entity.h"
+#include <GameState.h>
+#include <ResourceManager.h>
+#include <TechnologyManager.h>
+#include <Entity.h>
 
 /** Main class designed for managing and controlling the Simulation.
  * 
