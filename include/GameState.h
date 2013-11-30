@@ -14,10 +14,10 @@ class Worker;
 class GameState
 {
 	private:	
-		int minerals;
-		int gas;
-		int energy;
-		int supply;
+		float minerals;
+		float gas;
+		float energy;
+		float supply;
 		std::vector<Worker> workerList;
 		std::vector<Building> buildingList;
 		std::vector<Unit> unitList;
@@ -25,19 +25,19 @@ class GameState
 //		std::vector<Building&> buildingList;
 //		std::vector<Unit&> unitList;
 	public:
-		int getMinerals(){return minerals;};
-		int getGas(){return gas;};
-		int getEnergy(){return energy;};
-		int getSupply(){return supply;};
+		float getMinerals(){return minerals;};
+		float getGas(){return gas;};
+		float getEnergy(){return energy;};
+		float getSupply(){return supply;};
 
-		void addMinerals(int value){minerals += value;};
-		void subMinerals(int value){minerals -= value;};
-		void addGas(int value){gas += value;};
-        void subGas(int value){gas -= value;};
-		void addEnergy(int value){energy += value;};
-        void subEnergy(int value){energy -= value;};
-		void addSupply(int value){supply += value;};
-        void subSupply(int value){supply -= value;};
+		void addMinerals(float value){minerals += value;};
+		void subMinerals(float value){minerals -= value;};
+		void addGas(float value){gas += value;};
+        void subGas(float value){gas -= value;};
+		void addEnergy(float value){energy += value;};
+        void subEnergy(float value){energy -= value;};
+		void addSupply(float value){supply += value;};
+        void subSupply(float value){supply -= value;};
 };
 
 #endif

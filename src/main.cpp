@@ -1,11 +1,9 @@
 #include <Simulation.h>
-#include <DataReader.h>
+#include <TechnologyList.h>
 
 int main()
 {
 	Simulation simulation;
-	DataReader dat("./data/Protoss/units.txt");
-	DataReader d;
-	dat.getLine();
-	d.getLine();
+	TechnologyList tech;
+	tech.initUnitList("Protoss");
 }
