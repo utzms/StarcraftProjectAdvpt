@@ -14,19 +14,20 @@
  *
  * */
 
-typedef struct costs
+struct Costs
 {
 	float minerals;
 	float gas;
 	float supply;
-	int buildTime;
-} costs;
+    int   buildTime;
+};
 
 class Technology
 {
 	private:
 		std::string name;
-		costs TechCosts;
+        Costs       TechCosts;
+
 		std::vector<std::string> requirements;
 
 	public:
@@ -34,7 +35,7 @@ class Technology
 		Technology(std::string name);
 		Technology(std::string name, float min, float gas, float supply, int buildTime);
 
-		void setZero();
+        void setZero();
 		void addRequirement(std::string in);
 		void setName(std::string name);
 		void setMineral(float minerals);

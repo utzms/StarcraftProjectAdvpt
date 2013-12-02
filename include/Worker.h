@@ -1,8 +1,6 @@
 #ifndef _WORKER_H_
 #define _WORKER_H_
 
-#include <Entity.h>
-
 class Worker
 {
 	private:
@@ -17,8 +15,15 @@ class Worker
             Delayed
         };
 
-		void timeStep(){}        
-		int getTimer();
+        void timeStep()
+        {
+
+        }
+
+        int getTime()
+        {
+            return timer;
+        }
 
 };
 #endif
