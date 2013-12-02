@@ -25,11 +25,18 @@ class TechnologyManager
          * @return true, if all requirements are fulfilled
          * @return false, else
          */
-		bool request(Entity *entity);
+
+        // template argument deduction does the work here
+        // we do not have to specify the template type argument
+        // when calling this function
+        template <class EntityType>
+        bool request(EntityType *entity);
+
 	/** Function for notifying state-changes in entities.
 	 * @param The Entity that has changed it state
 	 */
-		void notify(Entity *entity);
+        template <class EntityType>
+        void notify(EntityType *entity);
 };
 
 #endif

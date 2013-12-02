@@ -24,7 +24,8 @@ class Simulation
 		GameState * gameState; /**< State of the whole game, containing all Entities and parameters */
 		ResourceManager * resourceManager; /**< Object that is responsible for updating the all resources at the end of each timestep */
 		TechnologyManager * technologyManager; /**< Manager ensuring that all technological and "financial" requirements for the desired buildung action are fulfilled. */
-		void timeStep(); /**< Calling this function precedes to the next timestep */
+        void timeStep(); /**< Calling this function proceeds to the next timestep */
+
 	public:
         /** Function starting the Simulation.
          *
@@ -33,6 +34,13 @@ class Simulation
          * by executing all necessary actions in an arbitrary amount of timesteps until the GameState fits to the specifed goal.
          */
 		void startSimulation(); 
+
+        ~Simulation()
+        {
+            delete gameState;
+            delete resourceManager;
+            delete technologyManager;
+        }
 
 };
 

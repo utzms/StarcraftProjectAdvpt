@@ -3,13 +3,27 @@
 
 #include <Entity.h>
 
-class Building : public Entity
+class Building
 {
 	private:	
 		int timer;
+
 	public:
-		void timeStep();
-		int getTimer();
+        enum class State
+        {
+            UnderConstruction,
+            Finished
+        };
+
+        void timeStep()
+        {
+
+        }
+
+        int getTime()
+        {
+            return timer;
+        }
 };
 
 #endif

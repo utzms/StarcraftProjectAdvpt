@@ -3,11 +3,20 @@
 
 #include <Entity.h>
 
-class Worker : public Entity
+class Worker
 {
 	private:
 		int timer;
+
 	public:
+        enum class State
+        {
+            CollectingMinerals,
+            CollectingVespene,
+            Constructing,
+            Delayed
+        };
+
 		void timeStep(){}        
 		int getTimer();
 

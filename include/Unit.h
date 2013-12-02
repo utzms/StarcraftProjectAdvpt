@@ -3,12 +3,11 @@
 
 #include <Entity.h>
 
-class Unit : public Entity
+class Unit
 {   
     private:
-        int timer;
+
 	public:
-		void timeStep();
-        int getTimer();
+
 };
 #endif

@@ -1,6 +1,6 @@
 
 CC=g++
-OPT=-Wall -pedantic
+OPT=-std=c++11 -Wall -pedantic
 LIBS=
 INCPATH=./include/
 SRCPATH=./src/

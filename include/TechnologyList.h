@@ -13,7 +13,7 @@
 class TechnologyList
 {
 	private:
-		std::map<std::string,Technology*> units;
+        std::map<std::string, Technology*> units;
 
 	public:
 		TechnologyList();
