@@ -1,5 +1,5 @@
-#ifndef DEBUG_HH
-#define DEBUG_HH
+#ifndef DEBUG_H
+#define DEBUG_H
 
 #include <sstream>
 
@@ -90,4 +90,4 @@ namespace internal
 
 
 
-#endif // DEBUG_HH
+#endif // DEBUG_H
