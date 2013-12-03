@@ -1,4 +1,4 @@
-Unit			Mineral		Vespene		Supply		BuildTime		BuildFrom		Requirements
+Unit			Mineral		Vespene		Supply		BuildTime		BuildFrom			Requirements		Vanish_Req
 Larva				-		-				-		-				-					to-be-added
 Drone				50		-				1		17				Larva				to-be-added
 Overlord			100		-				-		25				Larva				to-be-added

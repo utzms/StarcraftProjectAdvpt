@@ -1,4 +1,4 @@
-Building			Minerals	Gas		Time	Supply
+Building			Minerals	Gas		Time	Supply	Requirements		Vanish_Req
 Hatchery 			300 		0 		100 	2
 Extractor 			25 			0 		30 		0
 Spawning Pool 		200 		0 		65 		0

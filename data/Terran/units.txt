@@ -1,14 +1,14 @@
-Unit			Mineral		Vespene		Supply		BuildTime		BuildFrom			Requirements
-SCV				50			-			1			17				CommandCenter		to-be-added
-Marine			50			-			1			25				Barracks			to-be-added
-Marauder		100			25			2			30				Barracks			to-be-added
-Reaper			50			50			1			45				Barracks			to-be-added
-Ghost			200			100			2			40				Barracks			to-be-added
-Hellion			100			-			2			30				Factory				to-be-added
-SiegeTank		150			125			3			45				Factory				to-be-added
-Thor			300			200			6			60				Factory				to-be-added
-Viking			150			75			2			42				Starport			to-be-added
-Medivac			100			100			2			42				Starport			to-be-added
-Raven			100			200			2			60				Starport			to-be-added
-Banshee			150			100			3			60				Starport			to-be-added
-Battlecruiser	400			300			6			90				Starport			to-be-added
+Unit			Mineral		Vespene		Supply		BuildTime		BuildFrom											Requirements		Vanish_Req
+SCV				50			-			1			17				CommandCenter, OrbitalCommand, PlanetaryFortress	-					-
+Marine			50			-			1			25				Barracks											-					-
+Marauder		100			25			2			30				TechLabBarracks										-					-
+Reaper			50			50			1			45				TechLabBarracks										-					-
+Ghost			200			100			2			40				TechLabBarracks										GhostAcademy		-
+Hellion			100			-			2			30				Factory												-					-
+SiegeTank		150			125			3			45				TechLabFactory										-					-
+Thor			300			200			6			60				TechLabFactory										Armory				-
+Viking			150			75			2			42				Starport											-					-
+Medivac			100			100			2			42				Starport											-					-
+Raven			100			200			2			60				TechLabStarport										-					-
+Banshee			150			100			3			60				TechLabStarport										-					-
+Battlecruiser	400			300			6			90				TechLabStarport										FusionCore			-
