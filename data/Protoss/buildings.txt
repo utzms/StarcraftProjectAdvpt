@@ -1,0 +1,16 @@
+Building			Minerals	Gas		Time	Supply
+Nexus 				400 		0		100		10
+Pylon 				100 		0		25		8
+Assimilator 		75			0		30		0
+Gateway 			150 		0		65		0
+Forge 				150 		0		45		0
+Photon Cannon 		150 		0		40		0
+Warpgate 			0			0		10		0
+Cybernetics Core 	150 		0		50		0
+Twilight Council 	150 		100 	50		0
+Robotics Facility 	200 		100 	65		0
+Stargate 			150 		150 	60		0
+Templar Archives 	150 		200 	50		0
+Dark Shrine[1] 		150 		150 	100		0
+Robotics Bay 		200 		200 	65		0
+Fleet Beacon 		300 		200 	60		0
