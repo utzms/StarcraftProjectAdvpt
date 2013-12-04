@@ -14,7 +14,9 @@ GhostAcademy 		150 		50		40 		0		SCV, Barracks			-
 Armory 				150 		100 	65 		0		SCV, Factory			-
 Starport 			150 		100 	50 		0		SCV, Factory			-
 FusionCore	 		150 		150 	65 		0		SCV, Starport			-
-TechLabBarracks		50			25		25 		0		-						Barracks
-TechLabFactory		50			25		25		0		-						Factory
-TechLabStarport		50			25		25		0		-						Starport
-Reactor 			50			50		50 		0		-						Barracks, Factory, Starport
+TechLabBarracks		50			25		25 		0		Barracks				-
+TechLabFactory		50			25		25		0		Factory					-
+TechLabStarport		50			25		25		0		Starport				-
+ReactorBarracks		50			50		50 		0		Barracks				-
+ReactorFactory		50			50		50		0		Factory					-
+ReactorStarport		50			50		50		0		Starport				-

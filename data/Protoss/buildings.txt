@@ -6,7 +6,7 @@ Gateway 			150 		0		65		0		Probe, Nexus, Pylon			-
 Forge 				150 		0		45		0		Probe, Nexus, Pylon			-
 PhotonCannon 		150 		0		40		0		Probe, Forge				-
 Warpgate 			0			0		10		0		-							Gateway
-CyberneticsCore 	150 		0		50		0		Probe, Gateway				-
+CyberneticsCore 	150 		0		50		0		Probe, Gateway/Warpgate		-
 TwilightCouncil 	150 		100 	50		0		Probe, CyberneticsCore		-
 RoboticsFacility 	200 		100 	65		0		Probe, CyberneticsCore		-
 Stargate 			150 		150 	60		0		Probe, CyberneticsCore		-

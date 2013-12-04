@@ -10,6 +10,6 @@ Units:
 Buildings:
 	-Hier sind die Dateien genauso aufgelistet, jedoch ist die Reihenfolge zwischen der Supply und BuildTime Spalte umgekehrt. Beim einlesen also aufpassen!
 	-Weiterhin gibt es keine BuildFrom-Spalte.
-
+	-Wenn bei den Requirements die Buildings durch ein '/' getrennt sind, bedeutet dass, dass nur eines der durch '/' getrennten Buildings notwendig ist. Dadurch werden auch die Upgrades von bestimmten Buildings abgedeckt.
 
 
