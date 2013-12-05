@@ -1,8 +1,10 @@
 #ifndef _TECHNOLOGYMANAGER_H_
 #define _TECHNOLOGYMANAGER_H_
-
+#include <memory>
 #include <GameState.h>
 #include <Entity.h>
+using std::shared_pointer;
+using std::string;
 
 /** Manager class responsible for ensuring that all requirements are fulfilled before an action can be executed.
  * 
@@ -17,9 +19,10 @@
 class TechnologyManager
 {
 	private:
-		GameState * gameState;
-	
+        shared_ptr<GameState> gameState;
+	     
 	public:
+        TechnologyManager(string race, const GameState& gameState); 
         /** Function for demanding a requirements check.
          * @param The Entity that shall be created
          * @return true, if all requirements are fulfilled
@@ -29,14 +32,14 @@ class TechnologyManager
         // template argument deduction does the work here
         // we do not have to specify the template type argument
         // when calling this function
-        template <class EntityType>
-        bool request(EntityType *entity);
+        template <class T>
+        bool request(const T& entity);
 
 	/** Function for notifying state-changes in entities.
 	 * @param The Entity that has changed it state
 	 */
-        template <class EntityType>
-        void notify(EntityType *entity);
+        template <class T>
+        void notify(const T& entity);
 };
 
 #endif
