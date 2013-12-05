@@ -1,10 +1,12 @@
 #ifndef _TECHNOLOGYMANAGER_H_
 #define _TECHNOLOGYMANAGER_H_
 #include <memory>
+
 #include "GameState.h"
 #include "Entity.h"
-using std::shared_pointer;
-using std::string;
+#include "TechnologyList.h"
+#include "Technology.h"
+
 
 /** Manager class responsible for ensuring that all requirements are fulfilled before an action can be executed.
  * 
@@ -19,10 +21,11 @@ using std::string;
 class TechnologyManager
 {
 	private:
-        shared_ptr<GameState> gameState;
-	     
+        std::shared_ptr<GameState> gameState;
+	    TechnologyList techList;
+
 	public:
-        TechnologyManager(string race, GameState *gameState); 
+        TechnologyManager(std::string race, std::shared_ptr<GameState> initialGameState); 
         /** Function for demanding a requirements check.
          * @param The Entity that shall be created
          * @return true, if all requirements are fulfilled

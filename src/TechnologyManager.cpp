@@ -2,6 +2,19 @@
 #include <memory>
 #include "TechnologyManager.h"
 
-using std::shared_ptr;
-using std::string;
 
+TechnologyManager::TechnologyManager(std::string race, shared_ptr<GameState> initialGameState)
+{
+    gameState = initialGameState;
+    techList.initUnitList(race);
+}
+
+TechnologyManager::template <class T> bool request(const T& entity) {
+
+
+}
+
+TechnologyManager::template <class T> void notify(const T& entity) {
+
+
+}
