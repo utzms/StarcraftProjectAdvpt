@@ -1,8 +1,8 @@
 #ifndef _TECHNOLOGYMANAGER_H_
 #define _TECHNOLOGYMANAGER_H_
 #include <memory>
-#include <GameState.h>
-#include <Entity.h>
+#include "GameState.h"
+#include "Entity.h"
 using std::shared_pointer;
 using std::string;
 
@@ -22,7 +22,7 @@ class TechnologyManager
         shared_ptr<GameState> gameState;
 	     
 	public:
-        TechnologyManager(string race, const GameState& gameState); 
+        TechnologyManager(string race, GameState *gameState); 
         /** Function for demanding a requirements check.
          * @param The Entity that shall be created
          * @return true, if all requirements are fulfilled
