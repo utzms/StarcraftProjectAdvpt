@@ -20,6 +20,7 @@ Technology::Technology(std::string name, float min, float gas, float supply, int
 	TechCosts.gas=gas;
 	TechCosts.supply=supply;
 	TechCosts.buildTime=buildTime;
+    existence = false;
 }
 
 inline void Technology::setZero()
@@ -57,6 +58,11 @@ inline void Technology::setBuildTime(int time)
 	TechCosts.buildTime=time;
 }
 
+inline void Technology::setExistence(bool state) 
+{
+    existence = state;
+}
+
 inline std::string Technology::getName(void)
 {
 	return name;
@@ -82,3 +88,7 @@ inline int Technology::getBuildTime(void)
 	return TechCosts.buildTime;
 }
 
+inline bool Technology::exists(void) 
+{
+    return existence;
+}

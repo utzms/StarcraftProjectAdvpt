@@ -29,6 +29,7 @@ class Technology
         Costs       TechCosts;
 
 		std::vector<std::string> requirements;
+        bool existence;
 
 	public:
 		Technology();
@@ -42,6 +43,7 @@ class Technology
 		void setGas(float gas);
 		void setSupply(float supply);
 		void setBuildTime(int time);
+        void setExistence(bool state);
 
 		std::string getName(void);
 		std::vector<std::string> getRequirements(void);
@@ -49,6 +51,9 @@ class Technology
 		float getGasCost(void);
 		float getSupplyCost(void);
 		int getBuildTime(void);
+        bool exists();
+        
+
 };
 
 #endif
