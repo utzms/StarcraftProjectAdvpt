@@ -36,13 +36,12 @@ class TechnologyManager
         // we do not have to specify the template type argument
         // when calling this function
         template <class T>
-        bool request(const T& entity);
+        bool request(std::shared_ptr<T> entity);
 
-	/** Function for notifying state-changes in entities.
-	 * @param The Entity that has changed it state
+	/** Functions for notifying state-changes in entities.
+	 * @param Shared Pointer to the Entity that has changed it state
 	 */
-        template <class T>
-        void notify(const T& entity);
+        template <class T> void notifyCreation(std::shared_ptr<T> entity);
+        template <class T> void notifyDestruction(std::shared_ptr<T> entity);
 };
-
 #endif
