@@ -11,7 +11,11 @@
 
 class Entity
 {   
+    private:
+        std::string name;
 
+    public:
+        std::string getName();
 };
 
 #endif

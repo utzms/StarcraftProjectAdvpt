@@ -23,7 +23,7 @@ class Building
             }
         };
 
-        std::queue<Order> orderQueue;
+       // std::queue<Order> orderQueue;
 
 		int timer;
         int maxOrders;
