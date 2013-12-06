@@ -23,6 +23,7 @@ class TechnologyManager
 	private:
         std::shared_ptr<GameState> gameState;
 	    TechnologyList techList;
+        bool checkRequirement(Technology& requirement);
 
 	public:
         TechnologyManager(std::string race, std::shared_ptr<GameState> initialGameState); 
