@@ -1,4 +1,5 @@
 #include <DataReader.h>
+#include <Debug.h>
 
 DataReader::DataReader()
 {
@@ -57,12 +58,17 @@ std::string DataReader::getLine()
 		std::cerr << "ERROR DataReader - getLine: No Path assigned" << std::endl; 
 		return ret;
 	}
-	if (!(input->good()))
+	if (file.is_open())
 	{
-		if (!(input->eof()))
-			std::cerr << "ERROR DataReader - getLine: Inputstream not good anymore" << std::endl; 
-		return ret;
+		if (!(input->good()))
+		{
+			if (!(input->eof()))
+				std::cerr << "ERROR DataReader - getLine: Inputstream not good anymore" << std::endl; 
+			return ret;
+		} else 
+		{
+			std::getline(*input, ret);
+		}
 	}
-	std::getline(*input, ret);
 	return ret;
 }

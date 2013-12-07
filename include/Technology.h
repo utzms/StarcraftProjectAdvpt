@@ -5,6 +5,7 @@
 #include <vector>
 #include <iostream>
 #include <algorithm>
+#include <memory>
 
 /*
  * Technology Class. Holds 'Blueprints' for each Entity (Building, Unit).
@@ -26,9 +27,9 @@ class Technology
 {
 	private:
 		std::string name;
-        Costs       TechCosts;
+        Costs TechCosts;
 
-		std::vector<std::string> requirements;
+		std::vector<std::shared_ptr<Technology>> requirements;
         bool existence;
 
 	public:
@@ -37,7 +38,7 @@ class Technology
 		Technology(std::string name, float min, float gas, float supply, int buildTime);
 
         void setZero();
-		void addRequirement(std::string in);
+		void addRequirement(std::shared_ptr<Technology>);
 		void setName(std::string name);
 		void setMineral(float minerals);
 		void setGas(float gas);
@@ -46,13 +47,13 @@ class Technology
         void setExistence(bool state);
 
 		std::string getName(void);
-		std::vector<std::string> getRequirements(void);
+		std::vector<std::shared_ptr<Technology>> getRequirements(void);
 		float getMineralsCost(void);
 		float getGasCost(void);
+		//getSupplyCost returns providing supply in case of buildings
 		float getSupplyCost(void);
 		int getBuildTime(void);
         bool exists();
-        
 
 };
 

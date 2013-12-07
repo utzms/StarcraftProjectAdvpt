@@ -15,7 +15,7 @@ Technology::Technology(std::string name, float min, float gas, float supply, int
 	std::cerr << "CONSTRUCTOR - Technology(name,float,float....)" << std::endl;
 	std::cerr << "\t" << name << " " << min << " " << gas << " " << supply << " " << buildTime << std::endl;
 #endif
-	name=name;
+	this->name=name;
 	TechCosts.minerals=min;
 	TechCosts.gas=gas;
 	TechCosts.supply=supply;
@@ -23,7 +23,7 @@ Technology::Technology(std::string name, float min, float gas, float supply, int
     existence = false;
 }
 
-inline void Technology::setZero()
+void Technology::setZero()
 {
 	TechCosts.minerals=0.0f;
 	TechCosts.gas=0.0f;
@@ -31,64 +31,64 @@ inline void Technology::setZero()
 	TechCosts.buildTime=0;
 }
 
-inline void Technology::addRequirement(std::string in)
+void Technology::addRequirement(std::shared_ptr<Technology> in)
 {
-	if (!(in.empty()))
+	if (!(in.get()==NULL))
 		if (std::find(requirements.begin(), requirements.end(), in) != requirements.end())
 			requirements.push_back(in);
 }
-inline void Technology::setName(std::string name)
+void Technology::setName(std::string name)
 {
-	name=name;
+	this->name=name;
 }
-inline void Technology::setMineral(float minerals)
+void Technology::setMineral(float minerals)
 {
 	TechCosts.minerals=minerals;
 }
-inline void Technology::setGas(float gas)
+void Technology::setGas(float gas)
 {
 	TechCosts.gas=gas;
 }
-inline void Technology::setSupply(float supply)
+void Technology::setSupply(float supply)
 {
 	TechCosts.supply=supply;
 }
-inline void Technology::setBuildTime(int time)
+void Technology::setBuildTime(int time)
 {
 	TechCosts.buildTime=time;
 }
 
-inline void Technology::setExistence(bool state) 
+void Technology::setExistence(bool state) 
 {
     existence = state;
 }
 
-inline std::string Technology::getName(void)
+std::string Technology::getName(void)
 {
 	return name;
 }
-inline std::vector<std::string> Technology::getRequirements(void)
+std::vector<std::shared_ptr<Technology>> Technology::getRequirements(void)
 {
 	return requirements;
 }
-inline float Technology::getMineralsCost(void)
+float Technology::getMineralsCost(void)
 {
 	return TechCosts.minerals;
 }
-inline float Technology::getGasCost(void)
+float Technology::getGasCost(void)
 {
 	return TechCosts.gas;
 }
-inline float Technology::getSupplyCost(void)
+float Technology::getSupplyCost(void)
 {
 	return TechCosts.supply;
 }
-inline int Technology::getBuildTime(void)
+int Technology::getBuildTime(void)
 {
 	return TechCosts.buildTime;
 }
 
-inline bool Technology::exists(void) 
+bool Technology::exists(void) 
 {
     return existence;
 }
