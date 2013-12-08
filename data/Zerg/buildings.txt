@@ -15,4 +15,3 @@ NydusNetwork 		150 		200 	50 		0			Lair/Hive				Drone
 Hive 				200 		150 	100 	0			InfestationPit			Lair
 UltraliskCavern 	150 		200 	65 		0			Hive					Drone
 GreaterSpire 		100 		150 	100 	0			Hive					Spire
-

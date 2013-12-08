@@ -29,7 +29,9 @@ class Technology
 		std::string name;
         Costs TechCosts;
 
-		std::vector<std::shared_ptr<Technology>> requirements;
+		//std::vector<std::shared_ptr<Technology>> requirements;
+		std::vector<std::vector<std::shared_ptr<Technology>>> requirements;
+		
         bool existence;
 
 	public:
@@ -39,6 +41,7 @@ class Technology
 
         void setZero();
 		void addRequirement(std::shared_ptr<Technology>);
+		void addRequirement(std::vector<std::shared_ptr<Technology>>);
 		void setName(std::string name);
 		void setMineral(float minerals);
 		void setGas(float gas);
@@ -47,7 +50,8 @@ class Technology
         void setExistence(bool state);
 
 		std::string getName(void);
-		std::vector<std::shared_ptr<Technology>> getRequirements(void);
+		//std::vector<std::shared_ptr<Technology>> getRequirements(void);
+		std::vector<std::vector<std::shared_ptr<Technology>>> getRequirements(void);
 		float getMineralsCost(void);
 		float getGasCost(void);
 		//getSupplyCost returns providing supply in case of buildings

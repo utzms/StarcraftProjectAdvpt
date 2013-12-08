@@ -5,12 +5,213 @@ TechnologyList::TechnologyList()
 	initialized=false;
 }
 
+void TechnologyList::initRest()
+{
+#ifdef DEBUG
+	std::cout << "INIT REST of TechnolgyList" << std::endl;
+#endif
+	std::string requirements;
+	std::string vanish;
+	std::string buildFrom;
+
+	std::vector<std::vector<std::string>> buildFromVec;
+	std::vector<std::vector<std::string>> vanishVec;
+
+	std::string sub, subsub;
+	size_t from,fromfrom,to,toto;
+
+	auto unitIt = unresolvedUnitRequirements.begin();
+	for (; unitIt != unresolvedUnitRequirements.end(); ++unitIt)
+	{
+		std::vector<std::string> fixedRequirements;
+		std::vector<std::vector<std::string>> orRequirements;
+		std::shared_ptr<Technology> tech = unitIt->first;
+		requirements = unitIt->second.req;
+		vanish = unitIt->second.vanish;
+		buildFrom = unitIt->second.buildFrom;
+		//requirement check
+		{
+			from=0;
+			to=0;
+			std::string sub;
+			do
+			{
+				to=requirements.find(",");
+				sub = requirements.substr(from,to);
+				//checken ob eine "eine von vielen" requirement ist
+				if (sub.find("/")!=std::string::npos)
+				{
+					std::vector<std::string> orReq;
+					std::string subsub;
+					toto=0;
+					fromfrom=0;
+					do
+					{
+						toto=sub.find("/");
+						subsub=sub.substr(fromfrom,toto);
+						orReq.push_back(subsub);
+						sub=sub.substr(toto+1,std::string::npos);
+					} while(toto != std::string::npos);
+					orRequirements.push_back(orReq);
+				} else
+				{
+					if (sub != "0")
+						fixedRequirements.push_back(sub);
+				}
+				requirements=requirements.substr(to+1,std::string::npos);
+			} while (to!=std::string::npos);
+			//add requirements to Technology
+			for (size_t i = 0; i < fixedRequirements.size(); ++i)
+			{
+				std::shared_ptr<Technology> source;
+				if ((source=findUnit(fixedRequirements[i]))==NULL)
+				{
+					//its a building
+					if ((source=findBuilding(fixedRequirements[i]))==NULL)
+					{
+						std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
+					} else
+					{
+						tech->addRequirement(source);
+					}
+				} else
+				{
+					tech->addRequirement(source);
+				}
+			}
+			//kill last search
+			findUnit("KillMe");
+			findBuilding("KillMe");
+		}
+		for (size_t i = 0; i < orRequirements.size(); ++i)
+		{
+			std::vector<std::shared_ptr<Technology>> sources;
+			for (size_t j = 0; j < orRequirements[i].size(); ++j)
+			{
+				std::shared_ptr<Technology> source;
+				if ((source=findUnit(orRequirements[i][j]))==NULL)
+				{
+					//its a building
+					if ((source=findBuilding(orRequirements[i][j]))==NULL)
+					{
+						std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
+					} else
+					{
+						sources.push_back(source);
+					}
+				} else
+				{
+						sources.push_back(source);
+				}
+				findUnit("KillMe");
+				findBuilding("KillMe");
+			}
+			tech->addRequirement(sources);
+		}
+	}
+
+
+	//here starts the building list
+	auto buildIt = unresolvedBuildingRequirements.begin();
+	for (; buildIt != unresolvedBuildingRequirements.end(); ++buildIt)
+	{
+		std::vector<std::string> fixedRequirements;
+		std::vector<std::vector<std::string>> orRequirements;
+		std::shared_ptr<Technology> tech = buildIt->first;
+		requirements = buildIt->second.req;
+		vanish = buildIt->second.vanish;
+		buildFrom = buildIt->second.buildFrom;
+		//requirement check
+		{
+			from=0;
+			to=0;
+			std::string sub;
+			do
+			{
+				to=requirements.find(",");
+				sub = requirements.substr(from,to);
+				//checken ob eine "eine von vielen" requirement ist
+				if (sub.find("/")!=std::string::npos)
+				{
+					std::vector<std::string> orReq;
+					std::string subsub;
+					toto=0;
+					fromfrom=0;
+					do
+					{
+						toto=sub.find("/");
+						subsub=sub.substr(fromfrom,toto);
+						orReq.push_back(subsub);
+						sub=sub.substr(toto+1,std::string::npos);
+					} while(toto != std::string::npos);
+					orRequirements.push_back(orReq);
+				} else
+				{
+					if (sub != "0")
+						fixedRequirements.push_back(sub);
+				}
+				if (to != std::string::npos)
+					requirements=requirements.substr(to+1,std::string::npos);
+			} while (to!=std::string::npos);
+			//add requirements to Technology
+			for (size_t i = 0; i < fixedRequirements.size(); ++i)
+			{
+				std::shared_ptr<Technology> source;
+				if ((source=findUnit(fixedRequirements[i]))==NULL)
+				{
+					//its a building
+					if ((source=findBuilding(fixedRequirements[i]))==NULL)
+					{
+						std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
+					} else
+					{
+						tech->addRequirement(source);
+					}
+				} else
+				{
+					tech->addRequirement(source);
+				}
+			}
+			//kill last search
+			findUnit("KillMe");
+			findBuilding("KillMe");
+		}
+		for (size_t i = 0; i < orRequirements.size(); ++i)
+		{
+			std::vector<std::shared_ptr<Technology>> sources;
+			for (size_t j = 0; j < orRequirements[i].size(); ++j)
+			{
+				std::shared_ptr<Technology> source;
+				if ((source=findUnit(orRequirements[i][j]))==NULL)
+				{
+					//its a building
+					if ((source=findBuilding(orRequirements[i][j]))==NULL)
+					{
+						std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
+					} else
+					{
+						sources.push_back(source);
+					}
+				} else
+				{
+					sources.push_back(source);
+				}
+				findUnit("KillMe");
+				findBuilding("KillMe");
+			}
+			tech->addRequirement(sources);
+		}
+	}
+}
+
 void TechnologyList::initUnitList(std::string unitList)
 {
 	DataReader readFile(unitList);
 	std::string line;
+	bool callRest=initialized;
 	while (!((line=readFile.getLine()).empty()))
 	{
+		initialized=true;
 		std::string unitName="";
 		float unitCostMinerals=0.0f;
 		float unitCostGas=0.0f;
@@ -54,34 +255,17 @@ void TechnologyList::initUnitList(std::string unitList)
 			continue;
 		}
 		stream >> unitBuildTime;
-
-		Technology *t = new Technology(unitName,unitCostMinerals,unitCostGas,unitCostSupply,unitBuildTime);
-		std::shared_ptr<Technology> tech(t);
-		initialized=true;
-
-		units.insert( std::pair<std::string, std::shared_ptr<Technology>>(unitName,
-					tech));
-
-		//resolve unresolved buildigns if needed
-		auto it = unresolvedBuildingRequirements.equal_range(unitName).first;
-		for(;it!=unresolvedBuildingRequirements.equal_range(unitName).second;++it)
-		{
-			(*it).second->addRequirement(tech);
-		}
-
 		if (!(stream.good()))
 		{
 			std::cerr << "INIT UNIT LIST : stream not good, probably no valid line"<<std::endl;
 			continue;
 		}
 		stream >> buildFrom;
-
 		if (!(stream.good()))
 		{
 			std::cerr << "INIT UNIT LIST : stream not good, probably no valid line"<<std::endl;
 			continue;
 		}
-
 		stream >> requirements;
 		if (!(stream.good()))
 		{
@@ -90,88 +274,40 @@ void TechnologyList::initUnitList(std::string unitList)
 		}
 		stream >> vanish;
 
-		//set up requirementList
-		size_t from=0;
-		size_t to=0;
-		std::string sub;
-		std::shared_ptr<Technology> tmp;
-		while ((to=requirements.find(",")) != std::string::npos)
-		{
-			sub = requirements.substr(from,to);
-			requirements = requirements.substr(to+1,std::string::npos);
-			bool found=false;
-			while ((tmp=findUnit(sub))!=NULL)
-			{
-				found=true;
-				tech->addRequirement(tmp);
-			}
-			if (!found)
-			{
-#ifdef DEBUG
-			std::cerr << "\t must be a building" << std::endl; 
-#endif
-				while((tmp=findBuilding(sub))!=NULL)
-				{
-					found=true;
-					tech->addRequirement(tmp);
-				}
-			}
-			if (!found)
-			{
-#ifdef DEBUG
-				std::cerr << "\t couldnt be resolved, unit list not built yet, will be resolved back then" << std::endl;
-#endif
-				unresolvedUnitRequirements.insert( std::pair<std::string,std::shared_ptr<Technology>>(sub,
-							tech));
-				continue;
-			}
-		}
-		findUnit("killMe");
-		sub = requirements.substr(from,std::string::npos);
-		if (!(sub == "0"))
-		{
-			bool found=false;
-			while((tmp=findUnit(sub))!=NULL)
-			{
-				found=true;
-				tech->addRequirement(tmp);
-			}
-#ifdef DEBUG
-			std::cerr << "\t must be a building" << std::endl; 
-#endif
-			if (!found)
-			{
-				while((tmp=findBuilding(sub))!=NULL)
-				{
-					found=true;
-					tech->addRequirement(tmp);
-				}
-			}
-			if (!found)
-			{
-#ifdef DEBUG
-				std::cerr << "\t couldnt be resolved, building list not built yet, will be resolved back then" << std::endl;
-#endif
-				unresolvedUnitRequirements.insert( std::pair<std::string,std::shared_ptr<Technology>>(sub,
-							tech));
-				continue;
-			}
-		}
+		Technology *t = new Technology(unitName,unitCostMinerals,unitCostGas,unitCostSupply,unitBuildTime);
+		std::shared_ptr<Technology> tech(t);
+
+		units.insert( std::pair<std::string, std::shared_ptr<Technology>>(unitName,
+					tech));
+
+		struct requirementRest rest;
+		rest.req=requirements;
+		rest.vanish=vanish;
+		rest.buildFrom=buildFrom;
+
+		auto unresolve = std::pair<std::shared_ptr<Technology>, requirementRest>(tech,rest);
+
+		unresolvedUnitRequirements.insert(unresolve);
+
 	}
-	std::cout << unresolvedUnitRequirements.size() << std::endl;
+	if (callRest)
+		initRest();
 }
 
 void TechnologyList::initBuildingList(std::string buildList)
 {
 	DataReader readFile(buildList);
 	std::string line;
+	bool callRest=initialized;
 	while (!((line=readFile.getLine()).empty()))
 	{
+		initialized=true;
 		std::string buildName="";
 		float buildCostMinerals=0.0f;
 		float buildCostGas=0.0f;
 		float buildCostSupply=0.0f;
 		int buildBuildTime=0;
+		std::string vanish;
 		std::string requirements;
 		std::stringstream stream;
 
@@ -216,89 +352,31 @@ void TechnologyList::initBuildingList(std::string buildList)
 		std::shared_ptr<Technology> tech(t);
 		buildings.insert( std::pair<std::string, std::shared_ptr<Technology>>(buildName,
 					tech));
-		initialized=true;
 
-		//resolve unresolved units if needed
-		auto it = unresolvedUnitRequirements.equal_range(buildName).first;
-		for(;it!=unresolvedUnitRequirements.equal_range(buildName).second;++it)
-		{
-			(*it).second->addRequirement(tech);
-		}
-
-
-		//requirements
 		if (!(stream.good()))
 		{
 			std::cerr << "INIT BUILDING LIST : stream not good, probably no valid line"<<std::endl;
 			continue;
 		}
 		stream >> requirements;
-		size_t from=0;
-		size_t to=0;
-		std::string sub;
-		std::shared_ptr<Technology> tmp;
-		while ((to=requirements.find(",")) != std::string::npos)
+		if (!(stream.good()))
 		{
-			sub = requirements.substr(from,to);
-			requirements = requirements.substr(to+1,std::string::npos);
-			bool found=false;
-			while((tmp=findBuilding(sub))!=NULL)
-			{
-				found=true;
-				tech->addRequirement(tmp);
-			}
-#ifdef DEBUG
-			std::cerr << "\t must be an unit" << std::endl; 
-#endif
-			if (!found)
-			{
-				while((tmp=findUnit(sub))!=NULL)
-				{
-					found=true;
-					tech->addRequirement(tmp);
-				}
-			}
-			if (!found)
-			{
-#ifdef DEBUG
-				std::cerr << "\t couldnt be resolved, unit list not built yet, will be resolved back then" << std::endl;
-#endif
-				unresolvedBuildingRequirements.insert( std::pair<std::string,std::shared_ptr<Technology>>(sub,
-							tech));
-				continue;
-			}
+			std::cerr << "INIT BUILDING LIST : stream not good, probably no valid line"<<std::endl;
+			continue;
 		}
-		sub = requirements.substr(from,std::string::npos);
-		if (!(sub == "0"))
-		{
-			bool found=false;
-			while((tmp=findBuilding(sub))!=NULL)
-			{
-				found=true;
-				tech->addRequirement(tmp);
-			}
-#ifdef DEBUG
-			std::cerr << "\t must be an unit" << std::endl; 
-#endif
-			if (!found)
-			{
-				while((tmp=findUnit(sub))!=NULL)
-				{
-					found=true;
-					tech->addRequirement(tmp);
-				}
-			}
-			if (!found)
-			{
-#ifdef DEBUG
-				std::cerr << "\t couldnt be resolved, unit list not built yet, will be resolved back then" << std::endl;
-#endif
-				unresolvedBuildingRequirements.insert( std::pair<std::string,std::shared_ptr<Technology>>(sub,
-							tech));
-				continue;
-			}
-		}
+		stream >> vanish;
+		
+		struct requirementRest rest;
+		rest.req=requirements;
+		rest.vanish=vanish;
+
+		auto unresolve = std::pair<std::shared_ptr<Technology>, requirementRest>(tech,rest);
+
+		unresolvedBuildingRequirements.insert(unresolve);
+
 	}
+	if (callRest)
+		initRest();
 }
 
 bool TechnologyList::isInitialized()
@@ -349,9 +427,6 @@ std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 	static std::string lastKey="PlaceHolder";
 	static std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
 
-#ifdef DEBUG
-		std::cerr << "\tseeked:\t" << key << std::endl;
-#endif
 	int count = units.count(key);
 	if (count == 0)
 	{

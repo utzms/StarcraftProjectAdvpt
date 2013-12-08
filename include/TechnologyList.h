@@ -14,11 +14,19 @@
 
 class TechnologyList
 {
+	struct requirementRest
+	{
+		std::string req;
+		std::string vanish;
+		std::string buildFrom;
+	};
 	private:
 		bool initialized;
 
-		std::multimap<std::string, std::shared_ptr<Technology>> unresolvedBuildingRequirements;
-		std::multimap<std::string, std::shared_ptr<Technology>> unresolvedUnitRequirements;
+		void initRest();
+
+		std::map<std::shared_ptr<Technology>, requirementRest> unresolvedBuildingRequirements;
+		std::map<std::shared_ptr<Technology>, requirementRest> unresolvedUnitRequirements;
 
         std::multimap<std::string, std::shared_ptr<Technology>> units;
         std::multimap<std::string, std::shared_ptr<Technology>> buildings;
