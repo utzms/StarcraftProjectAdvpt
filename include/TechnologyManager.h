@@ -6,7 +6,7 @@
 #include "Entity.h"
 #include "TechnologyList.h"
 #include "Technology.h"
-
+#include "InitTechTree.hpp"
 
 /** Manager class responsible for ensuring that all requirements are fulfilled before an action can be executed.
  * 
@@ -18,7 +18,7 @@
  */
 
 
-class TechnologyManager
+template <class Race> class TechnologyManager
 {
 	private:
         std::shared_ptr<GameState> gameState;
@@ -26,7 +26,7 @@ class TechnologyManager
         bool checkRequirement(Technology& requirement);
 
 	public:
-        TechnologyManager(std::string race, std::shared_ptr<GameState> initialGameState); 
+        TechnologyManager(std::shared_ptr<GameState> initialGameState); 
         /** Function for demanding a requirements check.
          * @param The Entity that shall be created
          * @return true, if all requirements are fulfilled
@@ -36,13 +36,13 @@ class TechnologyManager
         // template argument deduction does the work here
         // we do not have to specify the template type argument
         // when calling this function
-        template <class T>
-        bool request(std::shared_ptr<T> entity);
+        template <class EntityType> bool request(std::shared_ptr<EntityType> entity);
 
 	/** Functions for notifying state-changes in entities.
 	 * @param Shared Pointer to the Entity that has changed it state
 	 */
-        template <class T> void notifyCreation(std::shared_ptr<T> entity);
-        template <class T> void notifyDestruction(std::shared_ptr<T> entity);
+        template <class EntityType> void notifyCreation(std::shared_ptr<EntityType> entity);
+        template <class EntityType> void notifyDestruction(std::shared_ptr<EntityType> entity);
 };
+
 #endif

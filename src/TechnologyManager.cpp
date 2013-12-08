@@ -1,6 +1,7 @@
+#include <stdexcept>
 #include "TechnologyManager.h"
 
-inline bool TechnologyManager::checkRequirement(Technology& requirement)
+inline bool template <class Race> TechnologyManager::checkRequirement(Technology& requirement)
 {
     if(requirement.exists() && requirement.getMineralsCost() <= (*gameState).getMinerals() && requirement.getGasCost() <= (*gameState).getGas() && requirement.getSupplyCost() <= (*gameState).getSupply()) 
     {
@@ -10,13 +11,19 @@ inline bool TechnologyManager::checkRequirement(Technology& requirement)
 }
 
 
-TechnologyManager::TechnologyManager(std::string race, std::shared_ptr<GameState> initialGameState)
+template <class Race> TechnologyManager::TechnologyManager(std::shared_ptr<GameState> initialGameState)
 {
+    if(initialGameState == nullptr) {
+        throw invalid_argument("Can not pass nullptr as initial GameState");
+    }
+
     gameState = initialGameState;
-    techList.initUnitList(race);
+    if(!InitTechTree().initTechTree(techList)) {
+        throw exception("TechnologyList initialization failed. Something went terribly wrong!");
+    }
 }
 
-template <class T> bool TechnologyManager::request(std::shared_ptr<T> entity) {
+template <class T> bool template <class Race> TechnologyManager<Race>::request(std::shared_ptr<T> entity) {
     Technology& technology = *(techList.findUnit((*entity).getName()));
     std::vector<std::string> requirements = technology.getRequirements();
     for(std::string name : requirements )
@@ -27,14 +34,14 @@ template <class T> bool TechnologyManager::request(std::shared_ptr<T> entity) {
     return true; 
 }
 
-template <class T> void TechnologyManager::notifyCreation(std::shared_ptr<T> entity) 
+template <class T> void template <class Race> TechnologyManager::notifyCreation(std::shared_ptr<T> entity) 
 {
     Technology&& technology = *(techList.findUnit((*entity).getName()));
     technology.setExistence(true);
 }
 
 
-template <class T> void TechnologyManager::notifyDestruction(std::shared_ptr<T> entity) 
+template <class T> void template <class Race> TechnologyManager<Race>::notifyDestruction(std::shared_ptr<T> entity) 
 {
     Technology&& technology = *(techList.findUnit((*entity).getName()));
     technology.setExistence(false);

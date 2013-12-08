@@ -23,7 +23,7 @@ class Simulation
 	private:
 		GameState * gameState; /**< State of the whole game, containing all Entities and parameters */
 		ResourceManager * resourceManager; /**< Object that is responsible for updating the all resources at the end of each timestep */
-		TechnologyManager * technologyManager; /**< Manager ensuring that all technological and "financial" requirements for the desired buildung action are fulfilled. */
+		//TechnologyManager * technologyManager; /**< Manager ensuring that all technological and "financial" requirements for the desired buildung action are fulfilled. */
         void timeStep(); /**< Calling this function proceeds to the next timestep */
 
 	public:
@@ -39,7 +39,7 @@ class Simulation
         {
             delete gameState;
             delete resourceManager;
-            delete technologyManager;
+            //delete technologyManager;
         }
 
 };
