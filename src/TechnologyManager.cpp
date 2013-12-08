@@ -76,13 +76,24 @@ template <class Race> TechnologyManager<Race>::TechnologyManager(std::shared_ptr
 
  template <class Race> template <class EntityType> void TechnologyManager<Race>::notifyCreation(std::shared_ptr<EntityType> entity) 
 {
-    Technology&& technology = *(TechnologyManager<Race>::findTechnology(entity));
-    technology.setExistence(true);
+    std::shared_ptr<Technology> technology = nullptr;
+    technology = TechnologyManager<Race>::findTechnology(entity);
+    if(technology == nullptr) 
+    {
+        throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
+    }
+    technology->setExistence(true);
+
 }
 
 
 template <class Race> template <class EntityType> void TechnologyManager<Race>::notifyDestruction(std::shared_ptr<EntityType> entity) 
 {
-    Technology&& technology = *(TechnologyManager<Race>::findTechnology(entity));
-    technology.setExistence(false);
+    std::shared_ptr<Technology> technology = nullptr;
+    technology = TechnologyManager<Race>::findTechnology(entity);
+    if(technology == nullptr) 
+    {
+        throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
+    }
+    technology->setExistence(false);
 }
