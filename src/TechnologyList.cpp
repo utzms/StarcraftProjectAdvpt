@@ -2,6 +2,7 @@
 
 TechnologyList::TechnologyList()
 {
+	initialized=false;
 }
 
 void TechnologyList::initUnitList(std::string unitList)
@@ -52,9 +53,86 @@ void TechnologyList::initUnitList(std::string unitList)
 		}
 		stream >> unitBuildTime;
 
-		Technology tech();
+		Technology *t = new Technology(unitName,unitCostMinerals,unitCostGas,unitCostSupply,unitBuildTime);
+		std::shared_ptr<Technology> tech(t);
+		initialized=true;
+
 		units.insert( std::pair<std::string, std::shared_ptr<Technology>>(unitName,
-					std::shared_ptr<Technology>(new Technology(unitName,unitCostMinerals,unitCostGas,unitCostSupply,unitBuildTime))));
+					tech));
+
+		//resolve unresolved buildigns if needed
+		auto it = unresolvedBuildingRequirements.equal_range(unitName).first;
+		for(;it!=unresolvedBuildingRequirements.equal_range(unitName).second;++it)
+		{
+			(*it).second->addRequirement(tech);
+		}
+
+		stream >> requirements;
+		size_t from=0;
+		size_t to=0;
+		std::string sub;
+		std::shared_ptr<Technology> tmp;
+		while ((to=requirements.find(",")) != std::string::npos)
+		{
+			sub = requirements.substr(from,to);
+			requirements = requirements.substr(to+1,std::string::npos);
+			bool found=false;
+			while((tmp=findUnit(sub))!=NULL)
+			{
+				found=true;
+				tech->addRequirement(tmp);
+			}
+#ifdef DEBUG
+			std::cerr << "\t must be a building" << std::endl; 
+#endif
+			if (!found)
+			{
+				while((tmp=findBuilding(sub))!=NULL)
+				{
+					found=true;
+					tech->addRequirement(tmp);
+				}
+			}
+			if (!found)
+			{
+#ifdef DEBUG
+				std::cerr << "\t couldnt be resolved, unit list not built yet, will be resolved back then" << std::endl;
+#endif
+				unresolvedUnitRequirements.insert( std::pair<std::string,std::shared_ptr<Technology>>(sub,
+							tech));
+				continue;
+			}
+		}
+		sub = requirements.substr(from,std::string::npos);
+		if (!(sub == "0"))
+		{
+			bool found=false;
+			while((tmp=findUnit(sub))!=NULL)
+			{
+				found=true;
+				tech->addRequirement(tmp);
+			}
+#ifdef DEBUG
+			std::cerr << "\t must be an unit" << std::endl; 
+#endif
+			if (!found)
+			{
+				while((tmp=findBuilding(sub))!=NULL)
+				{
+					found=true;
+					tech->addRequirement(tmp);
+				}
+			}
+			if (!found)
+			{
+#ifdef DEBUG
+				std::cerr << "\t couldnt be resolved, unit list not built yet, will be resolved back then" << std::endl;
+#endif
+				unresolvedUnitRequirements.insert( std::pair<std::string,std::shared_ptr<Technology>>(sub,
+							tech));
+				continue;
+			}
+		}
 	}
 }
 
@@ -113,6 +191,14 @@ void TechnologyList::initBuildingList(std::string buildList)
 		std::shared_ptr<Technology> tech(t);
 		buildings.insert( std::pair<std::string, std::shared_ptr<Technology>>(buildName,
 					tech));
+		initialized=true;
+
+		//resolve unresolved units if needed
+		auto it = unresolvedUnitRequirements.equal_range(buildName).first;
+		for(;it!=unresolvedUnitRequirements.equal_range(buildName).second;++it)
+		{
+			(*it).second->addRequirement(tech);
+		}
 
 
 		//requirements
@@ -130,65 +216,83 @@ void TechnologyList::initBuildingList(std::string buildList)
 		{
 			sub = requirements.substr(from,to);
 			requirements = requirements.substr(to+1,std::string::npos);
-			tmp = findBuilding(sub);
-			if (tmp == NULL)
+			bool found=false;
+			while((tmp=findBuilding(sub))!=NULL)
 			{
+				found=true;
+				tech->addRequirement(tmp);
+			}
 #ifdef DEBUG
-				std::cerr << "\t must be an unit" << std::endl; 
+			std::cerr << "\t must be an unit" << std::endl; 
 #endif
-				tmp = findUnit(sub);
-				if (tmp == NULL)
+			if (!found)
+			{
+				while((tmp=findUnit(sub))!=NULL)
 				{
-#ifdef DEBUG
-					std::cerr << "\t couldnt be resolved, unit list not built yet, will be resolved back then" << std::endl;
-#endif
-					unresolvedBuildingRequirements.insert( std::pair<std::string,std::shared_ptr<Technology>>(sub,
-								tech));
-					continue;
+					found=true;
+					tech->addRequirement(tmp);
 				}
 			}
-			tech->addRequirement(tmp);
+			if (!found)
+			{
+#ifdef DEBUG
+				std::cerr << "\t couldnt be resolved, unit list not built yet, will be resolved back then" << std::endl;
+#endif
+				unresolvedBuildingRequirements.insert( std::pair<std::string,std::shared_ptr<Technology>>(sub,
+							tech));
+				continue;
+			}
 		}
 		sub = requirements.substr(from,std::string::npos);
 		if (!(sub == "0"))
 		{
-			tmp = findBuilding(sub);
-			if (tmp == NULL)
+			bool found=false;
+			while((tmp=findBuilding(sub))!=NULL)
 			{
+				found=true;
+				tech->addRequirement(tmp);
+			}
 #ifdef DEBUG
-				std::cerr << "\t must be an unit" << std::endl; 
+			std::cerr << "\t must be an unit" << std::endl; 
 #endif
-				tmp = findUnit(sub);
-				if (tmp == NULL)
+			if (!found)
+			{
+				while((tmp=findUnit(sub))!=NULL)
 				{
-#ifdef DEBUG
-					std::cerr << "\t couldnt be resolved, unit list not built yet, will be resolved back then" << std::endl;
-#endif
-					unresolvedBuildingRequirements.insert( std::pair<std::string,std::shared_ptr<Technology>>(sub,
-								tech));
-				} else
-				{
+					found=true;
 					tech->addRequirement(tmp);
 				}
-			} else
+			}
+			if (!found)
 			{
-				tech->addRequirement(tmp);
+#ifdef DEBUG
+				std::cerr << "\t couldnt be resolved, unit list not built yet, will be resolved back then" << std::endl;
+#endif
+				unresolvedBuildingRequirements.insert( std::pair<std::string,std::shared_ptr<Technology>>(sub,
+							tech));
+				continue;
 			}
 		}
 	}
 }
 
+bool TechnologyList::isInitialized()
+{
+	return initialized;
+}
 
 std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 {
-	static int currentTech=0;
-	static std::string lastKey="";
+	static std::string lastKey="PlaceHolder";
 	static std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
 
-	auto count = buildings.count(key);
+	int count = buildings.count(key);
 	if (count == 0)
 	{
+		lastKey="PlaceHolder";
+#ifdef DEBUG
 		std::cerr << "Nothing found in building list with key:\t" << key << std::endl;
+#endif
 		return NULL;
 	} else
 	{
@@ -203,6 +307,7 @@ std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 #ifdef DEBUG
 				std::cout << "No other building with key:\t" << key << " found" << std::endl;
 #endif
+				lastKey = "PlaceHolder";
 				return NULL;
 			}
 		} else
@@ -216,16 +321,16 @@ std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 
 std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 {
-	static int currentTech=0;
 	static std::string lastKey="PlaceHolder";
 	static std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
 
 	int count = units.count(key);
-	std::cout << count << std::endl;
 	if (count == 0)
 	{
-		lastKey=key;
+		lastKey="PlaceHolder";
+#ifdef DEBUG
 		std::cerr << "Nothing found in unit list with key:\t" << key << std::endl;
+#endif
 		return NULL;
 	} else
 	{
@@ -240,6 +345,7 @@ std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 #ifdef DEBUG
 				std::cout << "No other unit with key:\t" << key << " found" << std::endl;
 #endif
+				lastKey = "PlaceHolder";
 				return NULL;
 			}
 		} else

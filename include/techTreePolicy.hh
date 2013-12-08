@@ -10,6 +10,10 @@ class ProtossTechTree
 	protected:
 		std::string unitPath1() const
 		{
+			return "../data/Protoss/units.txt";
+		}
+		std::string unitPath2() const
+		{
 			return "./data/Protoss/units.txt";
 		}
 };

@@ -34,8 +34,12 @@ void Technology::setZero()
 void Technology::addRequirement(std::shared_ptr<Technology> in)
 {
 	if (!(in.get()==NULL))
-		if (std::find(requirements.begin(), requirements.end(), in) != requirements.end())
+	{
+		if (std::find(requirements.begin(), requirements.end(), in) == requirements.end())
+		{
 			requirements.push_back(in);
+		}
+	}
 }
 void Technology::setName(std::string name)
 {

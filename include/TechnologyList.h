@@ -15,6 +15,8 @@
 class TechnologyList
 {
 	private:
+		bool initialized;
+
 		std::multimap<std::string, std::shared_ptr<Technology>> unresolvedBuildingRequirements;
 		std::multimap<std::string, std::shared_ptr<Technology>> unresolvedUnitRequirements;
 
@@ -24,6 +26,7 @@ class TechnologyList
 	public:
 		TechnologyList();
 
+		bool isInitialized();
 		void initUnitList(std::string race);
 		void initBuildingList(std::string race);
 

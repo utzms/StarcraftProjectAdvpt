@@ -13,8 +13,8 @@ all: exe
 debug: OPT += -DDEBUG
 debug: exe
 
-exe: $(SRCPATH)main.cpp $(OBJPATH)simulation.o $(OBJPATH)gameState.o $(OBJPATH)worker.o $(OBJPATH)building.o $(OBJPATH)technologyManager.o $(OBJPATH)dataReader.o $(OBJPATH)technology.o $(OBJPATH)technologylist.o
-	$(CC) $(OPT) $(INC) $(LIBS) -o $(BINPATH)runme $(SRCPATH)main.cpp $(OBJPATH)simulation.o $(OBJPATH)gameState.o $(OBJPATH)worker.o $(OBJPATH)building.o $(OBJPATH)technologyManager.o $(OBJPATH)dataReader.o $(OBJPATH)technology.o $(OBJPATH)technologylist.o 
+exe: $(SRCPATH)main.cpp $(OBJPATH)simulation.o $(OBJPATH)gameState.o $(OBJPATH)worker.o $(OBJPATH)building.o $(OBJPATH)technologyManager.o $(OBJPATH)dataReader.o $(OBJPATH)technology.o $(OBJPATH)technologylist.o $(INCPATH)InitTechTree.hpp
+	$(CC) $(OPT) $(INC) $(LIBS) -o $(BINPATH)runme $(SRCPATH)main.cpp $(OBJPATH)simulation.o $(OBJPATH)gameState.o $(OBJPATH)worker.o $(OBJPATH)building.o $(OBJPATH)technologyManager.o $(OBJPATH)dataReader.o $(OBJPATH)technology.o $(OBJPATH)technologylist.o $(INCPATH)InitTechTree.hpp
 
 $(OBJPATH)simulation.o: $(INCPATH)Simulation.h $(SRCPATH)Simulation.cpp $(INCPATH)GameState.h $(INCPATH)ResourceManager.h $(INCPATH)TechnologyManager.h $(INCPATH)Entity.h
 	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)simulation.o $(SRCPATH)Simulation.cpp
@@ -39,7 +39,6 @@ $(OBJPATH)technology.o: $(INCPATH)Technology.h $(SRCPATH)Technology.cpp
 
 $(OBJPATH)technologylist.o: $(INCPATH)TechnologyList.h $(SRCPATH)TechnologyList.cpp $(INCPATH)Technology.h $(INCPATH)DataReader.h $(INCPATH)techTreePolicy.hh
 	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)technologylist.o $(SRCPATH)TechnologyList.cpp
-
 
 
 clean:
