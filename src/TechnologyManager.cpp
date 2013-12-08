@@ -6,7 +6,7 @@ template <class Race> inline bool TechnologyManager<Race>::checkRequirement(std:
 {
     if(tech->getMineralsCost() > gameState->getMinerals() || tech->getGasCost() > gameState->getGas() || tech->getSupplyCost() > gameState->getSupply()) return false;
     
-    std::vector<std::vector<std::shared_ptr<Technology>>> requirements = (*tech).getRequirements();
+    std::vector<std::vector<std::shared_ptr<Technology>>> requirements = tech->getRequirements();
     bool fulfilled;
     for(auto redundantRequirements : requirements) 
     {   
@@ -19,10 +19,7 @@ template <class Race> inline bool TechnologyManager<Race>::checkRequirement(std:
                 break;
             }
         }
-        if(!fulfilled) 
-        {
-            return false;
-        }
+        if(!fulfilled) return false;
     }
     return true;
 }
@@ -62,16 +59,19 @@ template <class Race> TechnologyManager<Race>::TechnologyManager(std::shared_ptr
 
     std::shared_ptr<Technology> tech = nullptr;
     tech = TechnologyManager<Race>::findTechnology(entity); 
-    if(tech == nullptr) {
+    if(tech == nullptr) 
+    {
         throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
     }
+
     do 
     {
         if(TechnologyManager<Race>::checkRequirements(tech)) return true;
         tech = TechnologyManager<Race>::findTechnology(entity);
-    } while(tech != nullptr);
+    } 
+    while(tech != nullptr);
     
-    return false; 
+    return false;
 }
 
  template <class Race> template <class EntityType> void TechnologyManager<Race>::notifyCreation(std::shared_ptr<EntityType> entity) 

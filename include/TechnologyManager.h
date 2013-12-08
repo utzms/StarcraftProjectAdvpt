@@ -1,9 +1,7 @@
 #ifndef _TECHNOLOGYMANAGER_H_
 #define _TECHNOLOGYMANAGER_H_
 #include <memory>
-
 #include "GameState.h"
-#include "Entity.h"
 #include "TechnologyList.h"
 #include "Technology.h"
 #include "InitTechTree.hpp"
