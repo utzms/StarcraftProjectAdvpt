@@ -1,6 +1,6 @@
 #ifndef _ENTITY_H_
 #define _ENTITY_H_
-
+#include <string>
 /** Abstract class all specific types of entities are derived from */
 
 

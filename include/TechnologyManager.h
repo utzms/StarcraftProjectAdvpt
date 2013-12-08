@@ -23,7 +23,11 @@ template <class Race> class TechnologyManager
 	private:
         std::shared_ptr<GameState> gameState;
 	    TechnologyList techList;
-        bool checkRequirement(std::shared_ptr<Technology> requirement);
+
+        inline bool checkRequirement(std::shared_ptr<Technology> requirement);
+        inline std::shared_ptr<Technology> findTechnology(std::shared_ptr<Unit> unit);
+        inline std::shared_ptr<Technology> findTechnology(std::shared_ptr<Building> building);
+        inline std::shared_ptr<Technology> findTechnology(std::shared_ptr<Worker> worker);
 
 	public:
         TechnologyManager(std::shared_ptr<GameState> initialGameState); 

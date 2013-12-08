@@ -19,9 +19,9 @@ int main()
 		std::cout << tec->getSupplyCost() << "\t";
 		std::cout << tec->getBuildTime() << "\t";
 		std::vector<std::vector<std::shared_ptr<Technology>>> req = tec->getRequirements();
-		for(int i = 0; i < req.size(); ++i)
+		for(size_t i = 0; i < req.size(); ++i)
 		{
-			for (int j = 0; j < req[i].size(); ++j)
+			for (size_t j = 0; j < req[i].size(); ++j)
 				std::cout << req[i][j]->getName() <<"/"; 
 			std::cout << ",";
 		}
@@ -35,9 +35,9 @@ int main()
 		std::cout << tec->getSupplyCost() << "\t";
 		std::cout << tec->getBuildTime() << "\t";
 		std::vector<std::vector<std::shared_ptr<Technology>>> req = tec->getRequirements();
-		for(int i = 0; i < req.size(); ++i)
+		for(size_t i = 0; i < req.size(); ++i)
 		{
-			for (int j = 0; j < req[i].size(); ++j)
+			for (size_t j = 0; j < req[i].size(); ++j)
 				std::cout << req[i][j]->getName() <<"/";
 			std::cout << ",";
 		}

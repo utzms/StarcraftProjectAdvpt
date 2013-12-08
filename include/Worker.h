@@ -1,7 +1,8 @@
 #ifndef _WORKER_H_
 #define _WORKER_H_
+#include "Entity.h"
 
-class Worker
+class Worker : public Entity
 {
 	private:
 		int timer;

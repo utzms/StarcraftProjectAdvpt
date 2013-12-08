@@ -1,9 +1,9 @@
 #ifndef _BUILDING_H_
 #define _BUILDING_H_
-
+#include "Entity.h"
 #include <queue>
 
-class Building
+class Building : public Entity
 {
 	private:	
         template <class EntityType>
