@@ -2,9 +2,29 @@
 #include <stdexcept>
 #include "TechnologyManager.h"
 
-template <class Race> inline bool TechnologyManager<Race>::checkRequirement(std::shared_ptr<Technology> requirement)
+template <class Race> inline bool TechnologyManager<Race>::checkRequirement(std::shared_ptr<Technology> tech)
 {
-    return false;
+    if((*tech).getMineralsCost() > (*gameState).getMinerals() || (*tech).getGasCost() > (*gameState).getGas() || (*tech).getSupplyCost() > (*gameState).getSupply()) return false;
+    
+    std::vector<std::vector<std::shared_ptr<Technology>>> requirements = (*tech).getRequirements();
+    bool fulfilled;
+    for(auto redundantRequirements : requirements) 
+    {   
+        fulfilled = false;
+        for(std::shared_ptr<Technology> requirement : redundantRequirements)
+        {
+            if((*requirement).exists())
+            {
+                fulfilled = true;
+                break;
+            }
+        }
+        if(!fulfilled) 
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 
@@ -23,22 +43,20 @@ template <class Race> TechnologyManager<Race>::TechnologyManager(std::shared_ptr
 }
 
  template <class Race> template <class EntityType> bool TechnologyManager<Race>::request(std::shared_ptr<EntityType> entity) 
-{
-    using std::vector;
-    using std::shared_ptr;
-    shared_ptr<Technology> tech = nullptr;
+{   
+    // if entity is Unit
+    std::string unitName = "foo";
+    std::shared_ptr<Technology> tech = nullptr;
     if(tech == nullptr) {
         throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
     }
-
-    vector<vector<shared_ptr<Technology>>> requirements = tech.getRequirements();
-
-    for(vector<shared_ptr<Technology>> req : requirements )
+    do 
     {
-        if(!checkRequirement(req)) return false;
-    }
-
-    return true; 
+        if(TechnologyManager<Race>::checkRequirements(tech)) return true;
+        tech = techList.findUnit(unitName);
+    } while(tech != nullptr);
+    
+    return false; 
 }
 
  template <class Race> template <class EntityType> void TechnologyManager<Race>::notifyCreation(std::shared_ptr<EntityType> entity) 
