@@ -1,47 +1,54 @@
+#include <exception>
 #include <stdexcept>
 #include "TechnologyManager.h"
 
-inline bool template <class Race> TechnologyManager::checkRequirement(Technology& requirement)
+template <class Race> inline bool TechnologyManager<Race>::checkRequirement(std::shared_ptr<Technology> requirement)
 {
-    if(requirement.exists() && requirement.getMineralsCost() <= (*gameState).getMinerals() && requirement.getGasCost() <= (*gameState).getGas() && requirement.getSupplyCost() <= (*gameState).getSupply()) 
-    {
-        return true;
-    }
     return false;
 }
 
 
-template <class Race> TechnologyManager::TechnologyManager(std::shared_ptr<GameState> initialGameState)
+template <class Race> TechnologyManager<Race>::TechnologyManager(std::shared_ptr<GameState> initialGameState)
 {
-    if(initialGameState == nullptr) {
-        throw invalid_argument("Can not pass nullptr as initial GameState");
+    if(initialGameState == nullptr) 
+    {
+        throw std::invalid_argument("Can not pass nullptr as initial GameState");
     }
 
     gameState = initialGameState;
-    if(!InitTechTree().initTechTree(techList)) {
-        throw exception("TechnologyList initialization failed. Something went terribly wrong!");
+    if(!InitTechTree<Race>().initTechTree(techList)) 
+    {
+        throw std::exception("TechnologyList initialization failed. Something went terribly wrong!");
     }
 }
 
-template <class T> bool template <class Race> TechnologyManager<Race>::request(std::shared_ptr<T> entity) {
-    Technology& technology = *(techList.findUnit((*entity).getName()));
-    std::vector<std::string> requirements = technology.getRequirements();
-    for(std::string name : requirements )
+ template <class Race> template <class EntityType> bool TechnologyManager<Race>::request(std::shared_ptr<EntityType> entity) 
+{
+    using std::vector;
+    using std::shared_ptr;
+    shared_ptr<Technology> tech = nullptr;
+    if(tech == nullptr) {
+        throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
+    }
+
+    vector<vector<shared_ptr<Technology>>> requirements = tech.getRequirements();
+
+    for(vector<shared_ptr<Technology>> req : requirements )
     {
-        if(!checkRequirement(*techList.findUnit(name))) return false;
+        if(!checkRequirement(req)) return false;
     }
 
     return true; 
 }
 
-template <class T> void template <class Race> TechnologyManager::notifyCreation(std::shared_ptr<T> entity) 
+ template <class Race> template <class EntityType> void TechnologyManager<Race>::notifyCreation(std::shared_ptr<EntityType> entity) 
 {
     Technology&& technology = *(techList.findUnit((*entity).getName()));
     technology.setExistence(true);
 }
 
 
-template <class T> void template <class Race> TechnologyManager<Race>::notifyDestruction(std::shared_ptr<T> entity) 
+template <class Race> template <class EntityType> void TechnologyManager<Race>::notifyDestruction(std::shared_ptr<EntityType> entity) 
 {
     Technology&& technology = *(techList.findUnit((*entity).getName()));
     technology.setExistence(false);
