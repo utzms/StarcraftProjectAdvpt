@@ -7,10 +7,8 @@ int main()
 	//Simulation simulation;
 	TechnologyList tech;
 	InitTechTree<ProtossTechTree> initTech(&tech);
-	initTech.initUnitList();
+	initTech.initTechTree();
 
-	//tech.initUnitList("./data/Protoss/units.txt");
-	//tech.initBuildingList("./data/Protoss/buildings.txt");
 	Technology *tec = tech.findUnit("Probe").get();
 	tec = tech.findUnit("Probe").get();
 	while (((tec = tech.findUnit("Archon").get()) != NULL))
