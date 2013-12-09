@@ -55,7 +55,7 @@ void RecourceManager::timestep()
 	updateGameState(vespinGasToAdd, mineralsToAdd);
 }
 
-void RecourceManager::updateGameState(double vespinGasTooAdd, double mineralsToAdd)
+void RecourceManager::updateGameState(double vespinGasToAdd, double mineralsToAdd)
 {
 	gamestate.vespinGas += vespinGasToAdd;
 	gamestate.minerals 	+= mineralsGasToAdd;
