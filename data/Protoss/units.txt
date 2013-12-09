@@ -11,9 +11,9 @@ Phoenix			150		100			2			35				Stargate					0					0
 VoidRay			250		150			3			60				Stargate					0					0
 HighTemplar		50		150			2			55				Gateway,Warpgate			TemplarArchives		0
 DarkTemplar		125		125			2			55				Gateway,Warpgate			DarkShrine			0
-Archon			100		300			4			12				HighTemplar					0					HighTemplar,HighTemplar
-Archon			175		275			4			12				DarkTemplar					0					DarkTemplar,DarkTemplar
-Archon			250		250			4			12				HighTemplar,DarkTemplar	0					DarkTemplar,HighTemplar
+Archon			100		300			4			12				0							0					HighTemplar,HighTemplar
+Archon			175		275			4			12				0							0					DarkTemplar,DarkTemplar
+Archon			250		250			4			12				0							0					DarkTemplar,HighTemplar
 Carrier			350		250			6			120				Stargate					FleetBeacon			0
 Mothership		400		400			8			160				Nexus						FleetBeacon			0
 
