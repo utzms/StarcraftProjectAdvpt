@@ -15,10 +15,13 @@
 class ResourceManager
 {
 	private:
-		GameState * gameState;
-		void update();
+		std::shared_ptr<GameState> gameState;
+		double vespinGasIncrementPerWorker; 
+		double mineralsIncrementPerWorker;
+		void updateGamestate();
 	public:
         /** Function that updates the GameStates resource count before preceding to the next timestep*/
+		ResourceManager(double initialVespinGasIncrement, double initialMineralsIncrement);
 		void timeStep();
 
 };
