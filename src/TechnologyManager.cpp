@@ -23,7 +23,7 @@ template <class Race> inline bool TechnologyManager<Race>::checkRequirement(std:
     }
     return true;
 }
-
+// string as argument preferrable
 template <class Race> inline std::shared_ptr<Technology> TechnologyManager<Race>::findTechnology(std::shared_ptr<Unit> unit) 
 {
     return techList.findUnit(unit->getName());
@@ -64,13 +64,7 @@ template <class Race> TechnologyManager<Race>::TechnologyManager(std::shared_ptr
         throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
     }
 
-    do 
-    {
-        if(TechnologyManager<Race>::checkRequirements(tech)) return true;
-        tech = TechnologyManager<Race>::findTechnology(entity);
-    } 
-    while(tech != nullptr);
-    
+        
     return false;
 }
 
