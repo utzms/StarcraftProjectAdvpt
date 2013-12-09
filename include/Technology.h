@@ -3,6 +3,7 @@
 
 
 #include <vector>
+#include <utility>
 #include <iostream>
 #include <algorithm>
 #include <memory>
@@ -14,6 +15,11 @@
  * TODO: Still incomplete, just demo-class - Suggestions are welcome
  *
  * */
+
+typedef enum RequirementFlag
+{
+	Existent, Vanish, Creation
+} RequirementFlag;
 
 struct Costs
 {
@@ -30,7 +36,7 @@ class Technology
         Costs TechCosts;
 
 		//std::vector<std::shared_ptr<Technology>> requirements;
-		std::vector<std::vector<std::shared_ptr<Technology>>> requirements;
+		std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementFlag>>> requirements;
 		
         bool existence;
 
@@ -40,8 +46,8 @@ class Technology
 		Technology(std::string name, float min, float gas, float supply, int buildTime);
 
         void setZero();
-		void addRequirement(std::shared_ptr<Technology>);
-		void addRequirement(std::vector<std::shared_ptr<Technology>>);
+		void addRequirement(std::pair<std::shared_ptr<Technology>,RequirementFlag>);
+		void addRequirement(std::vector<std::pair<std::shared_ptr<Technology>,RequirementFlag>>);
 		void setName(std::string name);
 		void setMineral(float minerals);
 		void setGas(float gas);
@@ -51,7 +57,7 @@ class Technology
 
 		std::string getName(void);
 		//std::vector<std::shared_ptr<Technology>> getRequirements(void);
-		std::vector<std::vector<std::shared_ptr<Technology>>> getRequirements(void);
+		std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementFlag>>> getRequirements(void);
 		float getMineralsCost(void);
 		float getGasCost(void);
 		//getSupplyCost returns providing supply in case of buildings

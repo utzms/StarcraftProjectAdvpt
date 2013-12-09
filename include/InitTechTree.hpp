@@ -1,7 +1,7 @@
 #ifndef _INITTECHTREE_HPP_
 #define _INITTECHTREE_HPP_
 
-#include "techTreePolicy.hh"
+#include "techTreePolicy.h"
 #include "TechnologyList.h"
 
 /*

@@ -14,9 +14,6 @@ void TechnologyList::initRest()
 	std::string vanish;
 	std::string buildFrom;
 
-	std::vector<std::vector<std::string>> buildFromVec;
-	std::vector<std::vector<std::string>> vanishVec;
-
 	std::string sub, subsub;
 	size_t from,fromfrom,to,toto;
 
@@ -25,6 +22,7 @@ void TechnologyList::initRest()
 	{
 		std::vector<std::string> fixedRequirements;
 		std::vector<std::vector<std::string>> orRequirements;
+
 		std::shared_ptr<Technology> tech = unitIt->first;
 		requirements = unitIt->second.req;
 		vanish = unitIt->second.vanish;
@@ -64,6 +62,8 @@ void TechnologyList::initRest()
 			for (size_t i = 0; i < fixedRequirements.size(); ++i)
 			{
 				std::shared_ptr<Technology> source;
+				std::pair<std::shared_ptr<Technology>,RequirementFlag> commit;
+				commit.second=Existent;
 				if ((source=findUnit(fixedRequirements[i]))==NULL)
 				{
 					//its a building
@@ -72,43 +72,144 @@ void TechnologyList::initRest()
 						std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
 					} else
 					{
-						tech->addRequirement(source);
+						commit.first = source;
+						tech->addRequirement(commit);
 					}
 				} else
 				{
-					tech->addRequirement(source);
+					commit.first = source;
+					tech->addRequirement(commit);
 				}
 			}
-			//kill last search
-			findUnit("KillMe");
-			findBuilding("KillMe");
-		}
-		for (size_t i = 0; i < orRequirements.size(); ++i)
-		{
-			std::vector<std::shared_ptr<Technology>> sources;
-			for (size_t j = 0; j < orRequirements[i].size(); ++j)
+			for (size_t i = 0; i < orRequirements.size(); ++i)
 			{
-				std::shared_ptr<Technology> source;
-				if ((source=findUnit(orRequirements[i][j]))==NULL)
+				std::vector<std::pair<std::shared_ptr<Technology>,RequirementFlag>> sources;
+				for (size_t j = 0; j < orRequirements[i].size(); ++j)
 				{
-					//its a building
-					if ((source=findBuilding(orRequirements[i][j]))==NULL)
+					std::shared_ptr<Technology> source;
+					std::pair<std::shared_ptr<Technology>,RequirementFlag> commit;
+					commit.second=Existent;
+					if ((source=findUnit(orRequirements[i][j]))==NULL)
 					{
-						std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
+						//its a building
+						if ((source=findBuilding(orRequirements[i][j]))==NULL)
+						{
+							std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
+						} else
+						{
+							commit.first = source;
+							sources.push_back(commit);
+						}
 					} else
 					{
-						sources.push_back(source);
+						commit.first = source;
+						sources.push_back(commit);
 					}
-				} else
-				{
-						sources.push_back(source);
 				}
-				findUnit("KillMe");
-				findBuilding("KillMe");
+				tech->addRequirement(sources);
 			}
-			tech->addRequirement(sources);
+			orRequirements.clear();
+			fixedRequirements.clear();
 		}
-	}
+		/*
+		 * Build From Check:
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+		 * Care, using fixed- and orRequirements, dont mix it, because of the name
+		 */
+		{
+			from=0;
+			to=0;
+			std::string sub;
+			std::vector<std::string> orReq;
+			do
+			{
+				to=buildFrom.find(",");
+				sub=buildFrom.substr(from,to);
+				if (sub != "0")
+					orReq.push_back(sub);
+				buildFrom=buildFrom.substr(to+1,std::string::npos);
+			} while (to!=std::string::npos);
+			orRequirements.push_back(orReq);
+			for (size_t i = 0; i < orRequirements.size(); ++i)
+			{
+				std::vector<std::pair<std::shared_ptr<Technology>,RequirementFlag>> sources;
+				for (size_t j = 0; j < orRequirements[i].size(); ++j)
+				{
+					std::shared_ptr<Technology> source;
+					std::pair<std::shared_ptr<Technology>,RequirementFlag> commit;
+					commit.second=Creation;
+					if ((source=findUnit(orRequirements[i][j]))==NULL)
+					{
+						//its a building
+						if ((source=findBuilding(orRequirements[i][j]))==NULL)
+						{
+							std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
+						} else
+						{
+							commit.first = source;
+							sources.push_back(commit);
+						}
+					} else
+					{
+						commit.first = source;
+						sources.push_back(commit);
+					}
+				}
+				tech->addRequirement(sources);
+			}
+			orRequirements.clear();
+			fixedRequirements.clear();
+		} //end buildFrom check
+		/*
+		 * Vanish Check:
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+		 * Care, using fixed- and orRequirements, dont mix it, because of the name
+		 */
+		{
+			from=0;
+			to=0;
+			std::string sub;
+			std::vector<std::string> orReq;
+			do
+			{
+				to=vanish.find(",");
+				sub=vanish.substr(from,to);
+				if (sub != "0")
+					orReq.push_back(sub);
+				vanish=vanish.substr(to+1,std::string::npos);
+			} while (to!=std::string::npos);
+			orRequirements.push_back(orReq);
+			for (size_t i = 0; i < orRequirements.size(); ++i)
+			{
+				std::vector<std::pair<std::shared_ptr<Technology>,RequirementFlag>> sources;
+				for (size_t j = 0; j < orRequirements[i].size(); ++j)
+				{
+					std::shared_ptr<Technology> source;
+					std::pair<std::shared_ptr<Technology>,RequirementFlag> commit;
+					commit.second=Vanish;
+					if ((source=findUnit(orRequirements[i][j]))==NULL)
+					{
+						//its a building
+						if ((source=findBuilding(orRequirements[i][j]))==NULL)
+						{
+							std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
+						} else
+						{
+							commit.first = source;
+							sources.push_back(commit);
+						}
+					} else
+					{
+						commit.first = source;
+						sources.push_back(commit);
+					}
+				}
+				tech->addRequirement(sources);
+			}
+			orRequirements.clear();
+			fixedRequirements.clear();
+		} //end buildFrom check
+	} //end unit it for loop
 
 
 	//here starts the building list
@@ -157,6 +258,8 @@ void TechnologyList::initRest()
 			for (size_t i = 0; i < fixedRequirements.size(); ++i)
 			{
 				std::shared_ptr<Technology> source;
+				std::pair<std::shared_ptr<Technology>,RequirementFlag> commit;
+				commit.second=Existent;
 				if ((source=findUnit(fixedRequirements[i]))==NULL)
 				{
 					//its a building
@@ -165,23 +268,24 @@ void TechnologyList::initRest()
 						std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
 					} else
 					{
-						tech->addRequirement(source);
+						commit.first = source;
+						tech->addRequirement(commit);
 					}
 				} else
 				{
-					tech->addRequirement(source);
+					commit.first = source;
+					tech->addRequirement(commit);
 				}
 			}
-			//kill last search
-			findUnit("KillMe");
-			findBuilding("KillMe");
 		}
 		for (size_t i = 0; i < orRequirements.size(); ++i)
 		{
-			std::vector<std::shared_ptr<Technology>> sources;
+			std::vector<std::pair<std::shared_ptr<Technology>,RequirementFlag>> sources;
 			for (size_t j = 0; j < orRequirements[i].size(); ++j)
 			{
 				std::shared_ptr<Technology> source;
+				std::pair<std::shared_ptr<Technology>,RequirementFlag> commit;
+				commit.second=Existent;
 				if ((source=findUnit(orRequirements[i][j]))==NULL)
 				{
 					//its a building
@@ -190,17 +294,69 @@ void TechnologyList::initRest()
 						std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
 					} else
 					{
-						sources.push_back(source);
+						commit.first = source;
+						sources.push_back(commit);
 					}
 				} else
 				{
-					sources.push_back(source);
+					commit.first = source;
+					sources.push_back(commit);
 				}
-				findUnit("KillMe");
-				findBuilding("KillMe");
 			}
 			tech->addRequirement(sources);
 		}
+			orRequirements.clear();
+			fixedRequirements.clear();
+		/*
+		 * Vanish Check:
+		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+		 * Care, using fixed- and orRequirements, dont mix it, because of the name
+		 */
+		{
+			from=0;
+			to=0;
+			std::string sub;
+			std::vector<std::string> orReq;
+			do
+			{
+				to=vanish.find(",");
+				sub=vanish.substr(from,to);
+				//checken ob eine "eine von vielen" requirement ist
+				if (sub != "0")
+					orReq.push_back(sub);
+				vanish=vanish.substr(to+1,std::string::npos);
+			} while (to!=std::string::npos);
+			orRequirements.push_back(orReq);
+			for (size_t i = 0; i < orRequirements.size(); ++i)
+			{
+				std::vector<std::pair<std::shared_ptr<Technology>,RequirementFlag>> sources;
+				for (size_t j = 0; j < orRequirements[i].size(); ++j)
+				{
+					std::shared_ptr<Technology> source;
+					std::pair<std::shared_ptr<Technology>,RequirementFlag> commit;
+					commit.second=Vanish;
+					if ((source=findUnit(orRequirements[i][j]))==NULL)
+					{
+						//its a building
+						if ((source=findBuilding(orRequirements[i][j]))==NULL)
+						{
+							std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
+						} else
+						{
+							commit.first = source;
+							sources.push_back(commit);
+						}
+					} else
+					{
+						commit.first = source;
+						sources.push_back(commit);
+					}
+				}
+				tech->addRequirement(sources);
+			}
+			orRequirements.clear();
+			fixedRequirements.clear();
+		} //end vanish check
 	}
 }
 
@@ -365,7 +521,7 @@ void TechnologyList::initBuildingList(std::string buildList)
 			continue;
 		}
 		stream >> vanish;
-		
+
 		struct requirementRest rest;
 		rest.req=requirements;
 		rest.vanish=vanish;
@@ -383,6 +539,28 @@ bool TechnologyList::isInitialized()
 {
 	return initialized;
 }
+
+std::vector<std::shared_ptr<Technology>> TechnologyList::findUnitVec(std::string key)
+{
+	std::vector<std::shared_ptr<Technology>> ret;
+	auto it = units.equal_range(key).first;
+	for (;it != units.equal_range(key).second;++it)
+	{
+		ret.push_back((*it).second);
+	}
+	return ret;
+}
+std::vector<std::shared_ptr<Technology>> TechnologyList::findBuildingVec(std::string key)
+{
+	std::vector<std::shared_ptr<Technology>> ret;
+	auto it = buildings.equal_range(key).first;
+	for (;it != buildings.equal_range(key).second;++it)
+	{   
+		ret.push_back((*it).second);
+	}
+	return ret;
+}
+
 
 std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 {
@@ -411,7 +589,7 @@ std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 				std::cout << "No other building with key:\t" << key << " found" << std::endl;
 #endif
 				lastKey = "PlaceHolder";
-				return NULL;
+				return findBuilding(key);
 			}
 		} else
 		{
@@ -449,7 +627,7 @@ std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 				std::cout << "No other unit with key:\t" << key << " found\t" << count << std::endl;
 #endif
 				lastKey = "PlaceHolder";
-				return NULL;
+				return findUnit(key);
 			}
 		} else
 		{

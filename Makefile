@@ -1,4 +1,6 @@
 
+.PHONY: pathmaker clean
+
 CC=g++
 OPT=-std=c++11 -Wall -pedantic
 LIBS=
@@ -13,7 +15,10 @@ all: exe
 debug: OPT += -DDEBUG
 debug: exe
 
-exe: $(SRCPATH)main.cpp $(OBJPATH)simulation.o $(OBJPATH)gameState.o $(OBJPATH)worker.o $(OBJPATH)building.o $(OBJPATH)technologyManager.o $(OBJPATH)dataReader.o $(OBJPATH)technology.o $(OBJPATH)technologylist.o $(INCPATH)InitTechTree.hpp
+pathmaker:
+	mkdir -p obj/ bin/
+
+exe: pathmaker $(SRCPATH)main.cpp $(OBJPATH)simulation.o $(OBJPATH)gameState.o $(OBJPATH)worker.o $(OBJPATH)building.o $(OBJPATH)technologyManager.o $(OBJPATH)dataReader.o $(OBJPATH)technology.o $(OBJPATH)technologylist.o $(INCPATH)InitTechTree.hpp
 	$(CC) $(OPT) $(INC) $(LIBS) -o $(BINPATH)runme $(SRCPATH)main.cpp $(OBJPATH)simulation.o $(OBJPATH)gameState.o $(OBJPATH)worker.o $(OBJPATH)building.o $(OBJPATH)technologyManager.o $(OBJPATH)dataReader.o $(OBJPATH)technology.o $(OBJPATH)technologylist.o $(INCPATH)InitTechTree.hpp
 
 $(OBJPATH)simulation.o: $(INCPATH)Simulation.h $(SRCPATH)Simulation.cpp $(INCPATH)GameState.h $(INCPATH)ResourceManager.h $(INCPATH)TechnologyManager.h $(INCPATH)Entity.h
@@ -37,9 +42,9 @@ $(OBJPATH)dataReader.o: $(INCPATH)DataReader.h $(SRCPATH)DataReader.cpp
 $(OBJPATH)technology.o: $(INCPATH)Technology.h $(SRCPATH)Technology.cpp
 	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)technology.o $(SRCPATH)Technology.cpp
 
-$(OBJPATH)technologylist.o: $(INCPATH)TechnologyList.h $(SRCPATH)TechnologyList.cpp $(INCPATH)Technology.h $(INCPATH)DataReader.h $(INCPATH)techTreePolicy.hh
+$(OBJPATH)technologylist.o: $(INCPATH)TechnologyList.h $(SRCPATH)TechnologyList.cpp $(INCPATH)Technology.h $(INCPATH)DataReader.h $(INCPATH)techTreePolicy.h
 	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)technologylist.o $(SRCPATH)TechnologyList.cpp
 
 
 clean:
-	rm -f $(OBJPATH)* $(BINPATH)*
+	rm -rf $(OBJPATH) $(BINPATH)

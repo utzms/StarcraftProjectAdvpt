@@ -37,6 +37,9 @@ class TechnologyList
 		void initUnitList(std::string race);
 		void initBuildingList(std::string race);
 
+		std::vector<std::shared_ptr<Technology>> findUnitVec(std::string key);
+		std::vector<std::shared_ptr<Technology>> findBuildingVec(std::string key);
+
 		std::shared_ptr<Technology> findUnit(std::string key);
 		std::shared_ptr<Technology> findBuilding(std::string key);
 };

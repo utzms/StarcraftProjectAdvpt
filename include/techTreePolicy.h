@@ -1,6 +1,6 @@
 
-#ifndef _TECHTREEPOLICY_HH_
-#define _TECHTREEPOLICY_HH_
+#ifndef _TECHTREEPOLICY_H_
+#define _TECHTREEPOLICY_H_
 
 #include <iostream>
 #include <string>

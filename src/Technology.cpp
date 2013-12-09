@@ -31,29 +31,16 @@ void Technology::setZero()
 	TechCosts.buildTime=0;
 }
 
-void Technology::addRequirement(std::shared_ptr<Technology> in)
+void Technology::addRequirement(std::pair<std::shared_ptr<Technology>,RequirementFlag> in)
 {
-	if (!(in.get()==NULL))
+	std::vector<std::pair<std::shared_ptr <Technology>,RequirementFlag>> tmp;
+	tmp.push_back(in);
+	if (std::find(requirements.begin(), requirements.end(), tmp) == requirements.end())
 	{
-		std::vector<std::shared_ptr <Technology>> tmp;
-		tmp.push_back(in);
-		if (std::find(requirements.begin(), requirements.end(), tmp) == requirements.end())
-		{
-			requirements.push_back(tmp);
-		}
+		requirements.push_back(tmp);
 	}
-	/*
-	   alte Fassung mit einfachem Vektor
-	if (!(in.get()==NULL))
-	{
-		if (std::find(requirements.begin(), requirements.end(), in) == requirements.end())
-		{
-			requirements.push_back(in);
-		}
-	}
-	*/
 }
-void Technology::addRequirement(std::vector<std::shared_ptr<Technology>> in)
+void Technology::addRequirement(std::vector<std::pair<std::shared_ptr<Technology>,RequirementFlag>> in)
 {
 	if (!(in.size())==0)
 	{
@@ -99,7 +86,7 @@ std::vector<std::shared_ptr<Technology>> Technology::getRequirements(void)
 	return requirements;
 }
 */
-std::vector<std::vector<std::shared_ptr<Technology>>> Technology::getRequirements(void)
+std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementFlag>>> Technology::getRequirements(void)
 {
 	return requirements;
 }
