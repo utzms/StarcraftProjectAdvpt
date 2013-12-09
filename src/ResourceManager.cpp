@@ -11,11 +11,10 @@ RecourceManager::RecourceManager( std::shared_ptr<GameState> initialGameState, d
 	gameState 					= initialGameState;
 	if(gameState == NULL)
 	{
-		//TODO do exception handling instead of std::err print(std::invalid_arg)
-		std::err << "RecourceManager::ResourceManager: initialGameState is a NULL-pointer" << std::endl;
+	 	throw std::invalid_argument("RecourceManager::ResourceManager: initialGameState is a NULL-pointer");
 		return;
 	}
-	vespinGasIncrementPerWorker = initialVespinGasIncrement;
+	vespinGasIncrementPerWorer = initialVespinGasIncrement;
 	mineralsIncrementPerWorker 	= initialMineralsIncrement;
 }
 
@@ -26,8 +25,7 @@ void RecourceManager::timestep()
 	std::shared_ptr<std::vector<std::shared_ptr<Worker>>> workerListPtr = gamestate.workerList;
 	if(workerListPtr == NULL)
 	{
-		//TODO do exception handling instead of std::err print(std::invalid_arg)
-		std::err << "RecourceManager::timeStep: worker list is not initialized" << std::endl;  
+		throw std::invalid_argument("RecourceManager::timeStep: worker list is not initialized"):
 		return;
 	}
 
