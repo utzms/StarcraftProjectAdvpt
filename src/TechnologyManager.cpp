@@ -31,7 +31,7 @@ template <class Race> inline std::shared_ptr<Technology> TechnologyManager<Race>
 
 template <class Race> inline std::shared_ptr<Technology> TechnologyManager<Race>::findTechnology(std::shared_ptr<Building> building) 
 {
-    return techList.findUnit(building->getName());
+    return techList.findBuilding(building->getName());
 }
 
 template <class Race> inline std::shared_ptr<Technology> TechnologyManager<Race>::findTechnology(std::shared_ptr<Worker> worker) 
@@ -48,7 +48,7 @@ template <class Race> TechnologyManager<Race>::TechnologyManager(std::shared_ptr
     }
 
     gameState = initialGameState;
-    if(!InitTechTree<Race>().initTechTree(techList)) 
+    if(!InitTechTree<Race>(&techList).initTechTree()) 
     {
         throw std::exception("TechnologyList initialization failed. Something went terribly wrong!");
     }

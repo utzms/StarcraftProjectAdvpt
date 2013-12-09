@@ -4,7 +4,6 @@
 #include <iostream>
 #include <map>
 #include <string>
-#include <boost/tokenizer.hpp>
 #include <sstream>
 #include <memory>
 
