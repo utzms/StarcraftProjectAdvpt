@@ -10,7 +10,7 @@ class ProtossTechTree
     public:
         static std::string unitPath1()
 		{
-			return "../data/Protoss/units.txt";
+            return "../data/Protoss/units.txt";
 		}
 
         static std::string unitPath2()

@@ -17,7 +17,7 @@ int main()
     std::shared_ptr<ResourceManager> resourceManager(new ResourceManager(gameState, 0.6f, 0.6f));
     std::shared_ptr<TechnologyManager<ProtossTechTree> > techManager(new TechnologyManager<ProtossTechTree>(gameState, technologyList));
 
-    Simulation<ProtossTechTree> simulation("../../trunk/protoss1.txt", gameState, resourceManager, techManager);
+    Simulation<ProtossTechTree> simulation("protoss1.txt", gameState, resourceManager, techManager);
 
     simulation.run();
 
