@@ -7,7 +7,7 @@
 
 class ProtossTechTree
 {
-	protected:
+    public:
         static std::string unitPath1()
 		{
 			return "../data/Protoss/units.txt";
@@ -31,7 +31,7 @@ class ProtossTechTree
 
 class ZergTechTree
 {
-	protected:
+    public:
         static std::string unitPath1()
 		{
 			return "../data/Zerg/units.txt";
@@ -55,7 +55,7 @@ class ZergTechTree
 
 class TerranTechTree
 {
-	protected:
+    public:
         static std::string unitPath1()
 		{
 			return "../data/Terran/units.txt";
