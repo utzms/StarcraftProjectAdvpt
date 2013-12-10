@@ -40,7 +40,7 @@ template <class Race> class TechnologyManager
         inline std::vector< std::shared_ptr<Technology> > findTechnology(std::shared_ptr<Worker> worker);
 
 	public:
-        TechnologyManager(std::shared_ptr<GameState> initialGameState, std::shared_ptr<TechnologyList> techListPtr); 
+        TechnologyManager(std::shared_ptr<GameState> initialGameState, std::shared_ptr<TechnologyList> techList);
         /** Function for demanding a requirements check.
          * @param The Entity that shall be created
          * @return true, if all requirements are fulfilled

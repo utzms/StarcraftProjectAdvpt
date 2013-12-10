@@ -55,15 +55,15 @@ template <class Race> inline std::vector<std::shared_ptr<Technology> > Technolog
     return techList->findUnitVec(worker->getName());
 }
    
-template <class Race> TechnologyManager<Race>::TechnologyManager(std::shared_ptr<GameState> initialGameState, std::shared_ptr<TechnologyList> techListPtr)
+template <class Race> TechnologyManager<Race>::TechnologyManager(std::shared_ptr<GameState> initialGameState, std::shared_ptr<TechnologyList> techList)
 {
-    if(initialGameState == nullptr || techListPtr == nullptr) 
+    if(initialGameState == nullptr || techList == nullptr)
     {
         throw std::invalid_argument("Can not pass nullptr as initial argument");
     }
 
     gameState = initialGameState;
-    techList = techListPtr;
+    techList = techList;
     if(!InitTechTree<Race>(techList).initTechTree()) 
     {
         throw std::exception("TechnologyList initialization failed. Something went terribly wrong!");

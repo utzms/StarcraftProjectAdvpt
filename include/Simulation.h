@@ -24,8 +24,8 @@
 class Simulation
 {
 	private:
-        GameState*         gameState; /**< State of the whole game, containing all Entities and parameters */
-        ResourceManager*   resourceManager; /**< Object that is responsible for updating the all resources at the end of each timestep */
+        std::shared_ptr<GameState>       _gameState; /**< State of the whole game, containing all Entities and parameters */
+        std::shared_ptr<ResourceManager> _resourceManager; /**< Object that is responsible for updating the all resources at the end of each timestep */
 
         void timeStep(); /**< Calling this function proceeds to the next timestep */
 
@@ -38,12 +38,14 @@ class Simulation
          * Next the Simulation is started by entering the first timestep and proceded 
          * by executing all necessary actions in an arbitrary amount of timesteps until the GameState fits to the specifed goal.
          */
-		void startSimulation(); 
-	Simulation(std::string buildListFilename);
+        void startSimulation();
+        void run();
+
+        Simulation(std::string buildListFilename, std::shared_ptr<GameState> gameState, std::shared_ptr<ResourceManager> resourceManager);
         ~Simulation()
         {
-            delete gameState;
-            delete resourceManager;
+            //delete gameState;
+            //delete resourceManager;
         }
 
 };
