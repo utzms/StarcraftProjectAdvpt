@@ -24,6 +24,12 @@ class GameState
         std::vector< std::shared_ptr<Building> >    buildingList;
         std::vector< std::shared_ptr<Unit> >        unitList;
 
+        GameState()
+        {
+            workerList.push_back(std::shared_ptr<Worker>(new Worker()));
+            workerList[0]->state = Worker::State::CollectingMinerals;
+        }
+
         float getMinerals()
         {
             return minerals;
