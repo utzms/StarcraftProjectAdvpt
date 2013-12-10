@@ -1,6 +1,8 @@
 #ifndef _BUILDLIST_H_
 #define _BUILDLIST_H_
 
+#include <exception>
+#include <stdexcept>
 #include <fstream>
 #include <vector>
 
@@ -28,13 +30,18 @@ private:
             file >> currentLine;
             _nameList.push_back(currentLine);
         }
-
+	_currentItem = _nameList.begin();
         file.close();
     }
 
     std::vector<std::string>::iterator _currentItem;
 
 public:
+    enum class State
+    {
+        InProgress,
+        Finished
+    };
     BuildList(std::string filename)
         :_filename(filename)
         ,_currentItem(_nameList.begin())
@@ -60,11 +67,6 @@ public:
         return returnState;
     }
 
-    enum class State
-    {
-        InProgress,
-        Finished
-    };
 };
 
 #endif

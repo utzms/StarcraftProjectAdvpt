@@ -29,7 +29,7 @@ class Simulation
 
         void timeStep(); /**< Calling this function proceeds to the next timestep */
 
-        BuildList& _buildList;
+        BuildList* _buildList;
 
 	public:
         /** Function starting the Simulation.
@@ -39,7 +39,7 @@ class Simulation
          * by executing all necessary actions in an arbitrary amount of timesteps until the GameState fits to the specifed goal.
          */
 		void startSimulation(); 
-
+	Simulation(std::string buildListFilename);
         ~Simulation()
         {
             delete gameState;
