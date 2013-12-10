@@ -27,11 +27,11 @@ typedef std::vector<std::vector<std::pair<std::shared_ptr<Technology>, Requireme
 // a unit can be constructed from several similar technologies, so we need another vector
 typedef std::vector<std::pair<bool, std::pair<std::shared_ptr<Technology>, Requirements>>> RequirementsVec;
 
-template <class Race> class TechnologyManager
+template <class TechTree> class TechnologyManager
 {
 	private:
-        std::shared_ptr<GameState> gameState;
-        std::shared_ptr<TechnologyList> techList;
+        std::shared_ptr<GameState> _gameState;
+        std::shared_ptr<TechnologyList> _techList;
 
         inline bool check(std::shared_ptr<Technology> requirement);
         //inline bool getNeededRequirements(std::shared_ptr<Technology> tech, Requirements& res);

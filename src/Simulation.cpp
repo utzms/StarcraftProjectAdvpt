@@ -1,6 +1,10 @@
 #include "../include/Simulation.h"
 
-Simulation::Simulation(std::string buildListFilename, std::shared_ptr<GameState> gameState, std::shared_ptr<ResourceManager> resourceManager, std::shared_ptr<TechnologyManager> technologyManager)
+template <class TechTree>
+Simulation<TechTree>::Simulation(std::string buildListFilename,
+                                       std::shared_ptr<GameState> gameState,
+                                       std::shared_ptr<ResourceManager> resourceManager,
+                                       std::shared_ptr<TechnologyManager<TechTree> > technologyManager)
     :_buildList(new BuildList(buildListFilename))
     ,_gameState(gameState)
     ,_resourceManager(resourceManager)
@@ -9,14 +13,16 @@ Simulation::Simulation(std::string buildListFilename, std::shared_ptr<GameState>
 
 }
 
-void Simulation::run()
+template <class TechTree>
+void Simulation<TechTree>::run()
 {
-    std::string currentEntity = _buildList->current();
+
 
 
 }
 
-void Simulation::startSimulation()
+template <class TechTree>
+void Simulation<TechTree>::startSimulation()
 {
 	do	
 	{
@@ -26,7 +32,8 @@ void Simulation::startSimulation()
 
 }
 
-void Simulation::timeStep()
+template <class TechTree>
+void Simulation<TechTree>::timeStep()
 {
-
+    std::string currentEntity = _buildList->current();
 }

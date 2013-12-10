@@ -10,39 +10,52 @@
    */
 
 template<typename TechTree>
-class InitTechTree : private TechTree
+class InitTechTree
 {
 	private:
-		TechnologyList *tech;
-	public:
-		InitTechTree(){}
-		InitTechTree(TechnologyList *l){this->tech=l;}
+        std::shared_ptr<TechnologyList> _technologyList;
 
-		void setTechnologyList(TechnologyList *l)
+	public:
+        InitTechTree()
+        {
+        }
+
+        InitTechTree(std::shared_ptr<TechnologyList> technologyList)
+            :_technologyList(technologyList)
+        {
+        }
+
+        bool initTechTree()
 		{
-			this->tech=l;
-		}
-		bool initTechTree() const
-		{
-			if (!(tech==NULL))
+            bool result = false;
+
+            if (_technologyList)
 			{
-				tech->initBuildingList(TechTree::buildingPath1());
-				if (!(tech->isInitialized()))
+                _technologyList->initBuildingList(TechTree::buildingPath1());
+
+                if (!(_technologyList->isInitialized()))
 				{
 					std::cerr << "Will try another Path" << std::endl;
-					tech->initBuildingList(TechTree::buildingPath2());
-					tech->initUnitList(TechTree::unitPath2());
-				} else
+                    _technologyList->initBuildingList(TechTree::buildingPath2());
+                    _technologyList->initUnitList(TechTree::unitPath2());
+                }
+                else
 				{
-					tech->initUnitList(TechTree::unitPath1());
+                    _technologyList->initUnitList(TechTree::unitPath1());
 				}
-				if (!(tech->isInitialized()))
-					return false;
-				return true;
-			} else {
+
+                if (_technologyList->isInitialized())
+                {
+                    result = true;
+                }
+            }
+            else
+            {
 				std::cerr << "No valid Tech List used" << std::endl;
-				return false;
+                result = false;
 			}
+
+            return result;
 		}
 
 };

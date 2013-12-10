@@ -8,19 +8,22 @@
 class ProtossTechTree
 {
 	protected:
-		std::string unitPath1() const
+        static std::string unitPath1()
 		{
 			return "../data/Protoss/units.txt";
 		}
-		std::string unitPath2() const
+
+        static std::string unitPath2()
 		{
 			return "./data/Protoss/units.txt";
 		}
-		std::string buildingPath1() const
+
+        static std::string buildingPath1()
 		{
 			return "../data/Protoss/buildings.txt";
 		}
-		std::string buildingPath2() const
+
+        static std::string buildingPath2()
 		{
 			return "./data/Protoss/buildings.txt";
 		}
@@ -29,19 +32,22 @@ class ProtossTechTree
 class ZergTechTree
 {
 	protected:
-		std::string unitPath1() const
+        static std::string unitPath1()
 		{
 			return "../data/Zerg/units.txt";
 		}
-		std::string unitPath2() const
+
+        static std::string unitPath2()
 		{
 			return "./data/Zerg/units.txt";
 		}
-		std::string buildingPath1() const
+
+        static std::string buildingPath1()
 		{
 			return "../data/Zerg/buildings.txt";
 		}
-		std::string buildingPath2() const
+
+        static std::string buildingPath2()
 		{
 			return "./data/Zerg/buildings.txt";
 		}
@@ -50,19 +56,22 @@ class ZergTechTree
 class TerranTechTree
 {
 	protected:
-		std::string unitPath1() const
+        static std::string unitPath1()
 		{
 			return "../data/Terran/units.txt";
 		}
-		std::string unitPath2() const
+
+        static std::string unitPath2()
 		{
 			return "./data/Terran/units.txt";
 		}
-		std::string buildingPath1() const
+
+        static std::string buildingPath1()
 		{
 			return "../data/Terran/buildings.txt";
 		}
-		std::string buildingPath2() const
+
+        static std::string buildingPath2()
 		{
 			return "./data/Terran/buildings.txt";
 		}

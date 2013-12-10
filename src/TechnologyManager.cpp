@@ -3,9 +3,9 @@
 #include "../include/TechnologyManager.h"
 
 
-template <class Race> inline bool TechnologyManager<Race>::check(std::shared_ptr<Technology> tech)
+template <class TechTree> inline bool TechnologyManager<TechTree>::check(std::shared_ptr<Technology> tech)
 {
-    if(tech->getMineralsCost() > gameState->getMinerals() || tech->getGasCost() > gameState->getGas() || tech->getSupplyCost() > gameState->getSupply()) return false;
+    if(tech->getMineralsCost() > _gameState->getMinerals() || tech->getGasCost() > _gameState->getGas() || tech->getSupplyCost() > _gameState->getSupply()) return false;
     
     std::vector<std::vector<std::shared_ptr<Technology>>> requirements = tech->getRequirements();
     bool fulfilled;
@@ -26,10 +26,10 @@ template <class Race> inline bool TechnologyManager<Race>::check(std::shared_ptr
 }
 
 
-//template<class Race> inline bool TechnologyManager<Race>::getNeededRequirements(std::shared_ptr<Technology> tech, Requirements& neededReqs)
+//template<class TechTree> inline bool TechnologyManager<TechTree>::getNeededRequirements(std::shared_ptr<Technology> tech, Requirements& neededReqs)
 //{
 //    bool retVal = true;
-//    if(tech->getMineralsCost() > gameState->getMinerals() || tech->getGasCost() > gameState->getGas() || tech->getSupplyCost() > gameState->getSupply())
+//    if(tech->getMineralsCost() > _gameState->getMinerals() || tech->getGasCost() > _gameState->getGas() || tech->getSupplyCost() > _gameState->getSupply())
 //    {
 //        retVal = false;
 //    }
@@ -40,48 +40,48 @@ template <class Race> inline bool TechnologyManager<Race>::check(std::shared_ptr
 //}
 /* TODO adapt these helper functions or replace them in order to be able to get the entitys name as argument and still be able to determine according to the template parameter if the entity is a Building, Unit or Worker
  */
-template <class Race> inline std::vector<std::shared_ptr<Technology> > TechnologyManager<Race>::findTechnology(std::shared_ptr<Unit> unit)
+template <class TechTree> inline std::vector<std::shared_ptr<Technology> > TechnologyManager<TechTree>::findTechnology(std::shared_ptr<Unit> unit)
 {
-    return techList->findUnitVec(unit->getName());
+    return _techList->findUnitVec(unit->getName());
 }
 
-template <class Race> inline std::vector<std::shared_ptr<Technology> > TechnologyManager<Race>::findTechnology(std::shared_ptr<Building> building)
+template <class TechTree> inline std::vector<std::shared_ptr<Technology> > TechnologyManager<TechTree>::findTechnology(std::shared_ptr<Building> building)
 {
-    return techList->findBuildingVec(building->getName());
+    return _techList->findBuildingVec(building->getName());
 }
 
-template <class Race> inline std::vector<std::shared_ptr<Technology> > TechnologyManager<Race>::findTechnology(std::shared_ptr<Worker> worker)
+template <class TechTree> inline std::vector<std::shared_ptr<Technology> > TechnologyManager<TechTree>::findTechnology(std::shared_ptr<Worker> worker)
 {
-    return techList->findUnitVec(worker->getName());
+    return _techList->findUnitVec(worker->getName());
 }
-   
-template <class Race> TechnologyManager<Race>::TechnologyManager(std::shared_ptr<GameState> initialGameState, std::shared_ptr<TechnologyList> techList)
+
+template <class TechTree> TechnologyManager<TechTree>::TechnologyManager(std::shared_ptr<GameState> initialGameState, std::shared_ptr<TechnologyList> techList)
+    :_gameState(initialGameState)
+    ,_techList(techList)
 {
-    if(initialGameState == nullptr || techList == nullptr)
+    if(!_gameState || !_techList)
     {
         throw std::invalid_argument("Can not pass nullptr as initial argument");
     }
 
-    gameState = initialGameState;
-    techList = techList;
-    if(!InitTechTree<Race>(techList).initTechTree()) 
+    if(!InitTechTree<TechTree>(_techList).initTechTree())
     {
         throw std::exception("TechnologyList initialization failed. Something went terribly wrong!");
     }
 }
 
-template <class Race> template <class EntityType> bool TechnologyManager<Race>::checkRequirements(std::shared_ptr<EntityType> entity) 
+template <class TechTree> template <class EntityType> bool TechnologyManager<TechTree>::checkRequirements(std::shared_ptr<EntityType> entity)
 { 
     // TODO change argument to std::string and adapt the implementation
 
-    std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager<Race>::findTechnology(entity); 
+    std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager<TechTree>::findTechnology(entity);
     if(techVec.size() == 0) 
     {
         throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
     }
     for(auto tech : techVec) 
     {
-        if(TechnologyManager<Race>::check(tech))
+        if(TechnologyManager<TechTree>::check(tech))
         {
             return true;
         }
@@ -89,10 +89,10 @@ template <class Race> template <class EntityType> bool TechnologyManager<Race>::
     return false;
 }
 
-template <class Race> template <class EntityType> std::shared_ptr<RequirementsVec> TechnologyManager<Race>::requestRequirements(std::shared_ptr<EntityType> entity) 
+template <class TechTree> template <class EntityType> std::shared_ptr<RequirementsVec> TechnologyManager<TechTree>::requestRequirements(std::shared_ptr<EntityType> entity)
 {
     // TODO implementation, and adaption to std::string as argument
-    std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager<Race>::findTechnology(entity); 
+    std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager<TechTree>::findTechnology(entity);
     if(techVec.size() == 0) 
     {
         throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
@@ -105,10 +105,10 @@ template <class Race> template <class EntityType> std::shared_ptr<RequirementsVe
     return res;
 
 }
-template <class Race> template <class EntityType> void TechnologyManager<Race>::notifyCreation(std::shared_ptr<EntityType> entity) 
+template <class TechTree> template <class EntityType> void TechnologyManager<TechTree>::notifyCreation(std::shared_ptr<EntityType> entity)
 {   
     
-    std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager<Race>::findTechnology(entity);
+    std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager<TechTree>::findTechnology(entity);
     if(techVec.size() == 0)
     {
         throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
@@ -121,9 +121,9 @@ template <class Race> template <class EntityType> void TechnologyManager<Race>::
 }
 
 
-template <class Race> template <class EntityType> void TechnologyManager<Race>::notifyDestruction(std::shared_ptr<EntityType> entity) 
+template <class TechTree> template <class EntityType> void TechnologyManager<TechTree>::notifyDestruction(std::shared_ptr<EntityType> entity)
 {
-    std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager<Race>::findTechnology(entity);
+    std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager<TechTree>::findTechnology(entity);
     if(techVec.size() == 0)
     {
         throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
