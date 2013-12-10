@@ -83,12 +83,12 @@ void TechnologyList::initRest()
 			}
 			for (size_t i = 0; i < orRequirements.size(); ++i)
 			{
-				std::vector<std::pair<std::shared_ptr<Technology>,RequirementFlag>> sources;
+                std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>> sources;
 				for (size_t j = 0; j < orRequirements[i].size(); ++j)
 				{
 					std::shared_ptr<Technology> source;
-					std::pair<std::shared_ptr<Technology>,RequirementFlag> commit;
-					commit.second=Existent;
+                    std::pair<std::shared_ptr<Technology>,RequirementType> commit;
+                    commit.second = RequirementType::Existence;
 					if ((source=findUnit(orRequirements[i][j]))==NULL)
 					{
 						//its a building
@@ -132,13 +132,16 @@ void TechnologyList::initRest()
 			orRequirements.push_back(orReq);
 			for (size_t i = 0; i < orRequirements.size(); ++i)
 			{
-				std::vector<std::pair<std::shared_ptr<Technology>,RequirementFlag>> sources;
+                std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>> sources;
+
 				for (size_t j = 0; j < orRequirements[i].size(); ++j)
 				{
 					std::shared_ptr<Technology> source;
-					std::pair<std::shared_ptr<Technology>,RequirementFlag> commit;
-					commit.second=Creation;
-					if ((source=findUnit(orRequirements[i][j]))==NULL)
+                    std::pair<std::shared_ptr<Technology>,RequirementType> commit;
+
+                    commit.second = RequirementType::ForProduction;
+
+                    if ((source = findUnit(orRequirements[i][j]))==NULL)
 					{
 						//its a building
 						if ((source=findBuilding(orRequirements[i][j]))==NULL)
