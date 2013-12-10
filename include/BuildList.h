@@ -1,7 +1,9 @@
 #ifndef _BUILDLIST_H_
 #define _BUILDLIST_H_
 
-#include <ifstream>
+#include <fstream>
+#include <vector>
+
 
 class BuildList
 {
@@ -17,7 +19,7 @@ private:
 
         if (!file.good())
         {
-            std::throw std::invalid_argument("BuildList: wrong filename " + filename);
+            throw std::invalid_argument("BuildList: wrong filename " + filename);
         }
 
         while (file.good())

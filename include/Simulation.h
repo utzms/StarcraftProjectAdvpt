@@ -1,6 +1,8 @@
 #ifndef _SIMULATION_H_
 #define _SIMULATION_H_
 
+#include <vector>
+
 #include "BuildList.h"
 #include "GameState.h"
 #include "ResourceManager.h"
