@@ -56,7 +56,13 @@ class Simulation
 
         void run()
         {
-
+            int timesteps = 0;
+            while(_gameState->getMinerals() < 200 )
+            {
+                timeStep();
+                timesteps++;
+            }
+            std::cout << "Needed timesteps: " << timesteps << std::endl;
         }
 
         void startSimulation()
@@ -71,7 +77,19 @@ class Simulation
 
         void timeStep()
         {
-            std::string currentEntity = _buildList->current();
+            std::vector< std::shared_ptr<Worker> >&      workerList   = _gameState->workerList;
+            std::vector< std::shared_ptr<Building> >&    buildingList = _gameState->buildingList;
+            std::vector< std::shared_ptr<Unit> >&        unitList     = _gameState->unitList;
+
+            for (auto workerIterator : workerList)
+            {
+                workerIterator->timeStep();
+            }
+
+            for (auto buildingIterator : buildingList)
+            {
+                buildingIterator->timeStep();
+            }
         }
 
         ~Simulation()

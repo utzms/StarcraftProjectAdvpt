@@ -35,16 +35,14 @@ void ResourceManager::timeStep()
     float mineralsToAdd 	= 0.f;
 
 	//determine overall increase of resources depending on harvesting workers
-    for(auto currentWorker = workerList.begin();
-             currentWorker != workerList.end();
-             ++currentWorker)
+    for(auto currentWorker : workerList)
 	{
-        if((*currentWorker)->state == Worker::State::CollectingMinerals)
+        if(currentWorker->state == Worker::State::CollectingMinerals)
 		{
             mineralsToAdd += _mineralsIncrementPerWorker;
 		}
 
-        if((*currentWorker)->state == Worker::State::CollectingMinerals)
+        if(currentWorker->state == Worker::State::CollectingMinerals)
 		{
             mineralsToAdd += _vespinGasIncrementPerWorker;
 		}	
