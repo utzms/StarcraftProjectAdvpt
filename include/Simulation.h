@@ -26,6 +26,7 @@ class Simulation
 	private:
         std::shared_ptr<GameState>       _gameState; /**< State of the whole game, containing all Entities and parameters */
         std::shared_ptr<ResourceManager> _resourceManager; /**< Object that is responsible for updating the all resources at the end of each timestep */
+        std::shared_ptr<TechnologyManager> _technologyManager; /**< Object that is responsible for updating the all technologies at the end of each timestep */
 
         void timeStep(); /**< Calling this function proceeds to the next timestep */
 
@@ -41,7 +42,7 @@ class Simulation
         void startSimulation();
         void run();
 
-        Simulation(std::string buildListFilename, std::shared_ptr<GameState> gameState, std::shared_ptr<ResourceManager> resourceManager);
+        Simulation(std::string buildListFilename, std::shared_ptr<GameState> gameState, std::shared_ptr<ResourceManager> resourceManager, std::shared_ptr<TechnologyManager> technologyManager);
         ~Simulation()
         {
             //delete gameState;
