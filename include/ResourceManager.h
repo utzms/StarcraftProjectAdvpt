@@ -15,10 +15,10 @@
 class ResourceManager
 {
 	private:
-		std::shared_ptr<GameState> gameState;
-		double vespinGasIncrementPerWorker; 
-		double mineralsIncrementPerWorker;
-		void updateGameState(double vespinGasToAdd, double mineralsToAdd);
+		std::shared_ptr<GameState>	_gameState;
+		double 				_vespinGasIncrementPerWorker; 
+		double 				_mineralsIncrementPerWorker;
+		void 				updateGameState(double vespinGasToAdd, double mineralsToAdd);
 	public:
         /** Function that updates the GameStates resource count before preceding to the next timestep*/
 		ResourceManager(double initialVespinGasIncrement, double initialMineralsIncrement);

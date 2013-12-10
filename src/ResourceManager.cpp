@@ -8,27 +8,27 @@
 RecourceManager::RecourceManager( std::shared_ptr<GameState> initialGameState, double initialVespinGasIncrement, double initialMineralsIncrement )
 {
 	//initialize gamestate and increments
-	gameState 					= initialGameState;
-	if(gameState == NULL)
+	_gameState 			= initialGameState;
+	if(_gameState == NULL)
 	{
 	 	throw std::invalid_argument("RecourceManager::ResourceManager: initialGameState is a NULL-pointer");
 		return;
 	}
-	vespinGasIncrementPerWorer = initialVespinGasIncrement;
-	mineralsIncrementPerWorker 	= initialMineralsIncrement;
+	_vespinGasIncrementPerWorer 	= initialVespinGasIncrement;
+	_mineralsIncrementPerWorker 	= initialMineralsIncrement;
 }
 
 
 void RecourceManager::timestep()
 {
-
-	std::shared_ptr<std::vector<std::shared_ptr<Worker>>> workerListPtr = gamestate.workerList;
+	//get workerList of current gamestate
+	std::shared_ptr<std::vector<std::shared_ptr<Worker>>> workerListPtr = _gamestate.workerList;
 	if(workerListPtr == NULL)
 	{
 		throw std::invalid_argument("RecourceManager::timeStep: worker list is not initialized"):
 		return;
 	}
-
+	//check if there are no worker
 	int workerListLength = (gamestate.workerList).size();
 	if(workerListLength == 0)
 	{	
@@ -44,20 +44,20 @@ void RecourceManager::timestep()
 	{
 		if(currentWorker.state == currentWorker.State::CollectingMinerals )
 		{
-			mineralsToAdd += mineralsIncrementPerWorker ;
+			mineralsToAdd += _mineralsIncrementPerWorker ;
 		}
 		if(currentWorker.state == currentWorker.State::CollectingMinerals )
 		{
-			mineralsToAdd += vespinIncrementPerWorker ;
+			mineralsToAdd += _vespinIncrementPerWorker ;
 		}	
 	}
-	//update gamesstate
+	//update gamestate
 	updateGameState(vespinGasToAdd, mineralsToAdd);
 }
 
 void RecourceManager::updateGameState(double vespinGasToAdd, double mineralsToAdd)
 {
-	gamestate.vespinGas += vespinGasToAdd;
-	gamestate.minerals 	+= mineralsGasToAdd;
+	_gamestate.vespinGas += vespinGasToAdd;
+	_gamestate.minerals  += mineralsGasToAdd;
 }
 
