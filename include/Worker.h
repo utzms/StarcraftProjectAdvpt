@@ -16,6 +16,8 @@ class Worker : public Entity
             Delayed
         };
 
+        State state;
+
         void timeStep()
         {
 

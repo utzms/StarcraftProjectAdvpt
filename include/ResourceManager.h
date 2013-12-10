@@ -1,6 +1,7 @@
 #ifndef _RESOURCEMANAGER_H_
 #define _RESOURCEMANAGER_H_
 
+#include <stdexcept>
 #include "GameState.h"
 #include "Entity.h"
 
@@ -16,12 +17,15 @@ class ResourceManager
 {
 	private:
 		std::shared_ptr<GameState>	_gameState;
-		double 				_vespinGasIncrementPerWorker; 
-		double 				_mineralsIncrementPerWorker;
-		void 				updateGameState(double vespinGasToAdd, double mineralsToAdd);
+
+        float 	_vespinGasIncrementPerWorker;
+        float 	_mineralsIncrementPerWorker;
+
+        void updateGameState(float vespinGasToAdd, float mineralsToAdd);
 	public:
         /** Function that updates the GameStates resource count before preceding to the next timestep*/
-		ResourceManager(double initialVespinGasIncrement, double initialMineralsIncrement);
+        ResourceManager(std::shared_ptr<GameState> initialGameState, float initialVespinGasIncrement, float initialMineralsIncrement);
+
 		void timeStep();
 
 };

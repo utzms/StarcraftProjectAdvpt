@@ -2,62 +2,60 @@
 
 // Anmerkung:
 // Idee für die Erweiterung des Resource Managers: Wie bei den Builings
-// Race-Policies für das Update verwenden. Auf diese Weise wäre es möglich
-// die berüchtige Larva Produktion der Zerg zu realisieren.
+// Race-Policies für das Update verwenden. Auf diese Weise wäre es moeglich
+// die beruechtige Larva Produktion der Zerg zu realisieren.
 
-RecourceManager::RecourceManager( std::shared_ptr<GameState> initialGameState, double initialVespinGasIncrement, double initialMineralsIncrement )
+ResourceManager::ResourceManager(std::shared_ptr<GameState> initialGameState, float initialVespinGasIncrement, float initialMineralsIncrement)
 {
-	//initialize gamestate and increments
-	_gameState 			= initialGameState;
-	if(_gameState == NULL)
+    // initialize gamestate and increments
+    _gameState = initialGameState;
+
+    if(!_gameState)
 	{
-	 	throw std::invalid_argument("RecourceManager::ResourceManager: initialGameState is a NULL-pointer");
-		return;
+        throw std::invalid_argument("ResourceManager::ResourceManager: initialGameState points to null object");
 	}
-	_vespinGasIncrementPerWorer 	= initialVespinGasIncrement;
+
+    _vespinGasIncrementPerWorker 	= initialVespinGasIncrement;
 	_mineralsIncrementPerWorker 	= initialMineralsIncrement;
 }
 
-
-void RecourceManager::timestep()
+void ResourceManager::timeStep()
 {
-	//get workerList of current gamestate
-	std::shared_ptr<std::vector<std::shared_ptr<Worker>>> workerListPtr = _gamestate.workerList;
-	if(workerListPtr == NULL)
-	{
-		throw std::invalid_argument("RecourceManager::timeStep: worker list is not initialized"):
-		return;
-	}
-	//check if there are no worker
-	int workerListLength = (gamestate.workerList).size();
-	if(workerListLength == 0)
+    // get workerList of current gamestate
+    std::vector<std::shared_ptr<Worker> >& workerList = _gameState->workerList;
+
+    // check if there are no workers
+    // and return if thats true
+    if(workerList.empty())
 	{	
 		return;
 	}
 
-	double vespinGasToAdd 	= 0.0;
-	double mineralsToAdd 	= 0.0;
+    float vespinGasToAdd 	= 0.f;
+    float mineralsToAdd 	= 0.f;
 
 	//determine overall increase of resources depending on harvesting workers
-	for(std::vector<Worker>::iterator currentWorker = workerListPtr->begin();
-			currentWorker=!workerListPtr->end(); ++currentWorker )
+    for(auto currentWorker = workerList.begin();
+             currentWorker != workerList.end();
+             ++currentWorker)
 	{
-		if(currentWorker.state == currentWorker.State::CollectingMinerals )
+        if((*currentWorker)->state == Worker::State::CollectingMinerals)
 		{
-			mineralsToAdd += _mineralsIncrementPerWorker ;
+            mineralsToAdd += _mineralsIncrementPerWorker;
 		}
-		if(currentWorker.state == currentWorker.State::CollectingMinerals )
+
+        if((*currentWorker)->state == Worker::State::CollectingMinerals)
 		{
-			mineralsToAdd += _vespinIncrementPerWorker ;
+            mineralsToAdd += _vespinGasIncrementPerWorker;
 		}	
 	}
 	//update gamestate
 	updateGameState(vespinGasToAdd, mineralsToAdd);
 }
 
-void RecourceManager::updateGameState(double vespinGasToAdd, double mineralsToAdd)
+void ResourceManager::updateGameState(float vespinGasToAdd, float mineralsToAdd)
 {
-	_gamestate.vespinGas += vespinGasToAdd;
-	_gamestate.minerals  += mineralsGasToAdd;
+    _gameState->addGas(vespinGasToAdd);
+    _gameState->addMinerals(mineralsToAdd);
 }
 

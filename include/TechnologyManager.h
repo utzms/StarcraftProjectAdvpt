@@ -22,7 +22,7 @@
 // innermost pair of Requirements: Technology, RequirementFlag(Vanishing, Existing, Creation means building)
 // vector of innermost pairs: one of the pairs needs to be ok, each of those could be ok for the technology to be able to be built
 // outer vector: every element needs to be fulfilled
-typedef std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementFlag>>> Requirements;
+typedef std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementType>>> Requirements;
 
 // a unit can be constructed from several similar technologies, so we need another vector
 typedef std::vector<std::pair<bool, std::pair<std::shared_ptr<Technology>, Requirements>>> RequirementsVec;

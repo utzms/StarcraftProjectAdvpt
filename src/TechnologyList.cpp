@@ -62,8 +62,8 @@ void TechnologyList::initRest()
 			for (size_t i = 0; i < fixedRequirements.size(); ++i)
 			{
 				std::shared_ptr<Technology> source;
-				std::pair<std::shared_ptr<Technology>,RequirementFlag> commit;
-				commit.second=Existent;
+                std::pair<std::shared_ptr<Technology>, RequirementType> commit;
+                commit.second = RequirementType::Existence;
 				if ((source=findUnit(fixedRequirements[i]))==NULL)
 				{
 					//its a building
