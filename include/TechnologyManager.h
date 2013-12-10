@@ -19,21 +19,22 @@
 
 
 typedef std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementFlag>>> Requirements;
-
+typedef std::vector<std::pair<bool, std::pair<std::shared_ptr<Technology>, Requirements>>> RequirementsVec;
 
 template <class Race> class TechnologyManager
 {
 	private:
         std::shared_ptr<GameState> gameState;
-	    TechnologyList techList;
+        std::shared_ptr<TechnologyList> techList;
 
         inline bool check(std::shared_ptr<Technology> requirement);
+        inline bool getNeededRequirements(std::shared_ptr<Technology> tech, Requirements& res);
         inline std::vector< std::shared_ptr<Technology> > findTechnology(std::shared_ptr<Unit> unit);
         inline std::vector< std::shared_ptr<Technology> > findTechnology(std::shared_ptr<Building> building);
         inline std::vector< std::shared_ptr<Technology> > findTechnology(std::shared_ptr<Worker> worker);
 
 	public:
-        TechnologyManager(std::shared_ptr<GameState> initialGameState); 
+        TechnologyManager(std::shared_ptr<GameState> initialGameState, std::shared_ptr<TechnologyList> techListPtr); 
         /** Function for demanding a requirements check.
          * @param The Entity that shall be created
          * @return true, if all requirements are fulfilled
@@ -45,7 +46,7 @@ template <class Race> class TechnologyManager
         // when calling this function
         template <class EntityType> bool checkRequirements(std::shared_ptr<EntityType> entity);
 
-        template <class EntityType> std::shared_ptr< std::vector<std::pair<bool, std::shared_ptr<Requirements>>>> requestRequirements(std::shared_ptr<EntityType> entity); 
+        template <class EntityType> std::shared_ptr<RequirementsVec> requestRequirements(std::shared_ptr<EntityType> entity); 
 	/** Functions for notifying state-changes in entities.
 	 * @param Shared Pointer to the Entity that has changed it state
 	 */
