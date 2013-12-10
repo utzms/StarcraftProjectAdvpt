@@ -31,7 +31,7 @@ class Simulation
         std::shared_ptr<ResourceManager> _resourceManager; /**< Object that is responsible for updating the all resources at the end of each timestep */
         std::shared_ptr<TechnologyManager<TechTree> > _technologyManager; /**< Object that is responsible for updating the all technologies at the end of each timestep */
 
-        void timeStep(); /**< Calling this function proceeds to the next timestep */
+        /**< Calling this function proceeds to the next timestep */
 
         BuildList* _buildList;
 
@@ -42,10 +42,38 @@ class Simulation
          * Next the Simulation is started by entering the first timestep and proceded 
          * by executing all necessary actions in an arbitrary amount of timesteps until the GameState fits to the specifed goal.
          */
-        void startSimulation();
-        void run();
+        Simulation(std::string buildListFilename,
+                                               std::shared_ptr<GameState> gameState,
+                                               std::shared_ptr<ResourceManager> resourceManager,
+                                               std::shared_ptr<TechnologyManager<TechTree> > technologyManager)
+            :_buildList(new BuildList(buildListFilename))
+            ,_gameState(gameState)
+            ,_resourceManager(resourceManager)
+            ,_technologyManager(technologyManager)
+        {
 
-        Simulation(std::string buildListFilename, std::shared_ptr<GameState> gameState, std::shared_ptr<ResourceManager> resourceManager, std::shared_ptr<TechnologyManager<TechTree> > technologyManager);
+        }
+
+        void run()
+        {
+
+        }
+
+        void startSimulation()
+        {
+            do
+            {
+                std::cout <<  _buildList->current() << std::endl;
+            }
+            while( _buildList->advance() != BuildList::State::Finished );
+            return;
+        }
+
+        void timeStep()
+        {
+            std::string currentEntity = _buildList->current();
+        }
+
         ~Simulation()
         {
             //delete gameState;
