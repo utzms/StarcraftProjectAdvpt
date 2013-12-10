@@ -1,5 +1,5 @@
-#include <DataReader.h>
-#include <Debug.h>
+#include "../include/DataReader.h"
+#include "../include/Debug.h"
 
 DataReader::DataReader()
 {

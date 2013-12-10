@@ -1,4 +1,4 @@
-#include "ResourceManager.h"
+#include "../include/ResourceManager.h"
 
 // Anmerkung:
 // Idee für die Erweiterung des Resource Managers: Wie bei den Builings

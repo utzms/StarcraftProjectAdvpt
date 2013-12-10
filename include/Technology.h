@@ -16,10 +16,12 @@
  *
  * */
 
-typedef enum RequirementFlag
+enum class RequirementFlag
 {
-	Existent, Vanish, Creation
-} RequirementFlag;
+    Existent,
+    Vanish,
+    Creation
+};
 
 struct Costs
 {

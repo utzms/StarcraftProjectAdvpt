@@ -1,6 +1,6 @@
 #include <exception>
 #include <stdexcept>
-#include "TechnologyManager.h"
+#include "../include/TechnologyManager.h"
 
 
 template <class Race> inline bool TechnologyManager<Race>::check(std::shared_ptr<Technology> tech)
@@ -26,18 +26,18 @@ template <class Race> inline bool TechnologyManager<Race>::check(std::shared_ptr
 }
 
 
-template<class Race> inline bool TechnologyManager<Race>::getNeededRequirements(std::shared_ptr<Technology> tech, Requirements& neededReqs)
-{
-    bool retVal = true;
-    if(tech->getMineralsCost() > gameState->getMinerals() || tech->getGasCost() > gameState->getGas() || tech->getSupplyCost() > gameState->getSupply()) 
-    {
-        retVal = false;
-    }
+//template<class Race> inline bool TechnologyManager<Race>::getNeededRequirements(std::shared_ptr<Technology> tech, Requirements& neededReqs)
+//{
+//    bool retVal = true;
+//    if(tech->getMineralsCost() > gameState->getMinerals() || tech->getGasCost() > gameState->getGas() || tech->getSupplyCost() > gameState->getSupply())
+//    {
+//        retVal = false;
+//    }
     
-    // TODO
-    return retVal;
+//    // TODO
+//    return retVal;
 
-}
+//}
 /* TODO adapt these helper functions or replace them in order to be able to get the entitys name as argument and still be able to determine according to the template parameter if the entity is a Building, Unit or Worker
  */
 template <class Race> inline std::vector<std::shared_ptr<Technology> > TechnologyManager<Race>::findTechnology(std::shared_ptr<Unit> unit)

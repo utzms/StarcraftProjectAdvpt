@@ -19,8 +19,12 @@
  * The TechnologyManager is notified whenever a change concerning the Tech Tree occurs.
  */
 
-
+// innermost pair of Requirements: Technology, RequirementFlag(Vanishing, Existing, Creation means building)
+// vector of innermost pairs: one of the pairs needs to be ok, each of those could be ok for the technology to be able to be built
+// outer vector: every element needs to be fulfilled
 typedef std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementFlag>>> Requirements;
+
+// a unit can be constructed from several similar technologies, so we need another vector
 typedef std::vector<std::pair<bool, std::pair<std::shared_ptr<Technology>, Requirements>>> RequirementsVec;
 
 template <class Race> class TechnologyManager
@@ -30,7 +34,7 @@ template <class Race> class TechnologyManager
         std::shared_ptr<TechnologyList> techList;
 
         inline bool check(std::shared_ptr<Technology> requirement);
-        inline bool getNeededRequirements(std::shared_ptr<Technology> tech, Requirements& res);
+        //inline bool getNeededRequirements(std::shared_ptr<Technology> tech, Requirements& res);
         inline std::vector< std::shared_ptr<Technology> > findTechnology(std::shared_ptr<Unit> unit);
         inline std::vector< std::shared_ptr<Technology> > findTechnology(std::shared_ptr<Building> building);
         inline std::vector< std::shared_ptr<Technology> > findTechnology(std::shared_ptr<Worker> worker);

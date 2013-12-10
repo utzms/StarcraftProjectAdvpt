@@ -1,8 +1,9 @@
-#include <Simulation.h>
 #include <iomanip> //include this for formatted output
-#include <TechnologyList.h>
-#include "InitTechTree.hpp"
-#include "Technology.h"
+
+#include "../include/Simulation.h"
+#include "../include/TechnologyList.h"
+#include "../include/InitTechTree.hpp"
+#include "../include/Technology.h"
 
 int main()
 {

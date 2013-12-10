@@ -1,5 +1,5 @@
 
-#include "Debug.h"
+#include "../include/Debug.h"
 
 #include <iostream>
 #include <cstdlib> // std::abort

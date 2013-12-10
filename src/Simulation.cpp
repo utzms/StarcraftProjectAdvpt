@@ -1,4 +1,4 @@
-#include "Simulation.h"
+#include "../include/Simulation.h"
 
 Simulation::Simulation(std::string buildListFilename)
 :_buildList(new BuildList(buildListFilename))
