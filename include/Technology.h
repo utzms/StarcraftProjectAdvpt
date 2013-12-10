@@ -47,7 +47,7 @@ class Technology
 
         void setZero();
 		void addRequirement(std::pair<std::shared_ptr<Technology>,RequirementFlag>);
-		void addRequirement(std::vector<std::pair<std::shared_ptr<Technology>,RequirementFlag>>);
+        void addRequirement(std::vector<std::pair<std::shared_ptr<Technology>,RequirementFlag> >);
 		void setName(std::string name);
 		void setMineral(float minerals);
 		void setGas(float gas);

@@ -1,6 +1,8 @@
 #ifndef _TECHNOLOGYMANAGER_H_
 #define _TECHNOLOGYMANAGER_H_
 #include <memory>
+#include <vector>
+#include <utility>
 #include "GameState.h"
 #include "TechnologyList.h"
 #include "Technology.h"
@@ -16,16 +18,19 @@
  */
 
 
+typedef std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementFlag>>> Requirements;
+
+
 template <class Race> class TechnologyManager
 {
 	private:
         std::shared_ptr<GameState> gameState;
 	    TechnologyList techList;
 
-        inline bool checkRequirement(std::shared_ptr<Technology> requirement);
-        inline std::shared_ptr<Technology> findTechnology(std::shared_ptr<Unit> unit);
-        inline std::shared_ptr<Technology> findTechnology(std::shared_ptr<Building> building);
-        inline std::shared_ptr<Technology> findTechnology(std::shared_ptr<Worker> worker);
+        inline bool check(std::shared_ptr<Technology> requirement);
+        inline std::vector< std::shared_ptr<Technology> > findTechnology(std::shared_ptr<Unit> unit);
+        inline std::vector< std::shared_ptr<Technology> > findTechnology(std::shared_ptr<Building> building);
+        inline std::vector< std::shared_ptr<Technology> > findTechnology(std::shared_ptr<Worker> worker);
 
 	public:
         TechnologyManager(std::shared_ptr<GameState> initialGameState); 
@@ -38,8 +43,9 @@ template <class Race> class TechnologyManager
         // template argument deduction does the work here
         // we do not have to specify the template type argument
         // when calling this function
-        template <class EntityType> bool request(std::shared_ptr<EntityType> entity);
+        template <class EntityType> bool checkRequirements(std::shared_ptr<EntityType> entity);
 
+        template <class EntityType> std::shared_ptr< std::vector<std::pair<bool, std::shared_ptr<Requirements>>>> requestRequirements(std::shared_ptr<EntityType> entity); 
 	/** Functions for notifying state-changes in entities.
 	 * @param Shared Pointer to the Entity that has changed it state
 	 */
