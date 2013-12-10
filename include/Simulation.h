@@ -1,10 +1,11 @@
 #ifndef _SIMULATION_H_
 #define _SIMULATION_H_
 
-#include <GameState.h>
-#include <ResourceManager.h>
-#include <TechnologyManager.h>
-#include <Entity.h>
+#include "BuildList.h"
+#include "GameState.h"
+#include "ResourceManager.h"
+#include "TechnologyManager.h"
+#include "Entity.h"
 
 /** Main class designed for managing and controlling the Simulation.
  * 
@@ -21,10 +22,12 @@
 class Simulation
 {
 	private:
-		GameState * gameState; /**< State of the whole game, containing all Entities and parameters */
-		ResourceManager * resourceManager; /**< Object that is responsible for updating the all resources at the end of each timestep */
-		//TechnologyManager * technologyManager; /**< Manager ensuring that all technological and "financial" requirements for the desired buildung action are fulfilled. */
+        GameState*         gameState; /**< State of the whole game, containing all Entities and parameters */
+        ResourceManager*   resourceManager; /**< Object that is responsible for updating the all resources at the end of each timestep */
+
         void timeStep(); /**< Calling this function proceeds to the next timestep */
+
+        BuildList& _buildList;
 
 	public:
         /** Function starting the Simulation.
@@ -39,7 +42,6 @@ class Simulation
         {
             delete gameState;
             delete resourceManager;
-            //delete technologyManager;
         }
 
 };

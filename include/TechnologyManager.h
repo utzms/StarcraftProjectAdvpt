@@ -1,8 +1,10 @@
 #ifndef _TECHNOLOGYMANAGER_H_
 #define _TECHNOLOGYMANAGER_H_
+
 #include <memory>
 #include <vector>
 #include <utility>
+
 #include "GameState.h"
 #include "TechnologyList.h"
 #include "Technology.h"
