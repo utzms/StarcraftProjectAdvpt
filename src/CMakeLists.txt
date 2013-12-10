@@ -10,6 +10,7 @@ set ( OWN_HEADERS
   ../include/InitTechTree.hpp
   ../include/ResourceManager.h
   ../include/Simulation.h
+  ../include/StartingConfiguration.h
   ../include/Technology.h
   ../include/TechnologyList.h
   ../include/TechnologyManager.h

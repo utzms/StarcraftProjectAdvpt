@@ -31,7 +31,7 @@ void ResourceManager::timeStep()
 		return;
 	}
 
-    float vespinGasToAdd 	= 0.f;
+    float vespeneGasToAdd 	= 0.f;
     float mineralsToAdd 	= 0.f;
 
 	//determine overall increase of resources depending on harvesting workers
@@ -42,18 +42,18 @@ void ResourceManager::timeStep()
             mineralsToAdd += _mineralsIncrementPerWorker;
 		}
 
-        if(currentWorker->state == Worker::State::CollectingMinerals)
+        if(currentWorker->state == Worker::State::CollectingVespeneGas)
 		{
-            mineralsToAdd += _vespinGasIncrementPerWorker;
+            vespeneGasToAdd += _vespinGasIncrementPerWorker;
 		}	
 	}
 	//update gamestate
-	updateGameState(vespinGasToAdd, mineralsToAdd);
+    updateGameState(vespeneGasToAdd, mineralsToAdd);
 }
 
-void ResourceManager::updateGameState(float vespinGasToAdd, float mineralsToAdd)
+void ResourceManager::updateGameState(float vespeneGasToAdd, float mineralsToAdd)
 {
-    _gameState->addGas(vespinGasToAdd);
+    _gameState->addGas(vespeneGasToAdd);
     _gameState->addMinerals(mineralsToAdd);
 }
 

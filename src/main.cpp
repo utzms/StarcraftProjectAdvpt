@@ -13,11 +13,11 @@ int main()
 	//Simulation simulation;
     std::shared_ptr<GameState> gameState(new GameState());
     std::shared_ptr<TechnologyList> technologyList(new TechnologyList());
+	std::shared_ptr<ResourceManager> resourceManager(new ResourceManager(gameState, 1.f, 1.f));
+	std::shared_ptr<TechnologyManager<ProtossTechTree> > techManager(new TechnologyManager<ProtossTechTree>(gameState, technologyList));
+	std::shared_ptr<StartingConfiguration> startingConfiguration( new StartingConfiguration(std::string("./data/StartingConfiguration.txt")) );
 
-    std::shared_ptr<ResourceManager> resourceManager(new ResourceManager(gameState, 0.6f, 0.6f));
-    std::shared_ptr<TechnologyManager<ProtossTechTree> > techManager(new TechnologyManager<ProtossTechTree>(gameState, technologyList));
-
-    Simulation<ProtossTechTree> simulation("protoss1.txt", gameState, resourceManager, techManager);
+	Simulation<ProtossTechTree> simulation("protoss1.txt", gameState, resourceManager, techManager, startingConfiguration);
 
     simulation.run();
 

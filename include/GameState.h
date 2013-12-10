@@ -20,15 +20,17 @@ class GameState
 		float supply;
 
 	public:
-        std::vector< std::shared_ptr<Worker> >      workerList;
+		std::vector< std::shared_ptr<Worker> >      workerList;
         std::vector< std::shared_ptr<Building> >    buildingList;
         std::vector< std::shared_ptr<Unit> >        unitList;
 
-        GameState()
-        {
-            workerList.push_back(std::shared_ptr<Worker>(new Worker()));
-            workerList[0]->state = Worker::State::CollectingMinerals;
-        }
+		GameState()
+		{
+			minerals	=	0.0f;
+			gas			=	0.0f;
+			energy		=	0.0f;
+			supply		=	0.0f;
+		}
 
         float getMinerals()
         {

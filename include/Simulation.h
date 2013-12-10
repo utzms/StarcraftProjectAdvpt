@@ -7,6 +7,7 @@
 #include "GameState.h"
 #include "ResourceManager.h"
 #include "TechnologyManager.h"
+#include "StartingConfiguration.h"
 #include "Entity.h"
 
 /** Main class designed for managing and controlling the Simulation.
@@ -30,10 +31,10 @@ class Simulation
         std::shared_ptr<GameState>       _gameState; /**< State of the whole game, containing all Entities and parameters */
         std::shared_ptr<ResourceManager> _resourceManager; /**< Object that is responsible for updating the all resources at the end of each timestep */
         std::shared_ptr<TechnologyManager<TechTree> > _technologyManager; /**< Object that is responsible for updating the all technologies at the end of each timestep */
-
+		std::shared_ptr<StartingConfiguration> _startingConfiguration;
         /**< Calling this function proceeds to the next timestep */
 
-        BuildList* _buildList;
+		BuildList _buildList;
 
 	public:
         /** Function starting the Simulation.
@@ -45,12 +46,26 @@ class Simulation
         Simulation(std::string buildListFilename,
                                                std::shared_ptr<GameState> gameState,
                                                std::shared_ptr<ResourceManager> resourceManager,
-                                               std::shared_ptr<TechnologyManager<TechTree> > technologyManager)
-            :_buildList(new BuildList(buildListFilename))
+											   std::shared_ptr<TechnologyManager<TechTree> > technologyManager,
+											   std::shared_ptr<StartingConfiguration> startingConfiguration)
+			:_buildList(*(new BuildList(buildListFilename)))
             ,_gameState(gameState)
             ,_resourceManager(resourceManager)
             ,_technologyManager(technologyManager)
-        {
+			,_startingConfiguration(startingConfiguration)
+		{
+
+			std::vector< std::shared_ptr<Worker>>& workerList = gameState->workerList;
+
+
+			for(int currentWorker = 0; currentWorker < _startingConfiguration->getInitialWorkerCount(); ++currentWorker)
+			{
+				workerList.push_back(std::shared_ptr<Worker>(new Worker));
+				workerList[currentWorker]->state = Worker::State::CollectingMinerals;
+			}
+
+			gameState->addMinerals(_startingConfiguration->getInitialMinerals());
+			gameState->addGas(_startingConfiguration->getInitialVespeneGas());
 
         }
 
@@ -69,9 +84,9 @@ class Simulation
         {
             do
             {
-                std::cout <<  _buildList->current() << std::endl;
+				std::cout <<  _buildList.current() << std::endl;
             }
-            while( _buildList->advance() != BuildList::State::Finished );
+			while( _buildList.advance() != BuildList::State::Finished );
             return;
         }
 
@@ -90,6 +105,7 @@ class Simulation
             {
                 buildingIterator->timeStep();
             }
+            _resourceManager->timeStep();
         }
 
         ~Simulation()
