@@ -78,15 +78,15 @@ class TechnologyManager
 //				return false;
 //			}
 
-//		std::vector<std::vector<std::shared_ptr<Technology> > > requirements = technology->getRequirements();
+//		 std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > requirements = technology->getRequirements();
 //            bool fulfilled = false;
 
 //            for(auto redundantRequirements : requirements)
 //            {
 //                fulfilled = false;
-//                for(std::shared_ptr<Technology> requirement : redundantRequirements)
+//                for(auto requirement : redundantRequirements)
 //                {
-//                    if(requirement->exists())
+//                    if((requirement.first)->exists())
 //                    {
 //                        fulfilled = true;
 //                        break;
