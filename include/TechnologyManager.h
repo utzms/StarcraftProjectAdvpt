@@ -71,14 +71,14 @@ class TechnologyManager
             }
         }
 
-    bool checkRequirement(std::shared_ptr<Technology> requirement)
+    bool checkTechnologyRequirements(std::shared_ptr<Technology> technology)
         {
-//		if(requirement->getMineralsCost() > _gameState->getMinerals() || requirement->getGasCost() > _gameState->getGas() || requirement->getSupplyCost() > _gameState->getSupply())
+//		if(technology->getMineralsCost() > _gameState->getMinerals() || technology->getGasCost() > _gameState->getGas() || technology->getSupplyCost() > _gameState->getSupply())
 //			{
 //				return false;
 //			}
 
-//		std::vector<std::vector<std::shared_ptr<Technology> > > requirements = requirement->getRequirements();
+//		std::vector<std::vector<std::shared_ptr<Technology> > > requirements = technology->getRequirements();
 //            bool fulfilled = false;
 
 //            for(auto redundantRequirements : requirements)
@@ -118,7 +118,7 @@ class TechnologyManager
 //            }
 //            for(auto tech : techVec)
 //            {
-//				if(TechnologyManager::check(tech))
+//				if(TechnologyManager::checkTechnologyRequirements(tech))
 //                {
 //                    return true;
 //                }
