@@ -27,10 +27,10 @@
 // innermost pair of Requirements: Technology, RequirementFlag(Vanishing, Existing, Creation means building)
 // vector of innermost pairs: one of the pairs needs to be ok, each of those could be ok for the technology to be able to be built
 // outer vector: every element needs to be fulfilled
-typedef std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementType> > > Requirements;
+//typedef std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementType> > > Requirements;
 
 // a unit can be constructed from several similar technologies, so we need another vector
-typedef std::vector<std::pair<bool, std::pair<std::shared_ptr<Technology>, Requirements> > > RequirementsVec;
+//typedef std::vector<std::pair<bool, std::pair<std::shared_ptr<Technology>, Requirements> > > RequirementsVec;
 
 class TechnologyManager
 {
@@ -38,31 +38,6 @@ class TechnologyManager
         std::shared_ptr<GameState> _gameState;
         std::shared_ptr<TechnologyList> _techList;
 
-        inline bool check(std::shared_ptr<Technology> requirement)
-        {
-//			if(requirement->getMineralsCost() > _gameState->getMinerals() || requirement->getGasCost() > _gameState->getGas() || requirement->getSupplyCost() > _gameState->getSupply())
-//			{
-//				return false;
-//			}
-
-//			std::vector<std::vector<std::shared_ptr<Technology> > > requirements = requirement->getRequirements();
-//            bool fulfilled = false;
-
-//            for(auto redundantRequirements : requirements)
-//            {
-//                fulfilled = false;
-//                for(std::shared_ptr<Technology> requirement : redundantRequirements)
-//                {
-//                    if(requirement->exists())
-//                    {
-//                        fulfilled = true;
-//                        break;
-//                    }
-//                }
-//                if(!fulfilled) return false;
-//            }
-            return true;
-        }
 
         //inline bool getNeededRequirements(std::shared_ptr<Technology> tech, Requirements& res);
 //        inline std::vector< std::shared_ptr<Technology> > findTechnology(std::shared_ptr<Unit> unit)
@@ -96,6 +71,33 @@ class TechnologyManager
             }
         }
 
+        inline bool checkRequirement(std::shared_ptr<Technology> requirement)
+        {
+//		if(requirement->getMineralsCost() > _gameState->getMinerals() || requirement->getGasCost() > _gameState->getGas() || requirement->getSupplyCost() > _gameState->getSupply())
+//			{
+//				return false;
+//			}
+
+//		std::vector<std::vector<std::shared_ptr<Technology> > > requirements = requirement->getRequirements();
+//            bool fulfilled = false;
+
+//            for(auto redundantRequirements : requirements)
+//            {
+//                fulfilled = false;
+//                for(std::shared_ptr<Technology> requirement : redundantRequirements)
+//                {
+//                    if(requirement->exists())
+//                    {
+//                        fulfilled = true;
+//                        break;
+//                    }
+//                }
+//                if(!fulfilled) return false;
+//            }
+            return true;
+        }
+
+
         /** Function for demanding a requirements check.
          * @param The Entity that shall be created
          * @return true, if all requirements are fulfilled
@@ -105,7 +107,7 @@ class TechnologyManager
         // template argument deduction does the work here
         // we do not have to specify the template type argument
         // when calling this function
-        template <class EntityType> bool checkRequirements(std::shared_ptr<EntityType> entity)
+        template <class EntityType> bool checkEntityRequirements(std::shared_ptr<EntityType> entity)
         {
             // TODO change argument to std::string and adapt the implementation
 
@@ -123,8 +125,8 @@ class TechnologyManager
 //            }
 //            return false;
         }
-
-        template <class EntityType> std::shared_ptr<RequirementsVec> requestRequirements(std::shared_ptr<EntityType> entity)
+/*
+        template <class EntityType> std::shared_ptr<RequirementsVec> requestEntityRequirements(std::shared_ptr<EntityType> entity)
         {
 //            // TODO implementation, and adaption to std::string as argument
 //			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entity);
@@ -139,7 +141,7 @@ class TechnologyManager
 //            }
 //            return res;
         }
-
+*/
 	/** Functions for notifying state-changes in entities.
 	 * @param Shared Pointer to the Entity that has changed it state
 	 */
