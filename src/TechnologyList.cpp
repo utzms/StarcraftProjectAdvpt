@@ -1,9 +1,10 @@
 #include "../include/TechnologyList.h"
 
-TechnologyList::TechnologyList(std::string inputPath)
+TechnologyList::TechnologyList(std::string buildingPath, std::string unitPath)
+	:_buildingPath(buildingPath)
+	,_unitPath(unitPath)
+	,initialized(false)
 {
-	_inputPath = inputPath;
-	initialized=false;
 }
 
 void TechnologyList::initRest()

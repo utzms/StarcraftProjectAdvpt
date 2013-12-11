@@ -21,39 +21,39 @@ ResourceManager::ResourceManager(std::shared_ptr<GameState> initialGameState, fl
 
 void ResourceManager::timeStep()
 {
-    // get workerList of current gamestate
-    std::vector<std::shared_ptr<Worker> >& workerList = _gameState->workerList;
+//    // get workerList of current gamestate
+//    std::vector<std::shared_ptr<Worker> >& workerList = _gameState->workerList;
 
-    // check if there are no workers
-    // and return if thats true
-    if(workerList.empty())
-	{	
-		return;
-	}
+//    // check if there are no workers
+//    // and return if thats true
+//    if(workerList.empty())
+//	{
+//		return;
+//	}
 
-    float vespeneGasToAdd 	= 0.f;
-    float mineralsToAdd 	= 0.f;
+//    float vespeneGasToAdd 	= 0.f;
+//    float mineralsToAdd 	= 0.f;
 
-	//determine overall increase of resources depending on harvesting workers
-    for(auto currentWorker : workerList)
-	{
-        if(currentWorker->state == Worker::State::CollectingMinerals)
-		{
-            mineralsToAdd += _mineralsIncrementPerWorker;
-		}
+//	//determine overall increase of resources depending on harvesting workers
+//    for(auto currentWorker : workerList)
+//	{
+//        if(currentWorker->state == Worker::State::CollectingMinerals)
+//		{
+//            mineralsToAdd += _mineralsIncrementPerWorker;
+//		}
 
-		if(currentWorker->state == Worker::State::CollectingVespene)
-		{
-            vespeneGasToAdd += _vespinGasIncrementPerWorker;
-		}	
-	}
-	//update gamestate
-    updateGameState(vespeneGasToAdd, mineralsToAdd);
+//		if(currentWorker->state == Worker::State::CollectingVespene)
+//		{
+//            vespeneGasToAdd += _vespinGasIncrementPerWorker;
+//		}
+//	}
+//	//update gamestate
+//    updateGameState(vespeneGasToAdd, mineralsToAdd);
 }
 
 void ResourceManager::updateGameState(float vespeneGasToAdd, float mineralsToAdd)
 {
-    _gameState->addGas(vespeneGasToAdd);
-    _gameState->addMinerals(mineralsToAdd);
+//    _gameState->addGas(vespeneGasToAdd);
+//    _gameState->addMinerals(mineralsToAdd);
 }
 

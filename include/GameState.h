@@ -5,9 +5,8 @@
 #include <memory>
 
 #include "Worker.h"
-#include "Building.h"
-#include "Unit.h"
-
+//#include "Building.h"
+//#include "Unit.h"
 
 /** Class that represents the complete state of the game, enclosing all existing entities and the current amount of resources. */
 class GameState

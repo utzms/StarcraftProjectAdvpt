@@ -10,9 +10,9 @@
 #include "TechnologyList.h"
 #include "Technology.h"
 #include "InitTechTree.hpp"
-#include "Unit.h"
-#include "Worker.h"
-#include "Building.h"
+//#include "Unit.h"
+//#include "Worker.h"
+//#include "Building.h"
 
 
 /** Manager class responsible for ensuring that all requirements are fulfilled before an action can be executed.
@@ -31,6 +31,8 @@
 
 // a unit can be constructed from several similar technologies, so we need another vector
 //typedef std::vector<std::pair<bool, std::pair<std::shared_ptr<Technology>, Requirements> > > RequirementsVec;
+
+class GameState;
 
 class TechnologyManager
 {
