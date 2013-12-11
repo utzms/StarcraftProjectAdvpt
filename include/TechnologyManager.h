@@ -71,7 +71,7 @@ class TechnologyManager
             }
         }
 
-    bool checkTechnologyRequirements(std::shared_ptr<Technology> technology)
+        bool checkTechnologyRequirements(std::shared_ptr<Technology> technology)
         {
 //		if(technology->getMineralsCost() > _gameState->getMinerals() || technology->getGasCost() > _gameState->getGas() || technology->getSupplyCost() > _gameState->getSupply())
 //			{
@@ -95,6 +95,24 @@ class TechnologyManager
 //                if(!fulfilled) return false;
 //            }
             return true;
+        }
+
+        std::shared_ptr<std::vector<std::vector<std::shared_ptr<Technology > > > > getNeededTechnologyRequirements(std::shared_ptr<Technology> technology) 
+        {
+            auto res = std::shared_ptr<std::vector<std::vector<std::shared_ptr<Technology > > > >(new std::vector<std::vector<std::shared_ptr<Technology> > > );   
+            auto requirements = technology->getRequirements();
+            for(size_t i = 0; i != requirements.size(); ++i) 
+            {   
+                res->at(i) = std::vector<std::shared_ptr<Technology> >(requirements[i].size()); 
+                for(size_t j = 0; j != requirements[i].size(); ++j)
+                {
+                    if(!(((requirements[i][j]).first)->exists())) 
+                    {
+                        (res->at(i)).at(j) = (requirements[i][j]).first;
+                    }
+                }
+            }
+            return res;
         }
 
 
@@ -123,7 +141,7 @@ class TechnologyManager
 //                    return true;
 //                }
 //            }
-//            return false;
+            return false;
         }
 /*
         template <class EntityType> std::shared_ptr<RequirementsVec> requestEntityRequirements(std::shared_ptr<EntityType> entity)
