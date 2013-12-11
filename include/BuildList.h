@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <fstream>
 #include <vector>
+#include <algorithm>
 
 
 class BuildList
@@ -26,11 +27,18 @@ private:
 
         while (file.good())
         {
-            std::string currentLine;
-            file >> currentLine;
-            _nameList.push_back(currentLine);
+
+			std::string currentLine;
+			std::getline(file, currentLine);
+			currentLine.erase(std::remove(currentLine.begin(), currentLine.end(), ' '), currentLine.end());
+
+			if (!currentLine.empty())
+			{
+				_nameList.push_back(currentLine);
+			}
         }
-	_currentItem = _nameList.begin();
+
+		_currentItem = _nameList.begin();
         file.close();
     }
 
@@ -42,8 +50,9 @@ public:
         InProgress,
         Finished
     };
+
     BuildList(std::string filename)
-        :_filename(filename)
+		:_filename(filename)
         ,_currentItem(_nameList.begin())
     {
         readBuildList(filename);
@@ -67,6 +76,15 @@ public:
         return returnState;
     }
 
+	void reset()
+	{
+		_currentItem = _nameList.begin();
+	}
+
+	std::vector<std::string> getAsVector()
+	{
+		return _nameList;
+	}
 };
 
 #endif
