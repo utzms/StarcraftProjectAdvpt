@@ -1,32 +1,30 @@
 #ifndef _BUILDING_H_
 #define _BUILDING_H_
-#include "Entity.h"
+
 #include <queue>
+#include <memory>
 
-class Building : public Entity
+#include "GameState.h"
+#include "TechnologyManager.h"
+
+class Building
 {
-	private:	
-        template <class EntityType>
-        struct Order
-        {
-            int timer;
+	public:
+		enum class ProductionType
+		{
+			WorkerOrder,
+			UnitOrder
+		};
 
-            EntityType* finish()
-            {
-                return new EntityType;
-            }
+	private:
+		std::string _name;
+		int			_timer;
+		std::string _productionUnitName;
 
-            Order()
-                :timer(0)
-            {
+		ProductionType _productionType;
 
-            }
-        };
-
-       // std::queue<Order> orderQueue;
-
-		int timer;
-        int maxOrders;
+		std::shared_ptr<GameState> _gameState;
+		std::shared_ptr<TechnologyManager> _technologyManager;
 
 	public:
         enum class State
@@ -36,20 +34,67 @@ class Building : public Entity
             Producing
         };
 
-        template <class EntityType>
-        void order()
-        {
-        }
+		State state;
+
+		Building(std::string name, int buildTime, std::shared_ptr<GameState> gameState, std::shared_ptr<TechnologyManager> technologyManager)
+			:_name(name)
+			,_timer(buildTime)
+			,_gameState(gameState)
+			,_technologyManager(technologyManager)
+			,state(State::UnderConstruction)
+		{
+		}
+
+		template <class ProductionType>
+		void buildUnit(std::string name, int time)
+		{
+			if (state == State::Ready)
+			{
+				ProductionType type;
+				_productionType = type;
+				_productionUnitName = name;
+				_timer = time;
+
+				state = State::Producing;
+			}
+			else
+			{
+				std::cerr << "Building " << _name << " is already producing or being constructed." << std::endl;
+			}
+		}
 
         void timeStep()
         {
+			if (state != State::Ready)
+			{
+				_timer--;
 
+				if (_timer == 0)
+				{
+					if (state == State::Producing)
+					{
+						_gameState->workerList.push_back(std::shared_ptr<Worker>(new Worker(_productionUnitName, _gameState, _technologyManager)));
+						_technologyManager->notifyCreation(_gameState->workerList.back());
+					}
+					else if (state == State::UnderConstruction)
+					{
+						// nothing, all done in worker
+					}
+
+					state = State::Ready;
+				}
+			}
         }
 
         int getTime()
         {
-            return timer;
+			return _timer;
         }
+
+		std::string getName()
+		{
+			return _name;
+		}
 };
 
 #endif

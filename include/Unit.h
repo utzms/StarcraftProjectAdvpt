@@ -2,11 +2,15 @@
 #define _UNIT_H_
 #include "Entity.h"
 
-class Unit : public Entity
+class Unit
 {   
     private:
+		std::string _name;
 
 	public:
-
+		std::string getName()
+		{
+			return _name;
+		}
 };
 #endif
