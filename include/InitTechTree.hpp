@@ -25,10 +25,10 @@ class InitTechTree
 
         bool initTechTree()
 		{
-            bool result = false;
+                bool result = false;
 
-					_technologyList->initBuildingList(_technologyList->getBuildingPath());
-					_technologyList->initUnitList(_technologyList->getUnitPath());
+                _technologyList->initBuildingList(_technologyList->getBuildingPath());
+                _technologyList->initUnitList(_technologyList->getUnitPath());
 
 
                 if (_technologyList->isInitialized())

@@ -17,7 +17,7 @@ class GameStateUpdate
 		{
 		}
 
-		void timestep()
+        void timeStep()
 		{
 			std::vector< std::shared_ptr<Worker> >&      workerList   = _gameState->workerList;
 			std::vector< std::shared_ptr<Building> >&    buildingList = _gameState->buildingList;
