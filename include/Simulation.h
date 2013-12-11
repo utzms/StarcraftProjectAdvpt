@@ -52,28 +52,28 @@ class Simulation
 			,_startingConfiguration(startingConfiguration)
 		{
 
-			std::vector< std::shared_ptr<Worker>>& workerList = gameState->workerList;
+//			std::vector< std::shared_ptr<Worker>>& workerList = gameState->workerList;
 
 
-			for(int currentWorker = 0; currentWorker < _startingConfiguration->getInitialWorkerCount(); ++currentWorker)
-			{
-				workerList.push_back(std::shared_ptr<Worker>(new Worker("Konrad", _gameState, _technologyManager)));
-				workerList[currentWorker]->state = Worker::State::CollectingMinerals;
-			}
+//			for(int currentWorker = 0; currentWorker < _startingConfiguration->getInitialWorkerCount(); ++currentWorker)
+//			{
+//				workerList.push_back(std::shared_ptr<Worker>(new Worker("Konrad", _gameState, _technologyManager)));
+//				workerList[currentWorker]->state = Worker::State::CollectingMinerals;
+//			}
 
-			gameState->addMinerals(_startingConfiguration->getInitialMinerals());
-			gameState->addGas(_startingConfiguration->getInitialVespeneGas());
+//			gameState->addMinerals(_startingConfiguration->getInitialMinerals());
+//			gameState->addGas(_startingConfiguration->getInitialVespeneGas());
 
         }
 
         void run()
         {
             int timesteps = 0;
-            while(_gameState->getMinerals() < 200 )
-            {
-                timeStep();
-                timesteps++;
-            }
+//            while(_gameState->getMinerals() < 200 )
+//            {
+//                timeStep();
+//                timesteps++;
+//            }
             std::cout << "Needed timesteps: " << timesteps << std::endl;
         }
 
@@ -89,20 +89,20 @@ class Simulation
 
         void timeStep()
         {
-            std::vector< std::shared_ptr<Worker> >&      workerList   = _gameState->workerList;
-            std::vector< std::shared_ptr<Building> >&    buildingList = _gameState->buildingList;
-            std::vector< std::shared_ptr<Unit> >&        unitList     = _gameState->unitList;
+//            std::vector< std::shared_ptr<Worker> >&      workerList   = _gameState->workerList;
+//            std::vector< std::shared_ptr<Building> >&    buildingList = _gameState->buildingList;
+//            std::vector< std::shared_ptr<Unit> >&        unitList     = _gameState->unitList;
 
-            for (auto workerIterator : workerList)
-            {
-                workerIterator->timeStep();
-            }
+//            for (auto workerIterator : workerList)
+//            {
+//                workerIterator->timeStep();
+//            }
 
-            for (auto buildingIterator : buildingList)
-            {
-                buildingIterator->timeStep();
-            }
-            _resourceManager->timeStep();
+//            for (auto buildingIterator : buildingList)
+//            {
+//                buildingIterator->timeStep();
+//            }
+//            _resourceManager->timeStep();
         }
 
         ~Simulation()

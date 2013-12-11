@@ -100,18 +100,18 @@ class TechnologyManager
         std::shared_ptr<std::vector<std::vector<std::shared_ptr<Technology > > > > getNeededTechnologyRequirements(std::shared_ptr<Technology> technology) 
         {
             auto res = std::shared_ptr<std::vector<std::vector<std::shared_ptr<Technology > > > >(new std::vector<std::vector<std::shared_ptr<Technology> > > );   
-            auto requirements = technology->getRequirements();
-            for(size_t i = 0; i != requirements.size(); ++i) 
-            {   
-                res->at(i) = std::vector<std::shared_ptr<Technology> >(requirements[i].size()); 
-                for(size_t j = 0; j != requirements[i].size(); ++j)
-                {
-                    if(!(((requirements[i][j]).first)->exists())) 
-                    {
-                        (res->at(i)).at(j) = (requirements[i][j]).first;
-                    }
-                }
-            }
+//            auto requirements = technology->getRequirements();
+//            for(size_t i = 0; i != requirements.size(); ++i)
+//            {
+//                res->at(i) = std::vector<std::shared_ptr<Technology> >(requirements[i].size());
+//                for(size_t j = 0; j != requirements[i].size(); ++j)
+//                {
+//                    if(!(((requirements[i][j]).first)->exists()))
+//                    {
+//                        (res->at(i)).at(j) = (requirements[i][j]).first;
+//                    }
+//                }
+//            }
             return res;
         }
 
