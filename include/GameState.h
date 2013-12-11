@@ -19,9 +19,9 @@ class GameState
 		float supply;
 
 	public:
-		std::vector< std::shared_ptr<Worker> >      workerList;
-        std::vector< std::shared_ptr<Building> >    buildingList;
-        std::vector< std::shared_ptr<Unit> >        unitList;
+//		std::vector< std::shared_ptr<Worker> >      workerList;
+//		std::vector< std::shared_ptr<Building> >    buildingList;
+//		std::vector< std::shared_ptr<Unit> >        unitList;
 
 		GameState()
 		{

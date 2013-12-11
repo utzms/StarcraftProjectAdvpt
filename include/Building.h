@@ -50,51 +50,51 @@ class Building
 		template <class ProductionType>
 		void buildUnit(std::string name, int time)
 		{
-			if (state == State::Ready)
-			{
-				ProductionType type;
-				_productionType = type;
-				_productionUnitName = name;
-				_timer = time;
+//			if (state == State::Ready)
+//			{
+//				ProductionType type;
+//				_productionType = type;
+//				_productionUnitName = name;
+//				_timer = time;
 
-				state = State::Producing;
-			}
-			else
-			{
-				std::cerr << "Building " << _name << " is already producing or being constructed." << std::endl;
-			}
+//				state = State::Producing;
+//			}
+//			else
+//			{
+//				std::cerr << "Building " << _name << " is already producing or being constructed." << std::endl;
+//			}
 		}
 
         void timeStep()
         {
-			if (state != State::Ready)
-			{
-				_timer--;
+//			if (state != State::Ready)
+//			{
+//				_timer--;
 
-				if (_timer == 0)
-				{
-					if (state == State::Producing)
-					{
-						if (_productionType == ProductionType::WorkerOrder)
-						{
-							_gameState->workerList.push_back(std::shared_ptr<Worker>(new Worker(_productionUnitName, _gameState, _technologyManager)));
-							_technologyManager->notifyCreation(_gameState->workerList.back());
-						}
-						else if (_productionType == ProductionType::UnitOrder)
-						{
-							_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit(_productionUnitName)));
-							_technologyManager->notifyCreation(_gameState->unitList.back());
-						}
+//				if (_timer == 0)
+//				{
+//					if (state == State::Producing)
+//					{
+//						if (_productionType == ProductionType::WorkerOrder)
+//						{
+//							_gameState->workerList.push_back(std::shared_ptr<Worker>(new Worker(_productionUnitName, _gameState, _technologyManager)));
+//							_technologyManager->notifyCreation(_gameState->workerList.back());
+//						}
+//						else if (_productionType == ProductionType::UnitOrder)
+//						{
+//							_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit(_productionUnitName)));
+//							_technologyManager->notifyCreation(_gameState->unitList.back());
+//						}
 
-					}
-					else if (state == State::UnderConstruction)
-					{
-						// nothing, all done in worker
-					}
+//					}
+//					else if (state == State::UnderConstruction)
+//					{
+//						// nothing, all done in worker
+//					}
 
-					state = State::Ready;
-				}
-			}
+//					state = State::Ready;
+//				}
+//			}
         }
 
         int getTime()

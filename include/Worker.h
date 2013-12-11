@@ -40,35 +40,35 @@ class Worker
 
 		void buildBuilding(std::string name, int time)
 		{
-			if (state == State::Ready)
-			{
-				_currentBuilding = std::shared_ptr<Building>(new Building(name, time, _gameState, _technologyManager));
+//			if (state == State::Ready)
+//			{
+//				_currentBuilding = std::shared_ptr<Building>(new Building(name, time, _gameState, _technologyManager));
 
-				_gameState->buildingList.push_back(_currentBuilding);
-				_timer = time;
+//				_gameState->buildingList.push_back(_currentBuilding);
+//				_timer = time;
 
-				state = State::Constructing;
-			}
-			else
-			{
-				std::cerr << "Worker " << _name << " is already busy." << std::endl;
-			}
+//				state = State::Constructing;
+//			}
+//			else
+//			{
+//				std::cerr << "Worker " << _name << " is already busy." << std::endl;
+//			}
 		}
 
         void timeStep()
         {
-			if (state == State::Constructing)
-			{
-				_timer--;
+//			if (state == State::Constructing)
+//			{
+//				_timer--;
 
-				if(_timer == 0)
-				{
-					_currentBuilding->state = Building::State::Ready;
-					_technologyManager->notifyCreation(_currentBuilding);
+//				if(_timer == 0)
+//				{
+//					_currentBuilding->state = Building::State::Ready;
+//					_technologyManager->notifyCreation(_currentBuilding);
 
-					state = State::Ready;
-				}
-			}
+//					state = State::Ready;
+//				}
+//			}
 
         }
 
