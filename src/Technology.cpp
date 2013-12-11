@@ -2,111 +2,115 @@
 
 Technology::Technology()
 {
+	setZero();
 }
 
 Technology::Technology(std::string name)
-    :_name(name)
 {
+	name=name;
+	setZero();
+	PROGRESS("CONSTRUCTOR - Costs()" );
 }
 
+void Technology::setZero()
+{   
+	TechCosts.minerals=0.0f;
+	TechCosts.gas=0.0f;
+	TechCosts.supply=0.0f;
+	TechCosts.buildTime=0;
+}   
+
+
 Technology::Technology(std::string name, float min, float gas, float supply, int buildTime)
-    :_name(name)
-    ,_techCosts(Costs(min, gas, supply, buildTime))
-    ,_exists(false)
 {
+#ifdef DEBUG
+	std::cerr << "CONSTRUCTOR - Technology(name,float,float....)" << std::endl;
+	std::cerr << "\t" << name << " " << min << " " << gas << " " << supply << " " << buildTime << std::endl;
+#endif
+	this->name=name;
+	TechCosts.minerals=min;
+	TechCosts.gas=gas;
+	TechCosts.supply=supply;
+	TechCosts.buildTime=buildTime;
+	existence = false;
 }
 
 void Technology::addRequirement(std::pair<std::shared_ptr<Technology>,RequirementType> newRequirement)
 {
-    std::vector<std::pair<std::shared_ptr <Technology>,RequirementType>> tmp;
+	std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>> tmp;
 
-    tmp.push_back(newRequirement);
+	tmp.push_back(newRequirement);
 
-    if (std::find(_requirements.begin(), _requirements.end(), tmp) == _requirements.end())
+	if (std::find(requirements.begin(), requirements.end(), tmp) == requirements.end())
 	{
-        _requirements.push_back(tmp);
+		requirements.push_back(tmp);
 	}
 }
 
-void Technology::addRequirement(std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > newRequirement)
+void Technology::addRequirement(std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>> newRequirement)
 {
-    if (newRequirement.size() != 0)
+	if (newRequirement.size() != 0)
 	{
-        if (std::find(_requirements.begin(), _requirements.end(), newRequirement) == _requirements.end())
+		if (std::find(requirements.begin(), requirements.end(), newRequirement) == requirements.end())
 		{
-            _requirements.push_back(newRequirement);
+			requirements.push_back(newRequirement);
 		}
 	}
 }
-
 void Technology::setName(std::string name)
 {
-    _name = name;
-}
-
+	this->name=name;
+}   
 void Technology::setMineral(float minerals)
 {
-    _techCosts.minerals = minerals;
-}
-
+	TechCosts.minerals=minerals;
+}   
 void Technology::setGas(float gas)
 {
-    _techCosts.gas = gas;
-}
-
+	TechCosts.gas=gas;
+}   
 void Technology::setSupply(float supply)
 {
-    _techCosts.supply = supply;
-}
-
+	TechCosts.supply=supply;
+}   
 void Technology::setBuildTime(int time)
 {
-    _techCosts.buildTime = time;
-}
+	TechCosts.buildTime=time;
+}   
 
-void Technology::setExistence(bool state) 
+void Technology::setExistence(bool state)
 {
-    _exists = state;
-}
+	existence = state;
+}   
 
 std::string Technology::getName(void)
 {
-    return _name;
+	return name;
 }
-
-/*
-std::vector<std::shared_ptr<Technology>> Technology::getRequirements(void)
-{
-	return requirements;
-}
-*/
 
 std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>>> Technology::getRequirements(void)
 {
-    return _requirements;
+	return requirements;
 }
-
 float Technology::getMineralsCost(void)
 {
-    return _techCosts.minerals;
+	return TechCosts.minerals;
 }
-
 float Technology::getGasCost(void)
 {
-    return _techCosts.gas;
+	return TechCosts.gas;
 }
-
 float Technology::getSupplyCost(void)
 {
-    return _techCosts.supply;
+	return TechCosts.supply;
 }
-
 int Technology::getBuildTime(void)
 {
-    return _techCosts.buildTime;
+	return TechCosts.buildTime;
 }
 
-bool Technology::exists(void) 
+bool Technology::exists(void)
 {
-    return _exists;
+	return existence;
 }
+

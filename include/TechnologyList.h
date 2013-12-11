@@ -21,29 +21,32 @@ class TechnologyList
 	};
 	private:
 		bool initialized;
+		std::string buildingPath, unitPath;
 
 		void initRest();
+		void reset();
 
 		std::map<std::shared_ptr<Technology>, requirementRest> unresolvedBuildingRequirements;
 		std::map<std::shared_ptr<Technology>, requirementRest> unresolvedUnitRequirements;
-		std::string _buildingPath;
-		std::string _unitPath;
 
 		std::multimap<std::string, std::shared_ptr<Technology> > units;
 		std::multimap<std::string, std::shared_ptr<Technology> > buildings;
 
 	public:
 		TechnologyList(std::string buildingPath,std::string unitPath);
+		TechnologyList();
 
-		inline std::string getBuildingPath() {return _buildingPath;}
-		inline std::string getUnitPath() {return _unitPath;}
+		inline std::string getBuildingPath() {return buildingPath;}
+		inline std::string getUnitPath() {return unitPath;}
+
+		bool isBuildListPossible(std::vector<std::string> wuff);
 
 		bool isInitialized();
 		void initUnitList(std::string race);
 		void initBuildingList(std::string race);
 
-		std::vector<std::shared_ptr<Technology> > findUnitVec(std::string key);
-		std::vector<std::shared_ptr<Technology> > findBuildingVec(std::string key);
+		std::vector<std::shared_ptr<Technology>> findUnitVec(std::string key);
+		std::vector<std::shared_ptr<Technology>> findBuildingVec(std::string key);
 
 		std::shared_ptr<Technology> findUnit(std::string key);
 		std::shared_ptr<Technology> findBuilding(std::string key);

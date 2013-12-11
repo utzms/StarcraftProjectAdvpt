@@ -20,9 +20,9 @@
 
 enum class RequirementType
 {
-    Existence,
-    Vanishing,
-    ForProduction
+	Existence,
+	Vanishing,
+	ForProduction
 };
 
 struct Costs
@@ -30,64 +30,45 @@ struct Costs
 	float minerals;
 	float gas;
 	float supply;
-    int   buildTime;
-
-    Costs()
-        :minerals(0.f)
-        ,gas(0.f)
-        ,supply(0.f)
-        ,buildTime(0)
-    {
-    }
-
-    Costs(float newMinerals, float newGas, float newSupply, int newBuildTime)
-        :minerals(newMinerals)
-        ,gas(newGas)
-        ,supply(newSupply)
-        ,buildTime(newBuildTime)
-    {
-        PROGRESS("CONSTRUCTOR - Costs()" << " " << newMinerals << " " << newGas << " " << newSupply << " " << newBuildTime);
-    }
+	int   buildTime;
 };
 
 class Technology
 {
 	private:
-        std::string _name;
-        Costs       _techCosts;
-        bool        _exists;
+		std::string name;
+		Costs TechCosts;
+		bool existence;
 
-		//std::vector<std::shared_ptr<Technology>> requirements;
-        std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > _requirements;
+		std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>>> requirements;
 
 	public:
 		Technology();
 		Technology(std::string name);
 		Technology(std::string name, float min, float gas, float supply, int buildTime);
 
-        void setZero();
+		void setZero();
 
-        void addRequirement(std::pair<std::shared_ptr<Technology>, RequirementType>);
-        void addRequirement(std::vector<std::pair<std::shared_ptr<Technology>, RequirementType> >);
+		void addRequirement(std::pair<std::shared_ptr<Technology>, RequirementType>);
+		void addRequirement(std::vector<std::pair<std::shared_ptr<Technology>, RequirementType>>);
 
-        void setName     (std::string name);
-        void setMineral  (float minerals);
-        void setGas      (float gas);
-        void setSupply   (float supply);
-        void setBuildTime(int   time);
-        void setExistence(bool  state);
-
+		void setName(std::string name);
+		void setMineral(float minerals);
+		void setGas(float gas);
+		void setSupply(float supply);
+		void setBuildTime(int time);
+		void setExistence(bool state);
 		std::string getName(void);
 
-		//std::vector<std::shared_ptr<Technology>> getRequirements(void);
-        std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > getRequirements(void);
 
+		std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>>> getRequirements(void);
 		float getMineralsCost(void);
 		float getGasCost(void);
 		//getSupplyCost returns providing supply in case of buildings
 		float getSupplyCost(void);
-        int   getBuildTime(void);
-        bool  exists();
+		int getBuildTime(void);
+		bool exists();
+
 };
 
 #endif

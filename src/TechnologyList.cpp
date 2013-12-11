@@ -1,9 +1,17 @@
 #include "../include/TechnologyList.h"
 
-TechnologyList::TechnologyList(std::string inputPath)
+TechnologyList::TechnologyList()
 {
-	_inputPath = inputPath;
 	initialized=false;
+}
+TechnologyList::TechnologyList(std::string unitPath, std::string buildingPath)
+{
+	initialized=false;
+	this->unitPath=unitPath;
+	this->buildingPath=buildingPath;
+
+	initUnitList(unitPath);
+	initBuildingList(buildingPath);
 }
 
 void TechnologyList::initRest()
@@ -541,9 +549,27 @@ void TechnologyList::initBuildingList(std::string buildList)
 		initRest();
 }
 
+void TechnologyList::reset()
+{
+	for (auto it : units)
+	{
+		(it).second->setExistence(false);
+	}
+	for (auto it : buildings)
+	{
+		(it).second->setExistence(false);
+	}
+}
+
 bool TechnologyList::isInitialized()
 {
 	return initialized;
+}
+
+bool TechnologyList::isBuildListPossible(std::vector<std::string> wuff)
+{
+
+	return false;
 }
 
 std::vector<std::shared_ptr<Technology > > TechnologyList::findUnitVec(std::string key)

@@ -1,3 +1,6 @@
+
+#ifndef TECHTREETEST
+
 #include <iomanip> //include this for formatted output
 
 #include "../include/Simulation.h"
@@ -24,3 +27,15 @@ int main()
 
 	return 0;
 }
+
+#else
+
+#include "testTechList.cpp"
+
+int main()
+{
+	test();
+	return 0;
+}
+
+#endif
