@@ -6,10 +6,9 @@
 
 class Worker
 {
+
 	private:
 		std::string _name;
-		std::string _buildingName;
-		int			_timer;
 
 	public:
         enum class State
@@ -23,6 +22,7 @@ class Worker
 
         State state;
 		int timer;
+		std::string buildingName;
 
 		Worker(std::string name)
 			:_name(name)
@@ -43,5 +43,7 @@ class Worker
 		{
 			return _name;
 		}
+
+
 };
 #endif

@@ -12,10 +12,7 @@ class Building
 
 	private:
 		std::string _name;
-		int			_timer;
-		std::string _productionUnitName;
 
-		ProductionType _productionType;
 
 	public:
         enum class State
@@ -26,10 +23,14 @@ class Building
         };
 
 		State state;
+		int			timer;
+		std::string productionUnitName;
+		ProductionType productionType;
+
 
 		Building(std::string name, int buildTime)
 			:_name(name)
-			,_timer(buildTime)
+			,timer(buildTime)
 			,state(State::UnderConstruction)
 		{
 		}
@@ -38,13 +39,13 @@ class Building
         {
 			if (state != State::Ready)
 			{
-				_timer--;
+				timer--;
 			}
         }
 
         int getTime()
         {
-			return _timer;
+			return timer;
         }
 
 		std::string getName()
