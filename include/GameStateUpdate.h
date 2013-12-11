@@ -38,12 +38,12 @@ class GameStateUpdate
 				{
 					if (buildingIterator->state == Building::State::Producing)
 					{
-						if (buildingIterator->productionType == Building::ProductionType::WorkerOrder)
+                        if (buildingIterator->productionType == Building::ProductionType::WorkerOrder)
 						{
 							_gameState->workerList.push_back(std::shared_ptr<Worker>(new Worker(buildingIterator->productionUnitName)));
 							_technologyManager->notifyCreation(_gameState->workerList.back());
 						}
-						else if (buildingIterator->productionType == Building::ProductionType::UnitOrder)
+                        else if (buildingIterator->productionType == Building::ProductionType::UnitOrder)
 						{
 							_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit(buildingIterator->productionUnitName)));
 							_technologyManager->notifyCreation(_gameState->unitList.back());
@@ -52,6 +52,7 @@ class GameStateUpdate
 					}
 					else if (buildingIterator->state == Building::State::UnderConstruction)
 					{
+                        std::cout << "Construction Done" <<std::endl;
 						_technologyManager->notifyCreation(buildingIterator);
 					}
 					buildingIterator->state == Building::State::Ready;
@@ -71,9 +72,9 @@ class GameStateUpdate
 
 		}
 
-		template<class ProductionType> void produceUnit(std::string name, int time)
+        template<class ProductionType> void produceUnit(std::string name, int time)
 		{
-			std::vector< std::shared_ptr<Building> >&    buildingList = _gameState->buildingList;
+            std::vector< std::shared_ptr<Building> >&    buildingList = _gameState->buildingList;
 			std::shared_ptr<Building> BuildingForProduction = NULL;
 			 for (auto buildingIterator : buildingList)
 			 {
@@ -84,12 +85,12 @@ class GameStateUpdate
 				 }
 			 }
 
-			 if(BuildingForProduction == NULL)
+             if(BuildingForProduction == NULL)
 			 {
 				 throw std::runtime_error("GameStateUpdate::produceUnit: Wrong Order placed");
 			 }
 
-			ProductionType type;
+            ProductionType type;
 			BuildingForProduction->productionType = type;
 			BuildingForProduction->productionUnitName = name;
 			BuildingForProduction->timer = time;

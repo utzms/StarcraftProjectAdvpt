@@ -74,12 +74,18 @@ class Simulation
         void run()
         {
             int timesteps = 0;
-            while(_gameState->getMinerals() < 200 )
+            _gameStateUpdate->buildBuilding(_gameState->workerList[0] , "Nexus", 20);
+            while(timesteps < 200 )
             {
+                if( _gameState->buildingList.empty() != 0 )
+                {
+                    //_gameStateUpdate->produceUnit<Building::ProductionType::WorkerOrder>(std::string("Worker"), 10);
+                }
+
                 timeStep();
                 timesteps++;
             }
-            std::cout << "Needed timesteps: " << timesteps << std::endl;
+            std::cout << "Produced Minerals: " << _gameState->getMinerals() << std::endl;
         }
 
         void startSimulation()
