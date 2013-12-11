@@ -65,7 +65,6 @@ class Simulation
 
 //			gameState->addMinerals(_startingConfiguration->getInitialMinerals());
 //			gameState->addGas(_startingConfiguration->getInitialVespeneGas());
-
         }
 
         void run()

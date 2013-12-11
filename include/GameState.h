@@ -5,89 +5,89 @@
 #include <memory>
 
 #include "Worker.h"
-//#include "Building.h"
-//#include "Unit.h"
+#include "Building.h"
+#include "Unit.h"
 
 /** Class that represents the complete state of the game, enclosing all existing entities and the current amount of resources. */
 class GameState
 {
 	private:	
-		float minerals;
-		float gas;
-		float energy;
-		float supply;
+		float _minerals;
+		float _gas;
+		float _energy;
+		float _supply;
 
 	public:
-//		std::vector< std::shared_ptr<Worker> >      workerList;
-//		std::vector< std::shared_ptr<Building> >    buildingList;
-//		std::vector< std::shared_ptr<Unit> >        unitList;
+		std::vector< std::shared_ptr<Worker> >      workerList;
+		std::vector< std::shared_ptr<Building> >    buildingList;
+		std::vector< std::shared_ptr<Unit> >        unitList;
 
 		GameState()
 		{
-			minerals	=	0.0f;
-			gas			=	0.0f;
-			energy		=	0.0f;
-			supply		=	0.0f;
+			_minerals	=	0.0f;
+			_gas		=	0.0f;
+			_energy		=	0.0f;
+			_supply		=	0.0f;
 		}
 
         float getMinerals()
         {
-            return minerals;
+			return _minerals;
         }
 
         float getGas()
         {
-            return gas;
+			return _gas;
         }
 
         float getEnergy()
         {
-            return energy;
+			return _energy;
         }
 
         float getSupply()
         {
-            return supply;
+			return _supply;
         }
 
         void addMinerals(float value)
         {
-            minerals += value;
+			_minerals += value;
         }
 
         void subMinerals(float value)
         {
-            minerals -= value;
+			_minerals -= value;
         }
 
         void addGas(float value)
         {
-            gas += value;
+			_gas += value;
         }
 
         void subGas(float value)
         {
-            gas -= value;
+			_gas -= value;
         }
 
         void addEnergy(float value)
         {
-            energy += value;
+			_energy += value;
         }
 
         void subEnergy(float value)
         {
-            energy -= value;
+			_energy -= value;
         }
 
         void addSupply(float value)
         {
-            supply += value;
+			_supply += value;
         }
 
         void subSupply(float value)
         {
-            supply -= value;
+			_supply -= value;
         }
 };
 
