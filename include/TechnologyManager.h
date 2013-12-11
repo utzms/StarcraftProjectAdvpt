@@ -71,7 +71,7 @@ class TechnologyManager
             }
         }
 
-        inline bool checkRequirement(std::shared_ptr<Technology> requirement)
+    bool checkRequirement(std::shared_ptr<Technology> requirement)
         {
 //		if(requirement->getMineralsCost() > _gameState->getMinerals() || requirement->getGasCost() > _gameState->getGas() || requirement->getSupplyCost() > _gameState->getSupply())
 //			{
