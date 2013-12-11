@@ -42,7 +42,7 @@ void ResourceManager::timeStep()
             mineralsToAdd += _mineralsIncrementPerWorker;
 		}
 
-        if(currentWorker->state == Worker::State::CollectingVespeneGas)
+		if(currentWorker->state == Worker::State::CollectingVespene)
 		{
             vespeneGasToAdd += _vespinGasIncrementPerWorker;
 		}	

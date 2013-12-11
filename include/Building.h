@@ -4,6 +4,8 @@
 #include <queue>
 #include <memory>
 
+#include "Unit.h"
+#include "Worker.h"
 #include "GameState.h"
 #include "TechnologyManager.h"
 
@@ -73,8 +75,17 @@ class Building
 				{
 					if (state == State::Producing)
 					{
-						_gameState->workerList.push_back(std::shared_ptr<Worker>(new Worker(_productionUnitName, _gameState, _technologyManager)));
-						_technologyManager->notifyCreation(_gameState->workerList.back());
+						if (_productionType == ProductionType::WorkerOrder)
+						{
+							_gameState->workerList.push_back(std::shared_ptr<Worker>(new Worker(_productionUnitName, _gameState, _technologyManager)));
+							_technologyManager->notifyCreation(_gameState->workerList.back());
+						}
+						else if (_productionType == ProductionType::UnitOrder)
+						{
+							_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit(_productionUnitName)));
+							_technologyManager->notifyCreation(_gameState->unitList.back());
+						}
+
 					}
 					else if (state == State::UnderConstruction)
 					{

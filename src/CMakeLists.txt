@@ -1,6 +1,6 @@
 include_directories( . )
 
-set ( OWN_SOURCES  Building.cpp DataReader.cpp Debug.cpp main.cpp GameState.cpp ResourceManager.cpp Technology.cpp TechnologyList.cpp Unit.cpp )
+set ( OWN_SOURCES  DataReader.cpp Debug.cpp main.cpp ResourceManager.cpp Technology.cpp TechnologyList.cpp )
 set ( OWN_HEADERS 
   ../include/Building.h
   ../include/BuildList.h

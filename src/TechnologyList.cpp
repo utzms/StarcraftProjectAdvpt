@@ -1,7 +1,8 @@
 #include "../include/TechnologyList.h"
 
-TechnologyList::TechnologyList()
+TechnologyList::TechnologyList(std::string inputPath)
 {
+	_inputPath = inputPath;
 	initialized=false;
 }
 
@@ -545,7 +546,7 @@ bool TechnologyList::isInitialized()
 	return initialized;
 }
 
-std::vector<std::shared_ptr<Technology>> TechnologyList::findUnitVec(std::string key)
+std::vector<std::shared_ptr<Technology > > TechnologyList::findUnitVec(std::string key)
 {
 	std::vector<std::shared_ptr<Technology>> ret;
 	auto it = units.equal_range(key).first;
@@ -555,7 +556,7 @@ std::vector<std::shared_ptr<Technology>> TechnologyList::findUnitVec(std::string
 	}
 	return ret;
 }
-std::vector<std::shared_ptr<Technology>> TechnologyList::findBuildingVec(std::string key)
+std::vector<std::shared_ptr<Technology> > TechnologyList::findBuildingVec(std::string key)
 {
 	std::vector<std::shared_ptr<Technology>> ret;
 	auto it = buildings.equal_range(key).first;
@@ -570,7 +571,7 @@ std::vector<std::shared_ptr<Technology>> TechnologyList::findBuildingVec(std::st
 std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 {
 	static std::string lastKey="PlaceHolder";
-	static std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
+	static std::multimap<std::string,std::shared_ptr<Technology> >::iterator it;
 
 	int count = buildings.count(key);
 	if (count == 0)
@@ -608,7 +609,7 @@ std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 {
 	static std::string lastKey="PlaceHolder";
-	static std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
+	static std::multimap<std::string,std::shared_ptr<Technology> >::iterator it;
 
 	int count = units.count(key);
 	if (count == 0)

@@ -1,7 +1,6 @@
 #ifndef _INITTECHTREE_HPP_
 #define _INITTECHTREE_HPP_
 
-#include "techTreePolicy.h"
 #include "TechnologyList.h"
 
 /*
@@ -9,7 +8,6 @@
    This class builds the TechTree and all dependencies if needed files are present. (Paths are hardcoded in Policy Helperfile)
    */
 
-template<typename TechTree>
 class InitTechTree
 {
 	private:
@@ -29,31 +27,19 @@ class InitTechTree
 		{
             bool result = false;
 
-            if (_technologyList)
-			{
-                _technologyList->initBuildingList(TechTree::buildingPath1());
+					_technologyList->initBuildingList(_technologyList->getBuildingPath());
+					_technologyList->initUnitList(_technologyList->getUnitPath());
 
-                if (!(_technologyList->isInitialized()))
-				{
-					std::cerr << "Will try another Path" << std::endl;
-                    _technologyList->initBuildingList(TechTree::buildingPath2());
-                    _technologyList->initUnitList(TechTree::unitPath2());
-                }
-                else
-				{
-                    _technologyList->initUnitList(TechTree::unitPath1());
-				}
 
                 if (_technologyList->isInitialized())
                 {
                     result = true;
                 }
-            }
-            else
-            {
-				std::cerr << "No valid Tech List used" << std::endl;
-                result = false;
-			}
+				else
+				{
+					std::cerr << "No valid Tech List used" << std::endl;
+				  result = false;
+				}
 
             return result;
 		}

@@ -8,9 +8,15 @@ class Unit
 		std::string _name;
 
 	public:
+		Unit(std::string name)
+		{
+			_name = name;
+		}
+
 		std::string getName()
 		{
 			return _name;
 		}
+
 };
 #endif
