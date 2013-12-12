@@ -2,6 +2,7 @@
 #define _TECHNOLOGYLIST_H_
 
 #include <iostream>
+#include <stdexcept>
 #include <map>
 #include <string>
 #include <sstream>
@@ -22,6 +23,7 @@ class TechnologyList
 	private:
 		bool initialized;
 		std::string buildingPath, unitPath;
+		std::vector<std::vector<std::shared_ptr<Technology>>> passedRequirements;
 
 		void initRest();
 		void reset();
@@ -39,11 +41,15 @@ class TechnologyList
 		inline std::string getBuildingPath() {return buildingPath;}
 		inline std::string getUnitPath() {return unitPath;}
 
+		bool checkRequirements(std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>>>);
 		bool isBuildListPossible(std::vector<std::string> wuff);
 
 		bool isInitialized();
 		void initUnitList(std::string race);
 		void initBuildingList(std::string race);
+		void printAll();
+
+		std::vector<std::vector<std::shared_ptr<Technology>>> getPassedRequirements();
 
 		std::vector<std::shared_ptr<Technology>> findUnitVec(std::string key);
 		std::vector<std::shared_ptr<Technology>> findBuildingVec(std::string key);

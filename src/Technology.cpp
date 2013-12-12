@@ -5,9 +5,9 @@ Technology::Technology()
 	setZero();
 }
 
-Technology::Technology(std::string name)
+Technology::Technology(std::string nameIn)
 {
-	name=name;
+	this->name=nameIn;
 	setZero();
 	PROGRESS("CONSTRUCTOR - Costs()" );
 }
@@ -21,13 +21,13 @@ void Technology::setZero()
 }   
 
 
-Technology::Technology(std::string name, float min, float gas, float supply, int buildTime)
+Technology::Technology(std::string nameIn, float min, float gas, float supply, int buildTime)
 {
 #ifdef DEBUG
 	std::cerr << "CONSTRUCTOR - Technology(name,float,float....)" << std::endl;
 	std::cerr << "\t" << name << " " << min << " " << gas << " " << supply << " " << buildTime << std::endl;
 #endif
-	this->name=name;
+	this->name=nameIn;
 	TechCosts.minerals=min;
 	TechCosts.gas=gas;
 	TechCosts.supply=supply;
@@ -57,9 +57,9 @@ void Technology::addRequirement(std::vector<std::pair<std::shared_ptr<Technology
 		}
 	}
 }
-void Technology::setName(std::string name)
+void Technology::setName(std::string nameIn)
 {
-	this->name=name;
+	this->name=nameIn;
 }   
 void Technology::setMineral(float minerals)
 {
@@ -112,5 +112,74 @@ int Technology::getBuildTime(void)
 bool Technology::exists(void)
 {
 	return existence;
+}
+
+std::ostream& operator<< (std::ostream& os, const Technology& tech)
+{
+	os << std::setw(20) << tech.name;
+#ifdef DEBUG
+	os << std::setw(6) << tech.TechCosts.minerals;
+	os << std::setw(6) << tech.TechCosts.gas;
+	os << std::setw(6) << tech.TechCosts.supply;
+	os << std::setw(6) << tech.TechCosts.buildTime;
+	std::string tmp1="|";
+	std::string tmp2="|";
+	std::string tmp3="|";
+	std::string *tmp;
+	for (size_t it = 0; it < tech.requirements.size(); ++it)
+	{
+		size_t j=0;
+		if (tech.requirements[it][j].second == RequirementType::Existence)
+		{
+			tmp = &tmp1;
+		} else if (tech.requirements[it][j].second == RequirementType::Vanishing)
+		{
+			tmp = &tmp2;
+		} else
+		{
+			tmp = &tmp3;
+		}
+		*tmp+=tech.requirements[it][j].first->getName();
+		for (j=1; j < tech.requirements[it].size(); j++)
+		{
+			*tmp = *tmp +"/" + tech.requirements[it][j].first->getName();
+		}
+		*tmp = *tmp+",";
+	}
+	tmp1.pop_back();
+	tmp2.pop_back();
+	tmp3.pop_back();
+	tmp1.append("|");
+	tmp2.append("|");
+	tmp3.append("|");
+	os << std::setw(30) << tmp1;
+	os << std::setw(30) << tmp2;
+	os << std::setw(30) << tmp3;
+	os << std::setw(15);
+	if (tech.existence)
+	{
+		os << "Exists";
+	} else 
+	{
+		os << "No Instance";
+	}
+#endif
+
+	return os;
+}
+
+std::ostream& operator<< (std::ostream& os, const Technology *tech)
+{
+	os << *tech;
+	return os;
+}
+
+std::ostream& operator<< (std::ostream& os, const std::shared_ptr<Technology> tech)
+{
+	os << *tech;
+#ifdef DEBUG
+	os << std::setw(5) << tech.use_count();
+#endif
+	return os;
 }
 

@@ -4,11 +4,11 @@ TechnologyList::TechnologyList()
 {
 	initialized=false;
 }
-TechnologyList::TechnologyList(std::string unitPath, std::string buildingPath)
+TechnologyList::TechnologyList(std::string unitPathIn, std::string buildPath)
 {
 	initialized=false;
-	this->unitPath=unitPath;
-	this->buildingPath=buildingPath;
+	this->unitPath=unitPathIn;
+	this->buildingPath=buildPath;
 
 	initUnitList(unitPath);
 	initBuildingList(buildingPath);
@@ -23,7 +23,6 @@ void TechnologyList::initRest()
 	std::string vanish;
 	std::string buildFrom;
 
-	std::string sub, subsub;
 	size_t from,fromfrom,to,toto;
 
 	auto unitIt = unresolvedUnitRequirements.begin();
@@ -566,13 +565,111 @@ bool TechnologyList::isInitialized()
 	return initialized;
 }
 
-bool TechnologyList::isBuildListPossible(std::vector<std::string> wuff)
+std::vector<std::vector<std::shared_ptr<Technology>>> TechnologyList::getPassedRequirements()
 {
-
-	return false;
+	return passedRequirements;
 }
 
-std::vector<std::shared_ptr<Technology > > TechnologyList::findUnitVec(std::string key)
+bool TechnologyList::checkRequirements(std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>>> req)
+{
+	std::vector<std::shared_ptr<Technology>> missing;
+	std::vector<std::vector<std::shared_ptr<Technology>>> pass;
+	bool allOK = true;
+	std::string out="";
+	for (size_t outer = 0; outer < req.size(); ++outer)
+	{
+		std::vector<std::shared_ptr<Technology>> inPass;
+		bool ok=false;
+		for (size_t inner = 0; inner < req[outer].size(); ++inner)
+		{
+			if (req[outer][inner].first->exists()==true)
+			{
+				inPass.push_back(req[outer][inner].first);
+				ok=true;
+				break;
+			} else
+			{
+				missing.push_back(req[outer][inner].first);
+			}
+		}
+		if (ok==false)
+		{
+			if (allOK == true)
+			{
+				out += "Missing requirements:\t";
+				allOK = false;
+			}
+			for (size_t miss = 0; miss < missing.size(); ++miss)
+			{
+				out+= missing[miss]->getName();
+				if (miss != missing.size()-1)
+					out+= "/";
+			}
+			out+=",";
+			missing.clear();
+		} else
+		{
+			pass.push_back(inPass);
+		}
+		inPass.clear();
+	}
+	if (allOK == false)
+	{
+		passedRequirements.clear();
+		out.pop_back();
+		std::cerr << out;
+		std::cerr << std::endl;
+		return false;
+	}
+	passedRequirements=pass;
+	return true;
+}
+
+bool TechnologyList::isBuildListPossible(std::vector<std::string> wuff)
+{
+	//currently implemented vor Protoss only
+	//Starting buildings/units have to be called by outer functions earlier!
+	auto initBuild = findBuildingVec("Nexus");
+	auto initUnit = findUnitVec("Probe");
+	for (size_t tmp=0; tmp < initBuild.size(); ++tmp)
+	{
+		initBuild[tmp]->setExistence(true);
+	}
+	for (size_t tmp=0; tmp < initUnit.size(); ++tmp)
+	{
+		initUnit[tmp]->setExistence(true);
+	}
+	for (size_t i = 0; i < wuff.size(); ++i)
+	{
+		auto testPossible = findUnitVec(wuff[i]);
+		if (testPossible.empty())
+		{
+			testPossible = findBuildingVec(wuff[i]);
+		}
+		if (testPossible.empty())
+		{
+			std::cerr << "FATAL ERROR: Couldnt find Technology: " << wuff[i] << std::endl;
+			return false;
+		}
+		for (size_t vec=0; vec < testPossible.size(); ++vec)
+		{
+			std::string progress = "Checking: " + testPossible[vec]->getName();
+			PROGRESS(progress);
+			if (checkRequirements(testPossible[vec]->getRequirements()) == false)
+			{
+				return false;
+			} else
+			{
+				testPossible[vec]->setExistence(true);
+			}
+		}
+	}
+	//when finished, call reset()
+	//either here or after the calling function
+	return true;
+}
+
+std::vector<std::shared_ptr<Technology>> TechnologyList::findUnitVec(std::string key)
 {
 	std::vector<std::shared_ptr<Technology>> ret;
 	auto it = units.equal_range(key).first;
@@ -582,7 +679,7 @@ std::vector<std::shared_ptr<Technology > > TechnologyList::findUnitVec(std::stri
 	}
 	return ret;
 }
-std::vector<std::shared_ptr<Technology> > TechnologyList::findBuildingVec(std::string key)
+std::vector<std::shared_ptr<Technology>> TechnologyList::findBuildingVec(std::string key)
 {
 	std::vector<std::shared_ptr<Technology>> ret;
 	auto it = buildings.equal_range(key).first;
@@ -593,11 +690,24 @@ std::vector<std::shared_ptr<Technology> > TechnologyList::findBuildingVec(std::s
 	return ret;
 }
 
+void TechnologyList::printAll()
+{
+	for(auto it : units)
+	{
+		std::cout << (it).second << std::endl;
+	}
+	std::cout << std::endl;
+	for(auto it : buildings)
+	{
+		std::cout << (it).second << std::endl;
+	}
+}
+
 
 std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 {
 	static std::string lastKey="PlaceHolder";
-	static std::multimap<std::string,std::shared_ptr<Technology> >::iterator it;
+	static std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
 
 	int count = buildings.count(key);
 	if (count == 0)
@@ -635,7 +745,7 @@ std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 {
 	static std::string lastKey="PlaceHolder";
-	static std::multimap<std::string,std::shared_ptr<Technology> >::iterator it;
+	static std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
 
 	int count = units.count(key);
 	if (count == 0)

@@ -2,7 +2,7 @@
 .PHONY: pathmaker clean
 
 CC=g++
-OPT=-std=c++11 -Wall -pedantic
+OPT=-std=c++11 -Wall -Wshadow -pedantic
 LIBS=
 INCPATH=./include/
 SRCPATH=./src/
@@ -24,6 +24,7 @@ out=$(OBJPATH)worker.o\
 all: exe
 
 test: OPT += -DTECHTREETEST
+test: OPT += -DDEBUG
 test: exe
 
 debug: OPT += -DDEBUG

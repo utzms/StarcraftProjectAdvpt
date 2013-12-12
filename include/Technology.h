@@ -3,6 +3,7 @@
 
 
 #include <vector>
+#include <iomanip>
 #include <utility>
 #include <iostream>
 #include <algorithm>
@@ -37,12 +38,12 @@ class Technology
 {
 	private:
 		std::string name;
-		Costs TechCosts;
 		bool existence;
 
 		std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>>> requirements;
 
 	public:
+		Costs TechCosts;
 		Technology();
 		Technology(std::string name);
 		Technology(std::string name, float min, float gas, float supply, int buildTime);
@@ -69,6 +70,12 @@ class Technology
 		int getBuildTime(void);
 		bool exists();
 
+
+		//declare operator as friend, so it is able to get needed values (e.g. name)
+		friend std::ostream& operator<< (std::ostream& os, const Technology& tech);
 };
+		std::ostream& operator<< (std::ostream& os, const Technology& tech);
+		std::ostream& operator<< (std::ostream& os, const Technology *tech);
+		std::ostream& operator<< (std::ostream& os, const std::shared_ptr<Technology> tech);
 
 #endif
