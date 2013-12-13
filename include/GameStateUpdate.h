@@ -52,50 +52,15 @@ class GameStateUpdate
 					}
 					else if (buildingIterator->state == Building::State::UnderConstruction)
 					{
-                        std::cout << "Construction Done" <<std::endl;
 						_technologyManager->notifyCreation(buildingIterator);
 					}
-					buildingIterator->state == Building::State::Ready;
+                    buildingIterator->state = Building::State::Ready;
 				}
 			}
 
 		}
 
-		void buildBuilding(std::shared_ptr<Worker> workerForBuilding, std::string name ,int time)
-		{
 
-			std::shared_ptr<Building> buildingToBuild = std::shared_ptr<Building>(new Building(name, time));
-			_gameState->buildingList.push_back(buildingToBuild);
-			workerForBuilding->timer = time;
-			workerForBuilding->buildingName = name;
-			workerForBuilding->state = Worker::State::Constructing;
-
-		}
-
-        template<class ProductionType> void produceUnit(std::string name, int time)
-		{
-            std::vector< std::shared_ptr<Building> >&    buildingList = _gameState->buildingList;
-			std::shared_ptr<Building> BuildingForProduction = NULL;
-			 for (auto buildingIterator : buildingList)
-			 {
-				 if(buildingIterator->state == Building::State::Ready)
-				 {
-						BuildingForProduction = buildingIterator;
-						break;
-				 }
-			 }
-
-             if(BuildingForProduction == NULL)
-			 {
-				 throw std::runtime_error("GameStateUpdate::produceUnit: Wrong Order placed");
-			 }
-
-            ProductionType type;
-			BuildingForProduction->productionType = type;
-			BuildingForProduction->productionUnitName = name;
-			BuildingForProduction->timer = time;
-			BuildingForProduction->state = Building::State::Producing;
-		}
 };
 
 #endif // GAMESTATEUPDATE_H
