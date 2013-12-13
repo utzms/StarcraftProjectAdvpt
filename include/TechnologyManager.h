@@ -25,14 +25,7 @@
  * The TechnologyManager is notified whenever a change concerning the Tech Tree occurs.
  */
 
-// innermost pair of Requirements: Technology, RequirementFlag(Vanishing, Existing, Creation means building)
-// vector of innermost pairs: one of the pairs needs to be ok, each of those could be ok for the technology to be able to be built
-// outer vector: every element needs to be fulfilled
-//typedef std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementType> > > Requirements;
-
-// a unit can be constructed from several similar technologies, so we need another vector
-//typedef std::vector<std::pair<bool, std::pair<std::shared_ptr<Technology>, Requirements> > > RequirementsVec;
-
+template<typename TechTree>
 class TechnologyManager
 {
 	private:
@@ -63,7 +56,7 @@ class TechnologyManager
                 throw std::invalid_argument("Can not pass nullptr as initial argument");
             }
 
-			if(!InitTechTree(_techList).initTechTree())
+			if(!InitTechTree<TechTree>(_techList).initTechTree())
             {
                 throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
             }
