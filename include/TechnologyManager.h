@@ -3,6 +3,7 @@
 
 #include <memory>
 #include <vector>
+#include <string>
 #include <utility>
 #include <stdexcept>
 
@@ -39,21 +40,18 @@ class TechnologyManager
         std::shared_ptr<TechnologyList> _techList;
 
 
-        //inline bool getNeededRequirements(std::shared_ptr<Technology> tech, Requirements& res);
-//        inline std::vector< std::shared_ptr<Technology> > findTechnology(std::shared_ptr<Unit> unit)
-//        {
-//            return _techList->findUnitVec(unit->getName());
-//        }
+        inline std::vector< std::shared_ptr<Technology> > findTechnology(std::string entityName, bool isBuilding)
+        {
+			if (isBuilding)
+			{
+				return _techList->findBuildingVec(entityName);
+			}
+			else
+			{
+				_techList->findUnitVec(entityName);
+			}
+        }
 
-//        inline std::vector< std::shared_ptr<Technology> > findTechnology(std::shared_ptr<Building> building)
-//        {
-//            return _techList->findBuildingVec(building->getName());
-//        }
-
-//        inline std::vector< std::shared_ptr<Technology> > findTechnology(std::shared_ptr<Worker> worker)
-//        {
-//            return _techList->findUnitVec(worker->getName());
-//        }
 
 	public:
         TechnologyManager(std::shared_ptr<GameState> initialGameState, std::shared_ptr<TechnologyList> techList)
@@ -73,48 +71,29 @@ class TechnologyManager
 
         bool checkTechnologyRequirements(std::shared_ptr<Technology> technology)
         {
-//		if(technology->getMineralsCost() > _gameState->getMinerals() || technology->getGasCost() > _gameState->getGas() || technology->getSupplyCost() > _gameState->getSupply())
-//			{
-//				return false;
-//			}
+		if(technology->getMineralsCost() > _gameState->getMinerals() || technology->getGasCost() > _gameState->getGas() || technology->getSupplyCost() > _gameState->getSupply())
+			{
+				return false;
+			}
 
-//		 std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > requirements = technology->getRequirements();
-//            bool fulfilled = false;
+			std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > requirements = technology->getRequirements();
+            bool fulfilled = false;
 
-//            for(auto redundantRequirements : requirements)
-//            {
-//                fulfilled = false;
-//                for(auto requirement : redundantRequirements)
-//                {
-//                    if((requirement.first)->exists())
-//                    {
-//                        fulfilled = true;
-//                        break;
-//                    }
-//                }
-//                if(!fulfilled) return false;
-//            }
-            return true;
-        }
-
-        std::shared_ptr<std::vector<std::vector<std::shared_ptr<Technology > > > > getNeededTechnologyRequirements(std::shared_ptr<Technology> technology) 
-        {
-            auto res = std::shared_ptr<std::vector<std::vector<std::shared_ptr<Technology > > > >(new std::vector<std::vector<std::shared_ptr<Technology> > > );   
-            auto requirements = technology->getRequirements();
-            for(size_t i = 0; i != requirements.size(); ++i) 
-            {   
-                res->at(i) = std::vector<std::shared_ptr<Technology> >(requirements[i].size()); 
-                for(size_t j = 0; j != requirements[i].size(); ++j)
+            for(auto redundantRequirements : requirements)
+            {
+                fulfilled = false;
+                for(auto requirement : redundantRequirements)
                 {
-                    if(!(((requirements[i][j]).first)->exists())) 
+                    if((requirement.first)->exists())
                     {
-                        (res->at(i)).at(j) = (requirements[i][j]).first;
+                        fulfilled = true;
+                        break;
                     }
                 }
+                if(!fulfilled) return false;
             }
-            return res;
+            return true;
         }
-
 
         /** Function for demanding a requirements check.
          * @param The Entity that shall be created
@@ -125,68 +104,82 @@ class TechnologyManager
         // template argument deduction does the work here
         // we do not have to specify the template type argument
         // when calling this function
-        template <class EntityType> bool checkEntityRequirements(std::shared_ptr<EntityType> entity)
+        bool checkEntityRequirements(std::string entityName, isBuilding)
         {
-            // TODO change argument to std::string and adapt the implementation
 
-//			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entity);
-//            if(techVec.size() == 0)
-//            {
-//                throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
-//            }
-//            for(auto tech : techVec)
-//            {
-//				if(TechnologyManager::checkTechnologyRequirements(tech))
-//                {
-//                    return true;
-//                }
-//            }
+			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName, isBuilding);
+            if(techVec.size() == 0)
+            {
+                throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
+            }
+            for(auto tech : techVec)
+            {
+				if(TechnologyManager::checkTechnologyRequirements(tech))
+                {
+                    return true;
+                }
+            }
             return false;
         }
-/*
-        template <class EntityType> std::shared_ptr<RequirementsVec> requestEntityRequirements(std::shared_ptr<EntityType> entity)
-        {
-//            // TODO implementation, and adaption to std::string as argument
-//			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entity);
-//            if(techVec.size() == 0)
-//            {
-//                throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
-//            }
-//            auto res = std::shared_ptr<RequirementsVec>(new RequirementsVec(techVec.size()));
-//            for(size_t i = 0; i != techVec.size(); ++i)
-//            {
-//                //TODO
-//            }
-//            return res;
-        }
-*/
+
+
+		void checkAndGetVanishing(std::string entityName, bool isBuilding, std::pair<bool, std::vector<std::string>>& res)
+		{
+			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName, isBuilding);
+			if (techVec.size() == 0)
+			{
+				throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
+			}
+			for (auto tech : techVec)
+			{
+				if (TechnologyManager::checkTechnologyRequirements(tech))
+				{
+					res.first = true;
+					std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementType> > > requirements = tech->getRequirements();
+					for (auto redundantRequirements : requirements)
+					{
+						for (auto requirement : redundantRequirements)
+						{
+							if (requirement.second == RequirementType::Vanishing)
+							{
+								(res.second).push_back(requirement.first->getName());
+							}
+						}
+					}
+					return;
+				}
+			}
+			res.first = false;
+
+		}
+
 	/** Functions for notifying state-changes in entities.
 	 * @param Shared Pointer to the Entity that has changed it state
 	 */
-        template <class EntityType> void notifyCreation(std::shared_ptr<EntityType> entity)
+        void notifyCreation(std::string entityName, bool isBuilding)
         {
-//			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entity);
-//            if(techVec.size() == 0)
-//            {
-//                throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
-//            }
-//            for(auto tech : techVec)
-//            {
-//                tech->setExistence(true);
-//            }
+			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName, isBuilding);
+            if(techVec.size() == 0)
+            {
+                throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
+            }
+            for(auto tech : techVec)
+            {
+                tech->setExistence(true);
+            }
         }
 
-        template <class EntityType> void notifyDestruction(std::shared_ptr<EntityType> entity)
+        void notifyDestruction(std::string entityName, bool isBuilding)
         {
-//			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entity);
-//            if(techVec.size() == 0)
-//            {
-//                throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
-//            }
-//            for(auto tech : techVec)
-//            {
-//                tech->setExistence(false);
-//            }
+			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName, isBuilding);
+            if(techVec.size() == 0)
+            {
+                throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
+            }
+            for(auto tech : techVec)
+            {
+                tech->setExistence(false);
+            }
         }
 };
 
