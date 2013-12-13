@@ -111,8 +111,6 @@ class Simulation
 		{
 
             std::vector< std::shared_ptr<Worker>>& workerList = gameState->workerList;
-
-
             for(int currentWorker = 0; currentWorker < _startingConfiguration->getInitialWorkerCount(); ++currentWorker)
             {
                 workerList.push_back(std::shared_ptr<Worker>(new Worker("Konrad")));
@@ -128,7 +126,6 @@ class Simulation
 
             ////add here custom SIMULATION////
             int timesteps = 0;
-
             //just some time limit
             while(timesteps < 200 )
             {
