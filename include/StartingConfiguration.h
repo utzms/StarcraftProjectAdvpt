@@ -46,7 +46,7 @@ class StartingConfiguration
 
 		inline int getInitialMinerals()
 		{
-			return _initialWorkerCount;
+			return _initialMinerals;
 		}
 
 		inline int getInitialVespeneGas()

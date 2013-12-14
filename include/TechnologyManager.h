@@ -108,9 +108,6 @@ class TechnologyManager
          * @return false, else
          */
 
-        // template argument deduction does the work here
-        // we do not have to specify the template type argument
-        // when calling this function
         bool checkEntityRequirements(std::string entityName)
         {
 
@@ -128,7 +125,6 @@ class TechnologyManager
             }
             return false;
         }
-
 
 		void checkAndGetVanishing(std::string entityName, std::pair<bool, std::vector<std::string>>& res)
 		{
@@ -188,6 +184,84 @@ class TechnologyManager
                 tech->setExistence(false);
             }
         }
+
+		// Functions for deciding if a name (e.g. from buildList)
+		// is a building or a unit
+		bool checkIfNameIsBuilding(std::string entityName)
+		{
+			bool result = false;			
+
+			auto technology = _techList.findBuilding(entityName);
+            if(technology != nullptr) 
+            {
+                result = true;
+            }
+			
+			return result;
+		}
+
+		bool checkIfNameIsUnit(std::string entityName)
+		{
+			bool result = false;			
+
+			auto technology = _techList.findUnit(entityName);
+            if(technology != nullptr) 
+            {
+                result = true;
+            }
+			
+			return result;
+		}
+
+		Costs getEntityCosts(std::string entityName)
+		{
+			std::shared_ptr<Technology> technology;
+
+			if (checkIfNameIsBuilding(entityName))
+			{
+				technology = _techList.findBuilding(entityName);
+			}
+			else if (checkIfNameIsUnit(entityName))
+			{
+				technology = _techList.findUnit(entityName);
+			}
+			else
+			{
+				throw std::invalid_argument("TechnologyManager::getEntityCosts() entity does not exist in tech list.");
+			}
+
+			return technology->TechCosts;
+		}
+
+		std::vector<std::string> getBuildingsForUnitProduction(std::string unitName)
+		{
+			std::shared_ptr<Technology> technology;
+
+			if (checkIfNameIsUnit(unitName))
+			{
+				technology = _techList.findUnit(unitName);
+			}
+			else
+			{
+				throw std::invalid_argument("TechnologyManager::getBuildingForUnitProduction() entity is not a unit.");
+			}
+
+			auto requirements = technology->getRequirements();
+			std::vector<std::string> buildings;
+
+			for (auto outerIterator : requirements)
+			{
+				for (auto innerIterator : outerIterator)
+				{
+					if (innerIterator.second == RequirementType::ForProduction)
+					{
+						buildings.push_back(innerIterator.first->getName());
+					}
+				}
+			}
+
+			return buildings;
+		}
 };
 
 #endif

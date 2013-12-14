@@ -37,7 +37,7 @@ class Simulation
 
         void buildBuilding(std::shared_ptr<Worker> workerForBuilding, std::string name ,int time);
 
-        void produceUnit(std::string name, int time,Building::ProductionType type);
+        void produceUnit(std::vector<std::string> buildingNames, std::string unitName, int time,Building::ProductionType type);
 
         void timeStep();
 

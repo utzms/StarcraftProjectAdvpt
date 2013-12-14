@@ -6,14 +6,19 @@
 #include <fstream>
 #include <vector>
 #include <algorithm>
-
+#include <string>
 
 class BuildList
 {
 private:
     std::string              _filename;
     std::vector<std::string> _nameList;
+	std::vector<bool>		 _builtList;
 
+	
+    std::vector<std::string>::iterator _currentItem;
+	std::vector<bool>::iterator		   _currentItemOk;
+		
     void readBuildList(std::string filename)
     {
         std::ifstream file;
@@ -42,8 +47,6 @@ private:
         file.close();
     }
 
-    std::vector<std::string>::iterator _currentItem;
-
 public:
     enum class State
     {
@@ -56,6 +59,8 @@ public:
         ,_currentItem(_nameList.begin())
     {
         readBuildList(filename);
+		_builtList.resize(_nameList.size(), false);
+		_currentItemOk = _builtList.begin();
     }
 
     std::string current()
@@ -68,6 +73,8 @@ public:
         State returnState = State::InProgress;
 
         _currentItem++;
+		_currentItemOk++;
+
         if (_currentItem == _nameList.end())
         {
             returnState = State::Finished;
@@ -79,11 +86,37 @@ public:
 	void reset()
 	{
 		_currentItem = _nameList.begin();
+		_currentItemOk = _builtList.begin();
 	}
 
 	std::vector<std::string> getAsVector()
 	{
 		return _nameList;
+	}
+
+	bool isCurrentItemOk()
+	{
+		return *_currentItemOk;
+	}
+
+	void setCurrentItemOk()
+	{
+		*_currentItemOk = true;
+	}
+
+	bool allItemsOk()
+	{
+		bool result = true;
+
+		for (auto item : _builtList)
+		{
+			if (item == false)
+			{
+				result = false;
+			}
+		}
+
+		return result;
 	}
 };
 
