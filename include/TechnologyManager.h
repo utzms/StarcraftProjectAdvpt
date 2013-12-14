@@ -82,7 +82,7 @@ class TechnologyManager
 			{
 				return false;
 			}
-*/
+*///
 			std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > requirements = technology->getRequirements();
             bool fulfilled = false;
 

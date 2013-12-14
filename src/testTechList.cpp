@@ -30,10 +30,9 @@ int test()
 }
 
 void test2() {
-    
+    // bla
     std::shared_ptr<TechnologyList> tmp(new TechnologyList());
-    TechnologyManager<ProtossTechTree> techManager(tmp);
-    
+    TechnologyManager<ProtossTechTree> techManager(tmp); 
     techManager.notifyCreation("Nexus");
 	std::vector<std::string> names;
 	names.push_back("Probe");
