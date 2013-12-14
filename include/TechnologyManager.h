@@ -11,9 +11,9 @@
 #include "TechnologyList.h"
 #include "Technology.h"
 #include "InitTechTree.hpp"
-#include "Unit.h"
-#include "Worker.h"
-#include "Building.h"
+//#include "Unit.h"
+//#include "Worker.h"
+//#include "Building.h"
 
 
 /** Manager class responsible for ensuring that all requirements are fulfilled before an action can be executed.
@@ -25,7 +25,16 @@
  * The TechnologyManager is notified whenever a change concerning the Tech Tree occurs.
  */
 
-template<typename TechTree>
+// innermost pair of Requirements: Technology, RequirementFlag(Vanishing, Existing, Creation means building)
+// vector of innermost pairs: one of the pairs needs to be ok, each of those could be ok for the technology to be able to be built
+// outer vector: every element needs to be fulfilled
+//typedef std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementType> > > Requirements;
+
+// a unit can be constructed from several similar technologies, so we need another vector
+//typedef std::vector<std::pair<bool, std::pair<std::shared_ptr<Technology>, Requirements> > > RequirementsVec;
+
+class GameState;
+
 class TechnologyManager
 {
 	private:
@@ -72,20 +81,38 @@ class TechnologyManager
 			std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > requirements = technology->getRequirements();
             bool fulfilled = false;
 
-            for(auto redundantRequirements : requirements)
-            {
-                fulfilled = false;
-                for(auto requirement : redundantRequirements)
-                {
-                    if((requirement.first)->exists())
-                    {
-                        fulfilled = true;
-                        break;
-                    }
-                }
-                if(!fulfilled) return false;
-            }
+//            for(auto redundantRequirements : requirements)
+//            {
+//                fulfilled = false;
+//                for(auto requirement : redundantRequirements)
+//                {
+//                    if((requirement.first)->exists())
+//                    {
+//                        fulfilled = true;
+//                        break;
+//                    }
+//                }
+//                if(!fulfilled) return false;
+//            }
             return true;
+        }
+
+        std::shared_ptr<std::vector<std::vector<std::shared_ptr<Technology > > > > getNeededTechnologyRequirements(std::shared_ptr<Technology> technology) 
+        {
+            auto res = std::shared_ptr<std::vector<std::vector<std::shared_ptr<Technology > > > >(new std::vector<std::vector<std::shared_ptr<Technology> > > );   
+//            auto requirements = technology->getRequirements();
+//            for(size_t i = 0; i != requirements.size(); ++i)
+//            {
+//                res->at(i) = std::vector<std::shared_ptr<Technology> >(requirements[i].size());
+//                for(size_t j = 0; j != requirements[i].size(); ++j)
+//                {
+//                    if(!(((requirements[i][j]).first)->exists()))
+//                    {
+//                        (res->at(i)).at(j) = (requirements[i][j]).first;
+//                    }
+//                }
+//            }
+            return res;
         }
 
         /** Function for demanding a requirements check.

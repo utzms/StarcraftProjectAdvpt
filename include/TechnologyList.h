@@ -35,8 +35,7 @@ class TechnologyList
 		std::multimap<std::string, std::shared_ptr<Technology> > buildings;
 
 	public:
-		TechnologyList(std::string buildingPath,std::string unitPath);
-		TechnologyList();
+		TechnologyList(std::string buildingPath, std::string unitPath);
 
 		inline std::string getBuildingPath() {return buildingPath;}
 		inline std::string getUnitPath() {return unitPath;}

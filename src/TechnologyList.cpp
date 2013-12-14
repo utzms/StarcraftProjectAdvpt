@@ -2,7 +2,6 @@
 
 TechnologyList::TechnologyList()
 {
-	initialized=false;
 }
 TechnologyList::TechnologyList(std::string unitPathIn, std::string buildPath)
 {
