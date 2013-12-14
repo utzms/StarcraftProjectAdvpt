@@ -2,6 +2,8 @@
 #include <TechnologyList.h>
 #include "InitTechTree.hpp"
 #include "Technology.h"
+#include "Simulation.h"
+
 
 int test()
 {

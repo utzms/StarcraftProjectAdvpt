@@ -13,6 +13,7 @@ OBJPATH=./obj/
 objects=$(SRCPATH)main.cpp\
 		$(OBJPATH)debug.o\
 		$(OBJPATH)dataReader.o\
+		$(OBJPATH)resourcemanager.o\
 		$(OBJPATH)technology.o\
 		$(OBJPATH)technologylist.o\
 		$(INCPATH)InitTechTree.hpp
@@ -65,6 +66,9 @@ $(OBJPATH)technology.o: $(INCPATH)Technology.h $(SRCPATH)Technology.cpp
 
 $(OBJPATH)technologylist.o: $(INCPATH)TechnologyList.h $(SRCPATH)TechnologyList.cpp $(INCPATH)Technology.h $(INCPATH)DataReader.h $(INCPATH)techTreePolicy.h
 	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)technologylist.o $(SRCPATH)TechnologyList.cpp
+
+$(OBJPATH)resourcemanager.o: $(SRCPATH)ResourceManager.cpp $(INCPATH)ResourceManager.h
+	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)resourcemanager.o $(SRCPATH)ResourceManager.cpp	
 
 
 clean:

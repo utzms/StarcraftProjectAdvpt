@@ -66,9 +66,10 @@ class TechnologyManager
             {
                 throw std::invalid_argument("Can not pass nullptr as initial argument");
             }
-
-			if(!InitTechTree(_techList).initTechTree())
-            {
+			InitTechTree<ProtossTechTree> tmp(techList.get());
+			if (!(tmp.initTechTree()))
+			//if(!InitTechTree<ProtossTechTree>(_techList).initTechTree())
+			{
                 throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
             }
         }
