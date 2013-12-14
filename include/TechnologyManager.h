@@ -30,16 +30,18 @@ class TechnologyManager
         std::shared_ptr<TechnologyList> _techList;
 
 
-        inline std::vector< std::shared_ptr<Technology> > findTechnology(std::string entityName, bool isBuilding)
+        inline std::vector< std::shared_ptr<Technology> > findTechnology(std::string entityName)
         {
-			if (isBuilding)
-			{
-				return _techList->findBuildingVec(entityName);
-			}
-			else
-			{
-				_techList->findUnitVec(entityName);
-			}
+			
+				auto technology = _techList->findBuilding(entityName);
+                if(technology == nullptr) 
+                {
+                    return _techList->findUnitVec(entityName);
+                }
+                else 
+                {
+                    return _techList->findBuildingVec(entityName);
+                }
         }
 
 
@@ -68,7 +70,7 @@ class TechnologyManager
                 throw std::invalid_argument("Can not pass nullptr as initial argument");
             }
 
-			if(!InitTechTree<TechTree>(_techList).initTechTree())
+			if(!(InitTechTree<TechTree>(_techList).initTechTree()))
             {
                 throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
             }
@@ -109,10 +111,10 @@ class TechnologyManager
         // template argument deduction does the work here
         // we do not have to specify the template type argument
         // when calling this function
-        bool checkEntityRequirements(std::string entityName, bool isBuilding)
+        bool checkEntityRequirements(std::string entityName)
         {
 
-			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName, isBuilding);
+			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName);
             if(techVec.size() == 0)
             {
                 throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
@@ -128,9 +130,9 @@ class TechnologyManager
         }
 
 
-		void checkAndGetVanishing(std::string entityName, bool isBuilding, std::pair<bool, std::vector<std::string>>& res)
+		void checkAndGetVanishing(std::string entityName, std::pair<bool, std::vector<std::string>>& res)
 		{
-			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName, isBuilding);
+			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName);
 			if (techVec.size() == 0)
 			{
 				throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
@@ -161,9 +163,9 @@ class TechnologyManager
 	/** Functions for notifying state-changes in entities.
 	 * @param Shared Pointer to the Entity that has changed it state
 	 */
-        void notifyCreation(std::string entityName, bool isBuilding)
+        void notifyCreation(std::string entityName)
         {
-			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName, isBuilding);
+			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName);
             if(techVec.size() == 0)
             {
                 throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
@@ -174,9 +176,9 @@ class TechnologyManager
             }
         }
 
-        void notifyDestruction(std::string entityName, bool isBuilding)
+        void notifyDestruction(std::string entityName)
         {
-			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName, isBuilding);
+			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName);
             if(techVec.size() == 0)
             {
                 throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
