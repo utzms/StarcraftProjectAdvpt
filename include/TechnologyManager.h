@@ -7,13 +7,10 @@
 #include <utility>
 #include <stdexcept>
 
-#include "GameState.h"
+//#include "GameState.h"
 #include "TechnologyList.h"
 #include "Technology.h"
 #include "InitTechTree.hpp"
-#include "Unit.h"
-#include "Worker.h"
-#include "Building.h"
 
 
 /** Manager class responsible for ensuring that all requirements are fulfilled before an action can be executed.
@@ -29,7 +26,7 @@ template<typename TechTree>
 class TechnologyManager
 {
 	private:
-        std::shared_ptr<GameState> _gameState;
+        //std::shared_ptr<GameState> _gameState;
         std::shared_ptr<TechnologyList> _techList;
 
 
@@ -47,6 +44,7 @@ class TechnologyManager
 
 
 	public:
+        /*
         TechnologyManager(std::shared_ptr<GameState> initialGameState, std::shared_ptr<TechnologyList> techList)
             :_gameState(initialGameState)
             ,_techList(techList)
@@ -61,14 +59,28 @@ class TechnologyManager
                 throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
             }
         }
+        */
+        TechnologyManager(std::shared_ptr<TechnologyList> techList) 
+            : _techList(techList)
+        {
+             if(!_techList)
+            {
+                throw std::invalid_argument("Can not pass nullptr as initial argument");
+            }
+
+			if(!InitTechTree<TechTree>(_techList).initTechTree())
+            {
+                throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
+            }
+        }
 
         bool checkTechnologyRequirements(std::shared_ptr<Technology> technology)
         {
-		if(technology->getMineralsCost() > _gameState->getMinerals() || technology->getGasCost() > _gameState->getGas() || technology->getSupplyCost() > _gameState->getSupply())
+/*    		if(technology->getMineralsCost() > _gameState->getMinerals() || technology->getGasCost() > _gameState->getGas() || technology->getSupplyCost() > _gameState->getSupply())
 			{
 				return false;
 			}
-
+*/
 			std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > requirements = technology->getRequirements();
             bool fulfilled = false;
 
@@ -97,7 +109,7 @@ class TechnologyManager
         // template argument deduction does the work here
         // we do not have to specify the template type argument
         // when calling this function
-        bool checkEntityRequirements(std::string entityName, isBuilding)
+        bool checkEntityRequirements(std::string entityName, bool isBuilding)
         {
 
 			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName, isBuilding);

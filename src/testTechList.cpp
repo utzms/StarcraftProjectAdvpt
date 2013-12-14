@@ -1,8 +1,8 @@
 #include <iomanip> 
 #include <TechnologyList.h>
-#include "InitTechTree.hpp"
+//#include "InitTechTree.hpp"
 #include "Technology.h"
-
+#include "TechnologyManager.h"
 int test()
 {
 	TechnologyList tech;
@@ -27,3 +27,8 @@ int test()
 	return 0;
 }
 
+int test2() {
+    std::shared_ptr<TechnologyList> techList = std::shared_ptr<TechnologyList>(TechnologyList());
+    TechnologyManager<ProtossTechTree> techManager(techList);
+
+} 
