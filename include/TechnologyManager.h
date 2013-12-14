@@ -22,12 +22,11 @@
  * The TechnologyManager is notified whenever a change concerning the Tech Tree occurs.
  */
 
-template<typename TechTree>
 class TechnologyManager
 {
 	private:
         std::shared_ptr<GameState> _gameState;
-        std::shared_ptr<TechnologyList> _techList;
+        TechnologyList _techList;
 
 
         inline std::vector< std::shared_ptr<Technology> > findTechnology(std::string entityName)
@@ -46,33 +45,23 @@ class TechnologyManager
 
 
 	public:
-        TechnologyManager(std::shared_ptr<GameState> initialGameState, std::shared_ptr<TechnologyList> techList)
+        TechnologyManager(std::shared_ptr<GameState> initialGameState, std::string unitPath, std::string buildingPath)
             :_gameState(initialGameState)
-            ,_techList(techList)
         {
             if(!_gameState || !_techList)
             {
                 throw std::invalid_argument("Can not pass nullptr as initial argument");
             }
-
-			if(!InitTechTree<TechTree>(_techList).initTechTree())
+            /*
+			if(!InitTechTree(*_techList).initTechTree())
             {
                 throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
             }
+            */
+            _techList.initUnitList(unitPath);
+            _techList.initBuildingList(buildingPath);
         }
-        TechnologyManager(std::shared_ptr<TechnologyList> techList) 
-            : _techList(techList)
-        {
-             if(!_techList)
-            {
-                throw std::invalid_argument("Can not pass nullptr as initial argument");
-            }
-
-			if(!(InitTechTree<TechTree>(_techList).initTechTree()))
-            {
-                throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
-            }
-        }
+        
 
         bool checkTechnologyRequirements(std::shared_ptr<Technology> technology)
         {
