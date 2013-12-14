@@ -40,6 +40,8 @@ class TechnologyList
 
 		inline std::string getBuildingPath() {return buildingPath;}
 		inline std::string getUnitPath() {return unitPath;}
+		void setBuildingPath(std::string buildPath) {this->buildingPath=buildPath;}
+		void setUnitPath(std::string unitPath) {this->unitPath=unitPath;}
 
 		bool checkRequirements(std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>>>);
 		bool isBuildListPossible(std::vector<std::string> wuff);
