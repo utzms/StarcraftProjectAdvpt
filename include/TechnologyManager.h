@@ -33,8 +33,6 @@ class TechnologyManager
         inline std::vector< std::shared_ptr<Technology> > findTechnology(std::string entityName)
         {
 			
-
-			std::cout << (void *)this << std::endl;
 			PROGRESS("TM findTech1");
 				auto technology = _techList.findBuilding(entityName);
 			PROGRESS("TM findTech2");
@@ -69,7 +67,6 @@ class TechnologyManager
             _techList.initUnitList(unitPath);
             _techList.initBuildingList(buildingPath);
 			_techList.reset();
-			std::cout << (void *)this << std::endl;
         }
 		//sry jonas, testzweck only
 		TechnologyManager()

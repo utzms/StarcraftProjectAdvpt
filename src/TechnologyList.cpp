@@ -708,14 +708,11 @@ void TechnologyList::printAll()
 
 std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 {
-	std::cout << (void *)this << std::endl;
 	PROGRESS("TL findBuilding1")
 	static std::string lastKey="PlaceHolder";
 	static std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
 	PROGRESS("TL findBuilding2")
 
-	PROGRESS(key)
-	std::cout << buildings.size() << std::endl;
 	int count = buildings.count(key);
 	PROGRESS("TL findBuilding3")
 	if (count == 0)
@@ -752,7 +749,6 @@ std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 
 std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 {
-	std::cout << (void *)this << std::endl;
 	static std::string lastKey="PlaceHolder";
 	static std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
 

@@ -114,6 +114,7 @@ void Simulation::run()
             while(timesteps < 200 )
             {
                 //check for ready workers
+				PROGRESS(timesteps);
 				PROGRESS("RUN1");
                 std::vector< std::shared_ptr<Worker> >&      workerList   = _gameState->workerList;
 				PROGRESS("RUN2");
