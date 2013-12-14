@@ -27,27 +27,27 @@ void ResourceManager::timeStep()
     // check if there are no workers
     // and return if thats true
     if(workerList.empty())
-	{	
-		return;
-	}
+    {
+        return;
+    }
 
     float vespeneGasToAdd 	= 0.f;
     float mineralsToAdd 	= 0.f;
 
-	//determine overall increase of resources depending on harvesting workers
+    //determine overall increase of resources depending on harvesting workers
     for(auto currentWorker : workerList)
-	{
+    {
         if(currentWorker->state == Worker::State::CollectingMinerals)
-		{
+        {
             mineralsToAdd += _mineralsIncrementPerWorker;
-		}
+        }
 
-		if(currentWorker->state == Worker::State::CollectingVespene)
-		{
+        if(currentWorker->state == Worker::State::CollectingVespene)
+        {
             vespeneGasToAdd += _vespinGasIncrementPerWorker;
-		}	
-	}
-	//update gamestate
+        }
+    }
+    //update gamestate
     updateGameState(vespeneGasToAdd, mineralsToAdd);
 }
 

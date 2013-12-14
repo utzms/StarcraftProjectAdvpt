@@ -1,0 +1,4 @@
+mainBuildings	1
+Workers		6
+Minerals	50
+VespeneGas	0

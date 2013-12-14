@@ -7,6 +7,7 @@ set ( OWN_HEADERS
   ../include/DataReader.h
   ../include/Debug.h
   ../include/GameState.h
+  ../include/GameStateUpdate.h
   ../include/InitTechTree.hpp
   ../include/ResourceManager.h
   ../include/Simulation.h
