@@ -19,7 +19,7 @@ int main()
 	std::shared_ptr<GameState> gameState(new GameState());
 	std::shared_ptr<TechnologyList> technologyList(new TechnologyList());
 	std::shared_ptr<ResourceManager> resourceManager(new ResourceManager(gameState, 1.f, 1.f));
-	std::shared_ptr<TechnologyManager> techManager(new TechnologyManager(gameState, technologyList));
+	std::shared_ptr<TechnologyManager> techManager(new TechnologyManager(gameState, unitPath, buildingPath));
     std::shared_ptr<StartingConfiguration> startingConfiguration( new StartingConfiguration(std::string("./data/StartingConfiguration.txt")) );
 	std::shared_ptr<GameStateUpdate> gameStateUpdate(new GameStateUpdate(gameState));
 

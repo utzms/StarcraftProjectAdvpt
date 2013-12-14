@@ -41,18 +41,18 @@ class GameStateUpdate
                         if (buildingIterator->productionType == Building::ProductionType::WorkerOrder)
 						{
 							_gameState->workerList.push_back(std::shared_ptr<Worker>(new Worker(buildingIterator->productionUnitName)));
-							_technologyManager->notifyCreation(_gameState->workerList.back());
+							_technologyManager->notifyCreation(_gameState->workerList.back()->getName());
 						}
                         else if (buildingIterator->productionType == Building::ProductionType::UnitOrder)
 						{
 							_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit(buildingIterator->productionUnitName)));
-							_technologyManager->notifyCreation(_gameState->unitList.back());
+							_technologyManager->notifyCreation(_gameState->unitList.back()->getName());
 						}
 
 					}
 					else if (buildingIterator->state == Building::State::UnderConstruction)
 					{
-						_technologyManager->notifyCreation(buildingIterator);
+						_technologyManager->notifyCreation(buildingIterator->getName());
 					}
                     buildingIterator->state = Building::State::Ready;
 				}
