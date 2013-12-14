@@ -26,7 +26,7 @@ template<typename TechTree>
 class TechnologyManager
 {
 	private:
-        //std::shared_ptr<GameState> _gameState;
+        std::shared_ptr<GameState> _gameState;
         std::shared_ptr<TechnologyList> _techList;
 
 
@@ -46,7 +46,6 @@ class TechnologyManager
 
 
 	public:
-        /*
         TechnologyManager(std::shared_ptr<GameState> initialGameState, std::shared_ptr<TechnologyList> techList)
             :_gameState(initialGameState)
             ,_techList(techList)
@@ -61,7 +60,6 @@ class TechnologyManager
                 throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
             }
         }
-        */
         TechnologyManager(std::shared_ptr<TechnologyList> techList) 
             : _techList(techList)
         {
@@ -78,11 +76,11 @@ class TechnologyManager
 
         bool checkTechnologyRequirements(std::shared_ptr<Technology> technology)
         {
-/*    		if(technology->getMineralsCost() > _gameState->getMinerals() || technology->getGasCost() > _gameState->getGas() || technology->getSupplyCost() > _gameState->getSupply())
+    		if(technology->getMineralsCost() > _gameState->getMinerals() || technology->getGasCost() > _gameState->getGas() || technology->getSupplyCost() > _gameState->getSupply())
 			{
 				return false;
 			}
-*///
+
 			std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > requirements = technology->getRequirements();
             bool fulfilled = false;
 
