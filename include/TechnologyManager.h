@@ -32,14 +32,14 @@ class TechnologyManager
         inline std::vector< std::shared_ptr<Technology> > findTechnology(std::string entityName)
         {
 			
-				auto technology = _techList->findBuilding(entityName);
+				auto technology = _techList.findBuilding(entityName);
                 if(technology == nullptr) 
                 {
-                    return _techList->findUnitVec(entityName);
+                    return _techList.findUnitVec(entityName);
                 }
                 else 
                 {
-                    return _techList->findBuildingVec(entityName);
+                    return _techList.findBuildingVec(entityName);
                 }
         }
 
@@ -48,7 +48,7 @@ class TechnologyManager
         TechnologyManager(std::shared_ptr<GameState> initialGameState, std::string unitPath, std::string buildingPath)
             :_gameState(initialGameState)
         {
-            if(!_gameState || !_techList)
+            if(!_gameState)
             {
                 throw std::invalid_argument("Can not pass nullptr as initial argument");
             }
