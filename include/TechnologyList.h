@@ -26,7 +26,6 @@ class TechnologyList
 		std::vector<std::vector<std::shared_ptr<Technology>>> passedRequirements;
 
 		void initRest();
-		void reset();
 
 		std::map<std::shared_ptr<Technology>, requirementRest> unresolvedBuildingRequirements;
 		std::map<std::shared_ptr<Technology>, requirementRest> unresolvedUnitRequirements;
@@ -36,9 +35,14 @@ class TechnologyList
 
 	public:
 		TechnologyList(std::string buildingPath, std::string unitPath);
+		TechnologyList();
+		~TechnologyList(){PROGRESS("TL Destructor");}
 
+		void reset();
 		inline std::string getBuildingPath() {return buildingPath;}
 		inline std::string getUnitPath() {return unitPath;}
+		void setBuildingPath(std::string buildPath) {this->buildingPath=buildPath;}
+		void setUnitPath(std::string unitPathIn) {this->unitPath=unitPathIn;}
 
 		bool checkRequirements(std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>>>);
 		bool isBuildListPossible(std::vector<std::string> wuff);

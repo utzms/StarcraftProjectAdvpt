@@ -13,24 +13,21 @@ template<typename TechTree>
 class InitTechTree : private TechTree
 {
 	private:
-		TechnologyList *tech;
+        std::shared_ptr<TechnologyList> tech;
 	public:
 		InitTechTree(){}
-		InitTechTree(TechnologyList *l){this->tech=l;}
+		InitTechTree(std::shared_ptr<TechnologyList> l){this->tech=l;}
 
-		void setTechnologyList(TechnologyList *l)
+		void setTechnologyList(std::shared_ptr<TechnologyList> l)
 		{
-                bool result = false;
-
-                _technologyList->initBuildingList(_technologyList->getBuildingPath());
-                _technologyList->initUnitList(_technologyList->getUnitPath());
-
-
-                if (_technologyList->isInitialized())
-                {
-                    result = true;
-                }
-				else
+			this->tech=l;
+		}
+		bool initTechTree() const
+		{
+			if (!(tech==NULL))
+			{
+				tech->initBuildingList(TechTree::buildingPath1());
+				if (!(tech->isInitialized()))
 				{
 					std::cerr << "Will try another Path" << std::endl;
 					tech->initBuildingList(TechTree::buildingPath2());

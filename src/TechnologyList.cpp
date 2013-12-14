@@ -2,6 +2,7 @@
 
 TechnologyList::TechnologyList()
 {
+	initialized=false;
 }
 TechnologyList::TechnologyList(std::string unitPathIn, std::string buildPath)
 {
@@ -557,6 +558,8 @@ void TechnologyList::reset()
 	{
 		(it).second->setExistence(false);
 	}
+	findUnit("reset");
+	findBuilding("reset");
 }
 
 bool TechnologyList::isInitialized()
@@ -705,10 +708,13 @@ void TechnologyList::printAll()
 
 std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 {
+	PROGRESS("TL findBuilding1")
 	static std::string lastKey="PlaceHolder";
 	static std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
+	PROGRESS("TL findBuilding2")
 
 	int count = buildings.count(key);
+	PROGRESS("TL findBuilding3")
 	if (count == 0)
 	{
 		lastKey="PlaceHolder";
