@@ -117,17 +117,8 @@ void Simulation::run()
 {
 			PROGRESS("Simulation::run() starts ");
 
-			std::vector< std::shared_ptr<Worker> >&      workerList   = _gameState->workerList;
-
-			PROGRESS("Simulation::run() Setting ready workers to collect minerals");
-			for(auto workerIterator : workerList)
-			{
-				if(workerIterator->state == Worker::State::Ready)
-				{
-					//send ready workers to the mineralfields
-					workerIterator->state = Worker::State::CollectingMinerals;
-				}
-			}
+			std::vector< std::shared_ptr<Worker> >& workerList = _gameState->workerList;
+			bool vespeneHarvestingBuildingExists = false;
 
 			BuildList::State buildListState = BuildList::State::InProgress;
 			int time = 0;
@@ -141,14 +132,54 @@ void Simulation::run()
 				PROGRESS("Simulation::run() Time " << time);
 				PROGRESS("Simulation::run() [Current resources] Minerals: " << _gameState->getMinerals() << " Gas: " << _gameState->getGas() << " Energy: " << _gameState->getEnergy() << " Supply: " << _gameState->getSupply());
 
+				PROGRESS("Simulation::run() Resetting workers to collect resources");
+
+				// temporary hack to check for existence of vespene harvesting building
+				vespeneHarvestingBuildingExists =	_technologyManager->buildingExists("Assimilator");/* ||
+													_technologyManager->buildingExists("Refinery") ||
+													_technologyManager->buildingExists("Extractor");*/
+
+				for(auto workerIterator : workerList)
+				{
+					if( workerIterator->state == Worker::State::Ready ||
+						workerIterator->state == Worker::State::CollectingMinerals ||
+						workerIterator->state == Worker::State::CollectingVespene)
+					{
+						//send ready workers to the mineralfields
+						if (time%2==0 && vespeneHarvestingBuildingExists)
+						{
+							workerIterator->state = Worker::State::CollectingVespene;
+						}
+						else
+						{
+							workerIterator->state = Worker::State::CollectingMinerals;
+						}
+					}
+				}
+
 				while (buildListState != BuildList::State::Finished)
 				{
-
-					while (_buildList.isCurrentItemOk() && _buildList.advance() != BuildList::State::Finished)
+					if (_buildList.allItemsOk())
 					{
+						break;
 					}
 
-					if (_buildList.allItemsOk())
+					// go to the first element thats not ok
+					BuildList::State innerListState = BuildList::State::InProgress;
+					while (innerListState != BuildList::State::Finished)
+					{
+						if (!_buildList.isCurrentItemOk())
+						{
+							break;
+						}
+
+						innerListState = _buildList.advance();						
+					}
+
+					// it seems we tried every item on the list,
+					// now its better to go to the next time step.
+					// we won't be able to build anything in this one.
+					if (innerListState == BuildList::State::Finished)
 					{
 						break;
 					}

@@ -78,7 +78,9 @@ class TechnologyManager
 
         bool checkTechnologyRequirements(std::shared_ptr<Technology> technology)
         {
-    		if(technology->getMineralsCost() > _gameState->getMinerals() || technology->getGasCost() > _gameState->getGas() || technology->getSupplyCost() > _gameState->getSupply())
+    		if(technology->getMineralsCost() > _gameState->getMinerals() || 
+			   technology->getGasCost() > _gameState->getGas() || 
+			   (!checkIfNameIsBuilding(technology->getName()) && technology->getSupplyCost() > _gameState->getSupply()))
 			{
 				return false;
 			}
@@ -261,6 +263,22 @@ class TechnologyManager
 			}
 
 			return buildings;
+		}
+
+		bool buildingExists(std::string buildingName)
+		{
+			std::shared_ptr<Technology> technology;
+
+			if (checkIfNameIsBuilding(buildingName))
+			{
+				technology = _techList.findBuilding(buildingName);
+			}
+			else
+			{
+				throw std::invalid_argument("TechnologyManager::getBuildingForUnitProduction() entity is not a unit.");
+			}
+
+			return technology->exists();
 		}
 };
 
