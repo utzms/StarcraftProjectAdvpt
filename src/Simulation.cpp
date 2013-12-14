@@ -48,21 +48,29 @@ void Simulation::produceUnit(std::string name, int time,Building::ProductionType
 
 void Simulation::timeStep()
 {
+	PROGRESS("STEP1");
             std::vector< std::shared_ptr<Worker> >&      workerList   = _gameState->workerList;
+	PROGRESS("STEP2");
             std::vector< std::shared_ptr<Building> >&    buildingList = _gameState->buildingList;
+	PROGRESS("STEP3");
             std::vector< std::shared_ptr<Unit> >&        unitList     = _gameState->unitList;
+	PROGRESS("STEP4");
 
             for (auto workerIterator : workerList)
             {
                 workerIterator->timeStep();
             }
+	PROGRESS("STEP5");
 
             for (auto buildingIterator : buildingList)
             {
                 buildingIterator->timeStep();
             }
+	PROGRESS("STEP6");
             _resourceManager->timeStep();
+	PROGRESS("STEP7");
             _gameStateUpdate->timeStep();
+	PROGRESS("STEP8");
 }
 
         /** Function starting the Simulation.
@@ -106,7 +114,9 @@ void Simulation::run()
             while(timesteps < 200 )
             {
                 //check for ready workers
+				PROGRESS("RUN1");
                 std::vector< std::shared_ptr<Worker> >&      workerList   = _gameState->workerList;
+				PROGRESS("RUN2");
                 for(auto workerIterator : workerList)
                 {
                     if(workerIterator->state == Worker::State::Ready)
@@ -115,15 +125,19 @@ void Simulation::run()
                            workerIterator->state = Worker::State::CollectingMinerals;
                     }
                 }
+				PROGRESS("RUN3");
 
                 // test production of one worker
+				PROGRESS("RUN4");
                 if( !(_gameState->buildingList.empty()) != 0 && timesteps == 120)
                 {
                     produceUnit(std::string("Worker"), 10, Building::ProductionType::WorkerOrder );
                 }
+				PROGRESS("RUN5");
 
 
                 timeStep();
+				PROGRESS("RUN6");
                 timesteps++;
             }
             std::cout << "Produced Minerals: " << _gameState->getMinerals() << std::endl;

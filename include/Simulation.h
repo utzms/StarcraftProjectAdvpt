@@ -10,6 +10,7 @@
 #include "StartingConfiguration.h"
 #include "Entity.h"
 #include "GameStateUpdate.h"
+#include "Debug.h"
 /** Main class designed for managing and controlling the Simulation.
  *
  * During each timestep the Simulation decided which actions to execute and 

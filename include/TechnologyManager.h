@@ -11,6 +11,7 @@
 #include "TechnologyList.h"
 #include "Technology.h"
 #include "InitTechTree.hpp"
+#include "Debug.h"
 
 
 /** Manager class responsible for ensuring that all requirements are fulfilled before an action can be executed.
@@ -32,13 +33,19 @@ class TechnologyManager
         inline std::vector< std::shared_ptr<Technology> > findTechnology(std::string entityName)
         {
 			
+
+			std::cout << (void *)this << std::endl;
+			PROGRESS("TM findTech1");
 				auto technology = _techList.findBuilding(entityName);
+			PROGRESS("TM findTech2");
                 if(technology == nullptr) 
                 {
+			PROGRESS("TM findTech3");
                     return _techList.findUnitVec(entityName);
                 }
                 else 
                 {
+			PROGRESS("TM findTech4");
                     return _techList.findBuildingVec(entityName);
                 }
         }
@@ -48,6 +55,7 @@ class TechnologyManager
         TechnologyManager(std::shared_ptr<GameState> initialGameState, std::string unitPath, std::string buildingPath)
             :_gameState(initialGameState)
         {
+			PROGRESS("TM Constructor");
             if(!_gameState)
             {
                 throw std::invalid_argument("Can not pass nullptr as initial argument");
@@ -60,7 +68,15 @@ class TechnologyManager
             */
             _techList.initUnitList(unitPath);
             _techList.initBuildingList(buildingPath);
+			_techList.reset();
+			std::cout << (void *)this << std::endl;
         }
+		//sry jonas, testzweck only
+		TechnologyManager()
+		{
+			PROGRESS("WRONG TM Constructor");
+		}
+		~TechnologyManager(){PROGRESS("TM Destructor");}
         
 
         bool checkTechnologyRequirements(std::shared_ptr<Technology> technology)
@@ -152,7 +168,7 @@ class TechnologyManager
 	 */
         void notifyCreation(std::string entityName)
         {
-			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName);
+			std::vector<std::shared_ptr<Technology>> techVec = /*TechnologyManager::*/findTechnology(entityName);
             if(techVec.size() == 0)
             {
                 throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
