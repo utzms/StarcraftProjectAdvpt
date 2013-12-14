@@ -15,6 +15,7 @@ objects=$(SRCPATH)main.cpp\
 		$(OBJPATH)dataReader.o\
 		$(OBJPATH)resourcemanager.o\
 		$(OBJPATH)technology.o\
+		$(OBJPATH)simulation.o\
 		$(OBJPATH)technologylist.o\
 		$(INCPATH)InitTechTree.hpp
 
