@@ -15,7 +15,7 @@ TechnologyList::TechnologyList(std::string unitPathIn, std::string buildPath)
 TechnologyList::~TechnologyList()
 {
 	PROGRESS("TL Destructor");
-	cleanAll();
+	//cleanAll();
 }
 
 void TechnologyList::cleanAll()

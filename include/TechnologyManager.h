@@ -107,7 +107,7 @@ public:
         {
             throw std::invalid_argument("Can not pass nullptr as initial argument");
         }
-        if(!InitTechTree<RacePolicy>(std::shared_ptr<TechnologyList>(&_techList)).initTechTree())
+        if(!InitTechTree<RacePolicy>(&_techList).initTechTree())
         {
             throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
         }

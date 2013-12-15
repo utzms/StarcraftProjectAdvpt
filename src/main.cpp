@@ -39,7 +39,7 @@ int main(int argc, char **argv)
 		std::cerr << "Too few arguments" << std::endl;
 	}
 	std::string argument(argv[1]);
-	Simulation<Protoss> simulation(argument);
+	Simulation<Terran> simulation(argument);
 	simulation.run();
 
 	return 0;

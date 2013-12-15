@@ -35,6 +35,10 @@ class Protoss
 		{
 			return "Probe";
 		}
+		static std::string getGasHarvestBuilding()
+		{
+			return "Assimilator";
+		}
 };
 
 class Zerg
@@ -66,6 +70,10 @@ class Zerg
 		static std::string getWorker()
 		{
 			return "Drone";
+		}
+		static std::string getGasHarvestBuilding()
+		{
+			return "Extractor";
 		}
 		
 };
@@ -99,6 +107,10 @@ class Terran
 		static std::string getWorker()
 		{
 			return "SCV";
+		}
+		static std::string getGasHarvestBuilding()
+		{
+			return "Refinery";
 		}
 };
 

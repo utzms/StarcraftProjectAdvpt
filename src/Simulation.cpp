@@ -126,7 +126,6 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 	std::shared_ptr<GameState> gameState(new GameState());
 	std::shared_ptr<TechnologyList> technologyList(new TechnologyList());
 	std::shared_ptr<ResourceManager> resourceManager(new ResourceManager(gameState, 1.f, 1.f));
-	//der techManager braucht hier ein template
 	std::shared_ptr<TechnologyManager<RacePolicy>> techManager(new TechnologyManager<RacePolicy>(gameState));
 	std::shared_ptr<StartingConfiguration> startingConfiguration( new StartingConfiguration(std::string("./data/StartingConfiguration.txt")) );
 	std::shared_ptr<GameStateUpdate<RacePolicy>> gameStateUpdate(new GameStateUpdate<RacePolicy>(gameState,techManager));
@@ -136,13 +135,29 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 	_technologyManager = techManager;
 	_startingConfiguration = startingConfiguration;
 	_gameStateUpdate = gameStateUpdate;
-	
-//	_techManagerZerg = new TechnologyManager<Zerg>(gameState);
-//	_techmanagerProtoss = new TechnologyManager<Protoss>(gameState);
-//	_techManagerTerran = new TechnologyManager<Terran>(gameState);
+
+
+	std::vector< std::shared_ptr<Worker> >& workerList = gameState->workerList;
+
+	for(int currentWorker = 0; currentWorker < _startingConfiguration->getInitialWorkerCount(); ++currentWorker)
+	{
+		workerList.push_back(std::shared_ptr<Worker>(new Worker(RacePolicy::getWorker())));
+		workerList[currentWorker]->state = Worker::State::CollectingMinerals;
+	}   
+
+	_gameState->buildingList.push_back(std::shared_ptr<Building>(new Building(RacePolicy::getMainBuilding(), 0)));
+	_gameState->buildingList.back()->state = Building::State::Ready;
+
+	int supplyToAdd = _technologyManager->getEntityCosts(RacePolicy::getMainBuilding()).supply - _startingConfiguration->getInitialWorkerCount();
+
+	_gameState->addMinerals(_startingConfiguration->getInitialMinerals());
+	_gameState->addGas(_startingConfiguration->getInitialVespeneGas());
+	_gameState->addSupply(supplyToAdd);
+
+
 }
 
-template <class RacePolicy>
+	template <class RacePolicy>
 void Simulation<RacePolicy>::run()
 {
 	PROGRESS("Simulation::run() starts ");
@@ -164,16 +179,13 @@ void Simulation<RacePolicy>::run()
 
 		PROGRESS("Simulation::run() Resetting workers to collect resources");
 
-		// temporary hack to check for existence of vespene harvesting building
-		vespeneHarvestingBuildingExists =	_technologyManager->buildingExists("Assimilator");/* ||
-											_technologyManager->buildingExists("Refinery") ||
-											_technologyManager->buildingExists("Extractor");*/
+		vespeneHarvestingBuildingExists =	_technologyManager->buildingExists(RacePolicy::getGasHarvestBuilding());
 
 		for(auto workerIterator : workerList)
 		{
 			if( workerIterator->state == Worker::State::Ready ||
-				workerIterator->state == Worker::State::CollectingMinerals ||
-				workerIterator->state == Worker::State::CollectingVespene)
+					workerIterator->state == Worker::State::CollectingMinerals ||
+					workerIterator->state == Worker::State::CollectingVespene)
 			{
 				//send ready workers to the mineralfields
 				if (time%2==0 && vespeneHarvestingBuildingExists)
@@ -213,12 +225,12 @@ void Simulation<RacePolicy>::run()
 			{
 				break;
 			}
-						
+
 			std::string currentItem = _buildList->current();
 
 			// check the requirements
 			bool techRequirements = _technologyManager->checkEntityRequirements(currentItem);
-			
+
 			// if we do not meet the requirements ...
 			if (!techRequirements)
 			{
@@ -302,9 +314,7 @@ void Simulation<RacePolicy>::run()
 					{
 						// this way is temporary, maybe we find a nice
 						// design to do this better
-						if ((currentItem.compare("Probe") == 0) ||
-							(currentItem.compare("SCV")   == 0) ||
-							(currentItem.compare("Drone") == 0))
+						if ((currentItem.compare(RacePolicy::getWorker()) == 0))
 						{
 							produceUnit(buildings, currentItem, entityCosts.buildTime, Building::ProductionType::WorkerOrder);
 						}
@@ -340,12 +350,12 @@ void Simulation<RacePolicy>::run()
 	std::cout << "Produced Minerals: " << _gameState->getMinerals() << std::endl;
 }
 
-template <class RacePolicy>
+	template <class RacePolicy>
 void Simulation<RacePolicy>::startSimulation()
 {
 }
 
-template <class RacePolicy>
+	template <class RacePolicy>
 Simulation<RacePolicy>::~Simulation()
 {
 }
