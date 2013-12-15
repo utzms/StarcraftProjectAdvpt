@@ -7,7 +7,7 @@
 #include <utility>
 #include <stdexcept>
 
-//#include "GameState.h"
+#include "GameState.h"
 #include "TechnologyList.h"
 #include "Technology.h"
 #include "InitTechTree.hpp"

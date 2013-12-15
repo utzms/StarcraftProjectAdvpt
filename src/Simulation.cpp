@@ -51,7 +51,7 @@ void Simulation::timeStep()
 {
             std::vector< std::shared_ptr<Worker> >&      workerList   = _gameState->workerList;
             std::vector< std::shared_ptr<Building> >&    buildingList = _gameState->buildingList;
-            std::vector< std::shared_ptr<Unit> >&        unitList     = _gameState->unitList;
+        //    std::vector< std::shared_ptr<Unit> >&        unitList     = _gameState->unitList;
 
             for (auto workerIterator : workerList)
             {
@@ -103,6 +103,7 @@ Simulation::Simulation(	std::string buildListFilename,
             _gameState->addGas(_startingConfiguration->getInitialVespeneGas());
 			_gameState->addSupply(supplyToAdd);
 
+			_technologyList("Nexus");
 }
 
 void Simulation::run()
