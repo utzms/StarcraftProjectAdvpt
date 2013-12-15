@@ -23,6 +23,7 @@
  *
  */
 
+template <class RacePolicy>
 class Simulation
 {
 	private:
@@ -30,10 +31,13 @@ class Simulation
 
         std::shared_ptr<GameState>       _gameState; /**< State of the whole game, containing all Entities and parameters */
 		std::shared_ptr<ResourceManager> _resourceManager; /**< Object that is responsible for updating the all resources at the end of each timestep */
-		std::shared_ptr<TechnologyManager> _technologyManager; /**< Object that is responsible for updating the all technologies at the end of each timestep */
+		std::shared_ptr<TechnologyManager<T>> _technologyManager; /**< Object that is responsible for updating the all technologies at the end of each timestep */
 		std::shared_ptr<StartingConfiguration> _startingConfiguration;
         std::shared_ptr<GameStateUpdate> _gameStateUpdate;
         /**< Calling this function proceeds to the next timestep */
+		TechnologyManager<Zerg> _techManagerZerg;
+		TechnologyManager<Protoss> _techManagerProtoss;
+		TechnologyManager<Terran> _techManagerTerran;
 
         void buildBuilding(std::shared_ptr<Worker> workerForBuilding, std::string name ,int time);
 
@@ -49,12 +53,14 @@ class Simulation
          * by executing all necessary actions in an arbitrary amount of timesteps until the GameState fits to the specifed goal.
          */
         Simulation(std::string buildListFilename,
-                                               std::shared_ptr<GameState> gameState,
-                                               std::shared_ptr<ResourceManager> resourceManager,
-											   std::shared_ptr<TechnologyManager> technologyManager,
-                                               std::shared_ptr<StartingConfiguration> startingConfiguration,
-                                               std::shared_ptr<GameStateUpdate> gameStateUpdate
-                                               );
+					std::shared_ptr<GameState> gameState,
+					std::shared_ptr<ResourceManager> resourceManager,
+					std::shared_ptr<TechnologyManager<T>> technologyManager,
+					std::shared_ptr<StartingConfiguration> startingConfiguration,
+					std::shared_ptr<GameStateUpdate> gameStateUpdate
+					);
+
+		Simulation(std::string buildListFilename);
 
         void run();
 
