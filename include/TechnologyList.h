@@ -46,8 +46,6 @@ class TechnologyList
 		void setBuildingPath(std::string buildPath) {this->buildingPath=buildPath;}
 		void setUnitPath(std::string unitPathIn) {this->unitPath=unitPathIn;}
 
-		bool checkRequirements(std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>>>);
-		bool isBuildListPossible(std::vector<std::string> wuff);
 
 		bool isInitialized();
 		void initUnitList(std::string race);

@@ -22,12 +22,28 @@
  * concerning Resources and Tech in the GameState fits the requirements for its creation.
  * The TechnologyManager is notified whenever a change concerning the Tech Tree occurs.
  */
-template <typename Race>
-class TechnologyManager
+template <typename RacePolicy>
+class TechnologyManager : private RacePolicy 
 {
+
 private:
     std::shared_ptr<GameState> _gameState;
     TechnologyList _techList;
+    
+    inline void setTechnologyListToInitialState(void)
+    {   
+        _techList.reset();
+        auto initBuildings = findBuildingVec(RacePolicy::getMainBuilding());
+        auto initUnits = findUnitVec(RacePolicy::getWorker());
+        for (auto building : initBuildings)
+        {
+            building->setExistence(true);
+        }
+        for (auto unit : initUnits)
+        {
+            unit->setExistence(true);
+        }
+    }
 
 
     inline std::vector< std::shared_ptr<Technology> > findTechnology(std::string entityName)
@@ -45,12 +61,7 @@ private:
 
     inline bool checkTechnologyRequirements(std::shared_ptr<Technology> technology)
     {
-        if(technology->getMineralsCost() > _gameState->getMinerals() ||
-                technology->getGasCost() > _gameState->getGas() || (!checkIfNameIsBuilding(technology->getName()) && technology->getSupplyCost() > _gameState->getSupply()))
-        {
-            return false;
-        }
-
+       
         std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > requirements = technology->getRequirements();
         bool fulfilled = false;
 
@@ -69,7 +80,23 @@ private:
         }
         return true;
     }
-
+    inline bool checkTechnologyCosts(std::shared_ptr<Technology> technology)
+    {
+        if(technology->getMineralsCost() > _gameState->getMinerals() ||
+                technology->getGasCost() > _gameState->getGas() || (!checkIfNameIsBuilding(technology->getName()) && technology->getSupplyCost() > _gameState->getSupply()))
+        {
+            return false;
+        }
+        return true;
+    }
+    inline bool checkTechnology(std::shared_ptr<Technology> technology)
+    {
+        if(checkTechnologyCosts(technology))
+        {
+            return checkTechnologyRequirements(technology);
+        }
+        return false;
+    }
 
 public:
     TechnologyManager(std::shared_ptr<GameState> initialGameState)
@@ -80,12 +107,14 @@ public:
         {
             throw std::invalid_argument("Can not pass nullptr as initial argument");
         }
-        if(!InitTechTree<Race>(_techList).initTechTree())
+        if(!InitTechTree<RacePolicy>(_techList).initTechTree())
         {
             throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
         }
+        setTechnologyListToInitialState();
  
     }
+
     //sry jonas, testzweck only. No problem
     TechnologyManager()
     {
@@ -111,7 +140,7 @@ public:
         for(auto tech : techVec)
         {
             PROGRESS("NEXT TECHNOLOGY WILL BE TESTED");
-            if(TechnologyManager::checkTechnologyRequirements(tech))
+            if(TechnologyManager::checkTechnology(tech))
             {
                 return true;
             }
@@ -128,7 +157,7 @@ public:
         }
         for (auto tech : techVec)
         {
-            if (TechnologyManager::checkTechnologyRequirements(tech))
+            if (TechnologyManager::checkTechnology(tech))
             {
                 res.first = true;
                 std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementType> > > requirements = tech->getRequirements();
@@ -148,21 +177,34 @@ public:
         res.first = false;
 
     }
-/*
-    bool TechnologyList::isBuildListPossible(std::vector<std::string> buildList)
+    
+    bool isBuildListPossible(std::vector<std::string> buildList)
     {
-        //currently implemented vor Protoss only
-        //Starting buildings/units have to be called by outer functions earlier!
-        auto initBuild = findBuildingVec("Nexus");
-        auto initUnit = findUnitVec("Probe");
-        for (size_t tmp=0; tmp < initBuild.size(); ++tmp)
+        
+        bool fulfilled = false;
+        for(std::string entityName : buildList)
         {
-            initBuild[tmp]->setExistence(true);
+            std::vector<std::shared_ptr<Technology>> techVec = findTechnology(entityName);
+            fulfilled = false;
+            for(std::shared_ptr<Technology> tech : techVec)
+            {
+
+                if(checkTechnologyRequirements(tech)) 
+                {
+                    fulfilled = true;
+                    break;
+                }
+            }
+            if(!fulfilled) 
+            {
+                setTechnologyListToInitialState();
+                return false;
+            }
         }
-        for (size_t tmp=0; tmp < initUnit.size(); ++tmp)
-        {
-            initUnit[tmp]->setExistence(true);
-        }
+        setTechnologyListToInitialState();
+        return true;
+                
+        /*
         for (size_t i = 0; i < buildList.size(); ++i)
         {
             auto testPossible = findUnitVec(buildList[i]);
@@ -190,9 +232,9 @@ public:
         }
         //when finished, call reset()
         //either here or after the calling function
-        return true;
+        return true; */
     }
-*/
+
     /** Functions for notifying state-changes in entities.
      * @param Shared Pointer to the Entity that has changed it state
      */
