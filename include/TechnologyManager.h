@@ -33,17 +33,13 @@ class TechnologyManager
         inline std::vector< std::shared_ptr<Technology> > findTechnology(std::string entityName)
         {
 			
-			PROGRESS("TM findTech1");
 				auto technology = _techList.findBuilding(entityName);
-			PROGRESS("TM findTech2");
                 if(technology == nullptr) 
                 {
-			PROGRESS("TM findTech3");
                     return _techList.findUnitVec(entityName);
                 }
                 else 
                 {
-			PROGRESS("TM findTech4");
                     return _techList.findBuildingVec(entityName);
                 }
         }
@@ -88,19 +84,19 @@ class TechnologyManager
 			std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > requirements = technology->getRequirements();
             bool fulfilled = false;
 
-//            for(auto redundantRequirements : requirements)
-//            {
-//                fulfilled = false;
-//                for(auto requirement : redundantRequirements)
-//                {
-//                    if((requirement.first)->exists())
-//                    {
-//                        fulfilled = true;
-//                        break;
-//                    }
-//                }
-//                if(!fulfilled) return false;
-//            }
+            for(auto redundantRequirements : requirements)
+            {
+                fulfilled = false;
+                for(auto requirement : redundantRequirements)
+                {
+                    if((requirement.first)->exists())
+                    {
+                        fulfilled = true;
+                        break;
+                    }
+                }
+                if(!fulfilled) return false;
+            }
             return true;
         }
 
@@ -116,10 +112,11 @@ class TechnologyManager
 			std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName);
             if(techVec.size() == 0)
             {
-                throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
+                return false;
             }
             for(auto tech : techVec)
             {
+                PROGRESS("NEXT TECHNOLOGY WILL BE TESTED");
 				if(TechnologyManager::checkTechnologyRequirements(tech))
                 {
                     return true;

@@ -23,6 +23,7 @@ out=$(OBJPATH)worker.o\
 		$(OBJPATH)building.o\
 		$(OBJPATH)technologyManager.o\
 
+all: OPT += -DNDEBUG
 all: exe
 
 test: OPT += -DTECHTREETEST
