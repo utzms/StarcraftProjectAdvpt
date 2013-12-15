@@ -1,0 +1,8 @@
+SCV
+SCV
+Supply Depot
+Barracks
+Refinery
+Factory
+Starport
+Battlecruiser
