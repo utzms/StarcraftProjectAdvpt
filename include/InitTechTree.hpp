@@ -13,12 +13,12 @@ template<typename TechTree>
 class InitTechTree : private TechTree
 {
 	private:
-        std::shared_ptr<TechnologyList> tech;
+        TechnologyList *tech;
 	public:
 		InitTechTree(){}
-		InitTechTree(std::shared_ptr<TechnologyList> l){this->tech=l;}
+		InitTechTree(TechnologyList *l){this->tech=l;}
 
-		void setTechnologyList(std::shared_ptr<TechnologyList> l)
+		void setTechnologyList(TechnologyList *l)
 		{
 			this->tech=l;
 		}
