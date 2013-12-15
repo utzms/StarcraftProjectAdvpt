@@ -25,19 +25,24 @@ int main()
 
    	Simulation simulation("buildlists/protoss1.txt", gameState, resourceManager, techManager, startingConfiguration, gameStateUpdate);
 
-	simulation.run();
-
 	return 0;
 }
 
 #else
 
-#include "testTechList.cpp"
+#include "Simulation.cpp"
 
-int main()
+int main(int argc, char **argv)
 {
-	test();
-    test2();
+	if(argc < 2)
+	{
+		std::cerr << "Too few arguments" << std::endl;
+	}
+	std::string argument(argv[1]);
+	Simulation<Protoss> simulation(argument);
+	simulation.timeStep();
+	simulation.run();
+
 	return 0;
 }
 
