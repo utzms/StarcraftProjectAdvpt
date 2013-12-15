@@ -40,7 +40,6 @@ int main(int argc, char **argv)
 	}
 	std::string argument(argv[1]);
 	Simulation<Protoss> simulation(argument);
-	simulation.timeStep();
 	simulation.run();
 
 	return 0;

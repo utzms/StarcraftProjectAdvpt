@@ -11,11 +11,11 @@
  *
  */
 
-void temp()
+inline void temp()
 {
-	Simulation<Protoss> sim1;
-	Simulation<Zerg> sim2;
-	Simulation<Terran> sim3;
+	Simulation<Protoss> sim1("bla");
+	Simulation<Zerg> sim2("bli");
+	Simulation<Terran> sim3("bluuuuub");
 }
 
 template <class RacePolicy>
@@ -88,7 +88,7 @@ Simulation<RacePolicy>::Simulation(	std::string buildListFilename,
                         std::shared_ptr<ResourceManager> resourceManager,
 						std::shared_ptr<TechnologyManager<RacePolicy>> technologyManager,
                         std::shared_ptr<StartingConfiguration> startingConfiguration,
-                        std::shared_ptr<GameStateUpdate> gameStateUpdate
+                        std::shared_ptr<GameStateUpdate<RacePolicy>> gameStateUpdate
                         )
 	:_buildList(*(new BuildList(buildListFilename)))
 	,_gameState(gameState)
@@ -122,14 +122,14 @@ template <class RacePolicy>
 Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 {
 
-	_buildList = *(new BuildList(buildListFilename));
+	_buildList = new BuildList(buildListFilename);
 	std::shared_ptr<GameState> gameState(new GameState());
 	std::shared_ptr<TechnologyList> technologyList(new TechnologyList());
 	std::shared_ptr<ResourceManager> resourceManager(new ResourceManager(gameState, 1.f, 1.f));
 	//der techManager braucht hier ein template
 	std::shared_ptr<TechnologyManager<RacePolicy>> techManager(new TechnologyManager<RacePolicy>(gameState));
 	std::shared_ptr<StartingConfiguration> startingConfiguration( new StartingConfiguration(std::string("./data/StartingConfiguration.txt")) );
-	std::shared_ptr<GameStateUpdate> gameStateUpdate(new GameStateUpdate(gameState,techManager));
+	std::shared_ptr<GameStateUpdate<RacePolicy>> gameStateUpdate(new GameStateUpdate<RacePolicy>(gameState,techManager));
 
 	_gameState = gameState;
 	_resourceManager = resourceManager;
@@ -154,9 +154,9 @@ void Simulation<RacePolicy>::run()
 	int time = 0;
 
 	PROGRESS("Simulation::run() Starting main loop");
-	while (!_buildList.allItemsOk()/*&& missing: check if no items are under construction and no building is producing anymore */)
+	while (!_buildList->allItemsOk()/*&& missing: check if no items are under construction and no building is producing anymore */)
 	{
-		_buildList.reset();
+		_buildList->reset();
 		buildListState = BuildList::State::InProgress;
 
 		PROGRESS("Simulation::run() Time " << time);
@@ -189,7 +189,7 @@ void Simulation<RacePolicy>::run()
 
 		while (buildListState != BuildList::State::Finished)
 		{
-			if (_buildList.allItemsOk())
+			if (_buildList->allItemsOk())
 			{
 				break;
 			}
@@ -198,12 +198,12 @@ void Simulation<RacePolicy>::run()
 			BuildList::State innerListState = BuildList::State::InProgress;
 			while (innerListState != BuildList::State::Finished)
 			{
-				if (!_buildList.isCurrentItemOk())
+				if (!_buildList->isCurrentItemOk())
 				{
 					break;
 				}
 
-				innerListState = _buildList.advance();						
+				innerListState = _buildList->advance();						
 			}
 
 			// it seems we tried every item on the list,
@@ -214,7 +214,7 @@ void Simulation<RacePolicy>::run()
 				break;
 			}
 						
-			std::string currentItem = _buildList.current();
+			std::string currentItem = _buildList->current();
 
 			// check the requirements
 			bool techRequirements = _technologyManager->checkEntityRequirements(currentItem);
@@ -270,7 +270,7 @@ void Simulation<RacePolicy>::run()
 					{
 						PROGRESS("Simulation::run() Ordering building " << currentItem);
 						buildBuilding(ourWorker, currentItem, entityCosts.buildTime);
-						_buildList.setCurrentItemOk();
+						_buildList->setCurrentItemOk();
 						std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 					}
 
@@ -313,7 +313,7 @@ void Simulation<RacePolicy>::run()
 							produceUnit(buildings, currentItem, entityCosts.buildTime, Building::ProductionType::UnitOrder);
 						}
 
-						_buildList.setCurrentItemOk();
+						_buildList->setCurrentItemOk();
 						std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 					}
 					else
@@ -329,7 +329,7 @@ void Simulation<RacePolicy>::run()
 			}
 
 			// we go to the next item
-			buildListState = _buildList.advance();
+			buildListState = _buildList->advance();
 		}
 
 		time++;

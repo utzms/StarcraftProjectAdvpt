@@ -27,13 +27,14 @@ template <class RacePolicy>
 class Simulation
 {
 	private:
-		BuildList& _buildList;
+		//BuildList& _buildList;
+		BuildList *_buildList;
 
         std::shared_ptr<GameState>       _gameState; /**< State of the whole game, containing all Entities and parameters */
 		std::shared_ptr<ResourceManager> _resourceManager; /**< Object that is responsible for updating the all resources at the end of each timestep */
-		std::shared_ptr<TechnologyManager<T>> _technologyManager; /**< Object that is responsible for updating the all technologies at the end of each timestep */
+		std::shared_ptr<TechnologyManager<RacePolicy>> _technologyManager; /**< Object that is responsible for updating the all technologies at the end of each timestep */
 		std::shared_ptr<StartingConfiguration> _startingConfiguration;
-        std::shared_ptr<GameStateUpdate> _gameStateUpdate;
+        std::shared_ptr<GameStateUpdate<RacePolicy>> _gameStateUpdate;
         /**< Calling this function proceeds to the next timestep */
 		TechnologyManager<Zerg> _techManagerZerg;
 		TechnologyManager<Protoss> _techManagerProtoss;
@@ -55,9 +56,9 @@ class Simulation
         Simulation(std::string buildListFilename,
 					std::shared_ptr<GameState> gameState,
 					std::shared_ptr<ResourceManager> resourceManager,
-					std::shared_ptr<TechnologyManager<T>> technologyManager,
+					std::shared_ptr<TechnologyManager<RacePolicy>> technologyManager,
 					std::shared_ptr<StartingConfiguration> startingConfiguration,
-					std::shared_ptr<GameStateUpdate> gameStateUpdate
+					std::shared_ptr<GameStateUpdate<RacePolicy>> gameStateUpdate
 					);
 
 		Simulation(std::string buildListFilename);

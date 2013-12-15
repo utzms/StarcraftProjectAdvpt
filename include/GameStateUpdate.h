@@ -4,11 +4,12 @@
 #include "GameState.h"
 #include "TechnologyManager.h"
 
+template <class RacePolicy>
 class GameStateUpdate
 {
 	private:
 		std::shared_ptr<GameState> _gameState;
-		std::shared_ptr<TechnologyManager> _technologyManager;
+		std::shared_ptr<TechnologyManager<RacePolicy>> _technologyManager;
 
 	public:
 		GameStateUpdate(std::shared_ptr<GameState> gameState):_gameState(gameState)
@@ -17,7 +18,7 @@ class GameStateUpdate
 		}
 
 		//add another constructor for techManager
-		GameStateUpdate(std::shared_ptr<GameState> gameState, std::shared_ptr<TechnologyManager> technologyManager):_gameState(gameState),_technologyManager(technologyManager)
+		GameStateUpdate(std::shared_ptr<GameState> gameState, std::shared_ptr<TechnologyManager<RacePolicy>> technologyManager):_gameState(gameState),_technologyManager(technologyManager)
 		{
 			PROGRESS("GSU Constructor");
 		}

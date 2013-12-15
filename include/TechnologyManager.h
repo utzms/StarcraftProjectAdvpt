@@ -33,8 +33,8 @@ private:
     inline void setTechnologyListToInitialState(void)
     {   
         _techList.reset();
-        auto initBuildings = findBuildingVec(RacePolicy::getMainBuilding());
-        auto initUnits = findUnitVec(RacePolicy::getWorker());
+        auto initBuildings = _techList.findBuildingVec(RacePolicy::getMainBuilding());
+        auto initUnits = _techList.findUnitVec(RacePolicy::getWorker());
         for (auto building : initBuildings)
         {
             building->setExistence(true);
@@ -107,7 +107,7 @@ public:
         {
             throw std::invalid_argument("Can not pass nullptr as initial argument");
         }
-        if(!InitTechTree<RacePolicy>(_techList).initTechTree())
+        if(!InitTechTree<RacePolicy>(std::shared_ptr<TechnologyList>(&_techList)).initTechTree())
         {
             throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
         }
