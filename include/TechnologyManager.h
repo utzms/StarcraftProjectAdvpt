@@ -192,6 +192,7 @@ public:
                 if(checkTechnologyRequirements(tech)) 
                 {
                     fulfilled = true;
+                    notifyCreation(entityName);
                     break;
                 }
             }
