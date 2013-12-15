@@ -23,7 +23,7 @@ int main()
     std::shared_ptr<StartingConfiguration> startingConfiguration( new StartingConfiguration(std::string("./data/StartingConfiguration.txt")) );
 	std::shared_ptr<GameStateUpdate> gameStateUpdate(new GameStateUpdate(gameState,techManager));
 
-   	Simulation simulation("protoss1.txt", gameState, resourceManager, techManager, startingConfiguration, gameStateUpdate);
+   	Simulation simulation("buildlists/protoss1.txt", gameState, resourceManager, techManager, startingConfiguration, gameStateUpdate);
 
 	simulation.run();
 
