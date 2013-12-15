@@ -51,8 +51,8 @@ void Simulation::timeStep()
 {
             std::vector< std::shared_ptr<Worker> >&      workerList   = _gameState->workerList;
             std::vector< std::shared_ptr<Building> >&    buildingList = _gameState->buildingList;
-            // std::vector< std::shared_ptr<Unit> >&        unitList     = _gameState->unitList;
-            // unitList ist not used in this function, -Wunused compiler warning
+        //    std::vector< std::shared_ptr<Unit> >&        unitList     = _gameState->unitList;
+
             for (auto workerIterator : workerList)
             {
                 workerIterator->timeStep();
@@ -103,6 +103,7 @@ Simulation::Simulation(	std::string buildListFilename,
             _gameState->addGas(_startingConfiguration->getInitialVespeneGas());
 			_gameState->addSupply(supplyToAdd);
 
+			_technologyManager->notifyCreation("Nexus");
 }
 
 void Simulation::run()

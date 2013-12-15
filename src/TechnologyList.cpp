@@ -8,8 +8,8 @@ TechnologyList::TechnologyList(std::string unitPathIn, std::string buildPath)
 {
 	initialized=false;
 
-	initUnitList(unitPath);
-	initBuildingList(buildingPath);
+	initUnitList(unitPathIn);
+	initBuildingList(buildPath);
 }
 
 TechnologyList::~TechnologyList()

@@ -1,6 +1,8 @@
 #ifndef _BUILDING_H_
 #define _BUILDING_H_
 
+#include "Debug.h"
+
 class Building
 {
 	public:
@@ -23,15 +25,14 @@ class Building
         };
 
 		State state;
-		int			timer;
+		int	timer;
 		std::string productionUnitName;
 		ProductionType productionType;
 
-
 		Building(std::string name, int buildTime)
 			:_name(name)
-			,timer(buildTime)
 			,state(State::UnderConstruction)
+			,timer(buildTime)
 		{
 		}
 
