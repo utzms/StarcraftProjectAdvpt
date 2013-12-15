@@ -1,11 +1,11 @@
 
-#ifndef _TECHTREEPOLICY_H_
-#define _TECHTREEPOLICY_H_
+#ifndef _RACEPOLICY_H_
+#define _RACEPOLICY_H_
 
 #include <iostream>
 #include <string>
 
-class ProtossTechTree
+class Protoss
 {
     public:
         static std::string unitPath1()
@@ -27,9 +27,17 @@ class ProtossTechTree
 		{
 			return "./data/Protoss/buildings.txt";
 		}
+		static std::string getMainBuilding()
+		{
+			return "Nexus";
+		}
+		static std::string getWorker()
+		{
+			return "Probe";
+		}
 };
 
-class ZergTechTree
+class Zerg
 {
     public:
         static std::string unitPath1()
@@ -51,9 +59,18 @@ class ZergTechTree
 		{
 			return "./data/Zerg/buildings.txt";
 		}
+		static std::string getMainBuilding()
+		{
+			return "Hatchery";
+		}
+		static std::string getWorker()
+		{
+			return "Drone";
+		}
+		
 };
 
-class TerranTechTree
+class Terran
 {
     public:
         static std::string unitPath1()
@@ -74,6 +91,14 @@ class TerranTechTree
         static std::string buildingPath2()
 		{
 			return "./data/Terran/buildings.txt";
+		}
+		static std::string getMainBuilding()
+		{
+			return "CommandCenter";
+		}
+		static std::string getWorker()
+		{
+			return "SCV";
 		}
 };
 

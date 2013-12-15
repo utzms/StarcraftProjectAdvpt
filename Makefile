@@ -66,7 +66,7 @@ $(OBJPATH)dataReader.o: $(INCPATH)DataReader.h $(SRCPATH)DataReader.cpp
 $(OBJPATH)technology.o: $(INCPATH)Technology.h $(SRCPATH)Technology.cpp
 	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)technology.o $(SRCPATH)Technology.cpp
 
-$(OBJPATH)technologylist.o: $(INCPATH)TechnologyList.h $(SRCPATH)TechnologyList.cpp $(INCPATH)Technology.h $(INCPATH)DataReader.h $(INCPATH)techTreePolicy.h
+$(OBJPATH)technologylist.o: $(INCPATH)TechnologyList.h $(SRCPATH)TechnologyList.cpp $(INCPATH)Technology.h $(INCPATH)DataReader.h $(INCPATH)RacePolicy.h
 	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)technologylist.o $(SRCPATH)TechnologyList.cpp
 
 $(OBJPATH)resourcemanager.o: $(SRCPATH)ResourceManager.cpp $(INCPATH)ResourceManager.h
