@@ -31,6 +31,7 @@ int test()
 
 void test2() {
     // bla
+	/*
     std::shared_ptr<TechnologyList> tmp(new TechnologyList());
     TechnologyManager<ProtossTechTree> techManager(tmp); 
     techManager.notifyCreation("Nexus");
@@ -68,6 +69,7 @@ void test2() {
         }
     }
     std::cout << "SUCCESS!!!" << std::endl;
+	*/
     /*for(size_t i = 0; i < 5; ++i)
     {
         techManager.notifyCreation("Probe", false);

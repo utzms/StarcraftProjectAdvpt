@@ -49,29 +49,21 @@ void Simulation::produceUnit(std::vector<std::string> buildingNames, std::string
 
 void Simulation::timeStep()
 {
-	//PROGRESS("STEP1");
             std::vector< std::shared_ptr<Worker> >&      workerList   = _gameState->workerList;
-	//PROGRESS("STEP2");
             std::vector< std::shared_ptr<Building> >&    buildingList = _gameState->buildingList;
-	//PROGRESS("STEP3");
             std::vector< std::shared_ptr<Unit> >&        unitList     = _gameState->unitList;
-	//PROGRESS("STEP4");
 
             for (auto workerIterator : workerList)
             {
                 workerIterator->timeStep();
             }
-	//PROGRESS("STEP5");
 
             for (auto buildingIterator : buildingList)
             {
                 buildingIterator->timeStep();
             }
-	//PROGRESS("STEP6");
             _resourceManager->timeStep();
-	//PROGRESS("STEP7");
             _gameStateUpdate->timeStep();
-	//PROGRESS("STEP8");
 }
 
         /** Function starting the Simulation.

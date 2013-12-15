@@ -7,11 +7,32 @@ TechnologyList::TechnologyList()
 TechnologyList::TechnologyList(std::string unitPathIn, std::string buildPath)
 {
 	initialized=false;
-	this->unitPath=unitPathIn;
-	this->buildingPath=buildPath;
 
 	initUnitList(unitPath);
 	initBuildingList(buildingPath);
+}
+
+TechnologyList::~TechnologyList()
+{
+	PROGRESS("TL Destructor");
+	cleanAll();
+}
+
+void TechnologyList::cleanAll()
+{
+	cleanUnresolved();
+	if (!(units.size() == 0))
+		units.clear();
+	if (!(buildings.size() == 0))
+		buildings.clear();
+}
+
+void TechnologyList::cleanUnresolved()
+{
+	if (!(unresolvedBuildingRequirements.size() == 0))
+		unresolvedBuildingRequirements.clear();
+	if (!(unresolvedUnitRequirements.size() == 0))
+		unresolvedUnitRequirements.clear();
 }
 
 void TechnologyList::initRest()
@@ -371,10 +392,14 @@ void TechnologyList::initRest()
 			fixedRequirements.clear();
 		} //end vanish check
 	}
+	PROGRESS("TL Init done")
+
+	cleanUnresolved();
 }
 
 void TechnologyList::initUnitList(std::string unitList)
 {
+	this->unitPath=unitList;
 	DataReader readFile(unitList);
 	std::string line;
 	bool callRest=initialized;
@@ -443,8 +468,7 @@ void TechnologyList::initUnitList(std::string unitList)
 		}
 		stream >> vanish;
 
-		Technology *t = new Technology(unitName,unitCostMinerals,unitCostGas,unitCostSupply,unitBuildTime);
-		std::shared_ptr<Technology> tech(t);
+		std::shared_ptr<Technology> tech(new Technology(unitName,unitCostMinerals,unitCostGas,unitCostSupply,unitBuildTime));
 
 		units.insert( std::pair<std::string, std::shared_ptr<Technology>>(unitName,
 					tech));
@@ -465,6 +489,7 @@ void TechnologyList::initUnitList(std::string unitList)
 
 void TechnologyList::initBuildingList(std::string buildList)
 {
+	this->buildingPath=buildList;
 	DataReader readFile(buildList);
 	std::string line;
 	bool callRest=initialized;
@@ -703,18 +728,18 @@ void TechnologyList::printAll()
 	{
 		std::cout << (it).second << std::endl;
 	}
+	std::cout << std::endl;
+	std::cout << std::endl;
+	std::cout << std::endl;
 }
 
 
 std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 {
-	PROGRESS("TL findBuilding1")
 	static std::string lastKey="PlaceHolder";
 	static std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
-	PROGRESS("TL findBuilding2")
 
 	int count = buildings.count(key);
-	PROGRESS("TL findBuilding3")
 	if (count == 0)
 	{
 		lastKey="PlaceHolder";

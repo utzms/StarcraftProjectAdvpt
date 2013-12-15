@@ -36,8 +36,10 @@ class TechnologyList
 	public:
 		TechnologyList(std::string buildingPath, std::string unitPath);
 		TechnologyList();
-		~TechnologyList(){PROGRESS("TL Destructor");}
+		~TechnologyList();
 
+		void cleanUnresolved();
+		void cleanAll();
 		void reset();
 		inline std::string getBuildingPath() {return buildingPath;}
 		inline std::string getUnitPath() {return unitPath;}
