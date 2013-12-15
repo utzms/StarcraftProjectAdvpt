@@ -103,7 +103,7 @@ Simulation::Simulation(	std::string buildListFilename,
             _gameState->addGas(_startingConfiguration->getInitialVespeneGas());
 			_gameState->addSupply(supplyToAdd);
 
-			_technologyList("Nexus");
+			_technologyManager.notifyCreation("Nexus");
 }
 
 void Simulation::run()
