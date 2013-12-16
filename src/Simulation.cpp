@@ -91,9 +91,9 @@ void Simulation<RacePolicy>::morphUnit(std::shared_ptr<Unit> unitForMorphing, in
 
 	if (unitIterator != _gameState->unitList.end())
 	{
-		unitIterator->state = Unit::State::Morphing;
-		unitIterator->time = morphTime;
-		unitIterator->morphTargetName = morphTargetName;
+		(*unitIterator)->state = Unit::State::Morphing;
+		(*unitIterator)->timer = morphTime;
+		(*unitIterator)->morphTargetName = morphTargetName;
 	}
 	else
 	{

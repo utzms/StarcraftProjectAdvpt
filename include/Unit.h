@@ -7,9 +7,19 @@ class Unit
 		std::string _name;
 
 	public:
-		Unit(std::string name)
+
+		enum class State{
+			Ready,Morphing
+		};
+
+		State state;
+		std::string morphTargetName;
+		int timer;
+
+		Unit(std::string name):_name(name),
+								state(State::Ready),
+								timer(0)
 		{
-			_name = name;
 		}
 
 		std::string getName()
