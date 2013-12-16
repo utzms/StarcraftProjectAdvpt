@@ -45,6 +45,9 @@ class Simulation
 
         void produceUnit(std::shared_ptr<Building> buildingForProduction, std::string unitName, int time,Building::ProductionType type);
 
+		void removeUnit(std::shared_ptr<Unit> unitForRemoval, std::string unitName);
+		void removeWorker(std::shared_ptr<Worker> unitForRemoval, std::string unitName);
+
         void timeStep();
 	
 	std::shared_ptr<Worker> getAvailableWorker();

@@ -25,7 +25,8 @@ set ( OWN_HEADERS
   ../include/TechnologyManager.h
   ../include/Unit.h
   ../include/Worker.h
-  ../include/Entity.h )
+  ../include/Entity.h
+  ../include/RacePolicy.h )
   
   
   add_executable( adpvt ${OWN_SOURCES} ${OWN_HEADERS} )

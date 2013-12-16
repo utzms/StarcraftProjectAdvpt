@@ -37,6 +37,47 @@ void Simulation<RacePolicy>::produceUnit(std::shared_ptr<Building> buildingForPr
 	buildingForProduction->state = Building::State::Producing;
 }
 
+template <class RacePolicy>
+void Simulation<RacePolicy>::removeWorker(std::shared_ptr<Worker> unitForRemoval, std::string unitName)
+{
+	// we know it's a Worker
+	auto unitIterator = std::find(_gameState->workerList.begin(), _gameState->workerList.end(), unitForRemoval);
+
+	if (unitIterator != _gameState->workerList.end())
+	{
+		_gameState->workerList.erase(unitIterator);
+	}
+	else
+	{
+		throw std::invalid_argument("Simulation::removeUnit() Worker for removal is not in worker list.");
+	}
+
+	_technologyManager->notifyDestruction(unitName);
+}
+
+template <class RacePolicy>
+void Simulation<RacePolicy>::removeUnit(std::shared_ptr<Unit> unitForRemoval, std::string unitName)
+{
+	if (!_technologyManager->checkIfNameIsUnit(unitName))
+	{
+		throw std::invalid_argument("Simulation::removeUnit() Entity for removal is not a unit or worker.");
+	}
+
+	// we know it's a Unit
+	auto unitIterator = std::find(_gameState->unitList.begin(), _gameState->unitList.end(), unitForRemoval);
+
+	if (unitIterator != _gameState->unitList.end())
+	{
+		_gameState->unitList.erase(unitIterator);
+	}
+	else
+	{
+		throw std::invalid_argument("Simulation::removeUnit() Unit for removal is not in unit list.");
+	}
+
+	_technologyManager->notifyDestruction(unitName);
+}
+
 	template <class RacePolicy>
 void Simulation<RacePolicy>::timeStep()
 {
@@ -103,7 +144,7 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 
 	std::shared_ptr<GameState> gameState(new GameState());
 	std::shared_ptr<TechnologyList> technologyList(new TechnologyList());
-	std::shared_ptr<ResourceManager> resourceManager(new ResourceManager(gameState, 1.f, 1.f));
+	std::shared_ptr<ResourceManager> resourceManager(new ResourceManager(gameState, 0.7f, 0.7f));
 	std::shared_ptr<TechnologyManager<RacePolicy>> techManager(new TechnologyManager<RacePolicy>(gameState));
 	std::shared_ptr<StartingConfiguration> startingConfiguration( new StartingConfiguration(std::string("./data/StartingConfiguration.txt")) );
 	std::shared_ptr<GameStateUpdate<RacePolicy>> gameStateUpdate(new GameStateUpdate<RacePolicy>(gameState,techManager));
@@ -223,7 +264,7 @@ void Simulation<RacePolicy>::run()
 			std::string currentItem = _buildList->current();
 
 			// check the requirements
-			std::pair<bool, std::vector<std::string>> techRequirements; 
+			std::pair<bool, std::vector<std::string> > techRequirements;
 			_technologyManager->checkAndGetVanishing(currentItem, techRequirements);
 
 			// if we do not meet the requirements ...
@@ -234,7 +275,8 @@ void Simulation<RacePolicy>::run()
 			}
 			else
 			{
-				
+				std::vector<std::string> vanishingRequirements = techRequirements.second;
+
 				PROGRESS("Simulation::run() Requirements of " << currentItem << " OK");
 
 				// get the costs for game state manipulation and build time
@@ -248,6 +290,38 @@ void Simulation<RacePolicy>::run()
 				// otherwise, we find out if the item is a unit or a building
 				if (_technologyManager->checkIfNameIsBuilding(currentItem))
 				{
+					bool vanishingZergWorker = false;
+
+					if (!vanishingRequirements.empty())
+					{
+						bool isUpgrade = true;
+						for (auto requirementsIterator : vanishingRequirements)
+						{
+							if (_technologyManager->checkIfNameIsUnit(requirementsIterator))
+							{
+								isUpgrade = false;
+							}
+						}
+
+						if (isUpgrade)
+						{
+							// we have a building upgrade
+
+							// we have to order the upgrade
+
+							// then we can set the item to ok
+							_buildList->setCurrentItemOk();
+
+							// continue to the next item in the build list
+							continue;
+						}
+						else
+						{
+							// Zerg worker wants to build something
+							vanishingZergWorker = true;
+						}
+					}
+
 					// it is a building, so we need a worker
 					//TODO ausser bei upgrades brauchen wir hier den Worker
 					std::shared_ptr<Worker> ourWorker = getAvailableWorker();
@@ -259,6 +333,12 @@ void Simulation<RacePolicy>::run()
 						buildBuilding(ourWorker, currentItem, entityCosts.buildTime);
 						_buildList->setCurrentItemOk();
 						std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+
+						if (vanishingZergWorker)
+						{
+							// destroy zerg worker
+							removeWorker(ourWorker, RacePolicy::getWorker());
+						}
 					}
 					else
 					{
@@ -266,11 +346,31 @@ void Simulation<RacePolicy>::run()
 						break;
 					}
 
+
+
 					// if we still haven't got a worker
 					// we need to try again at a later point							
 				}
 				else if (_technologyManager->checkIfNameIsUnit(currentItem))
 				{
+					if (!vanishingRequirements.empty())
+					{
+						// we assume that units can have only other units as vanishing
+						// requirements (not workers)
+
+						for (auto requirementsIterator : vanishingRequirements)
+						{
+							for (auto unitIterator : _gameState->unitList)
+							{
+								if (unitIterator->getName().compare(requirementsIterator) == 0)
+								{
+									removeUnit(unitIterator, requirementsIterator);
+									break;
+								}
+							}
+						}
+					}
+
 					// it is a unit, so we need to decide if it is a 
 					// worker or another unit
 					PROGRESS("Simulation::run() Ordering unit " << currentItem);
