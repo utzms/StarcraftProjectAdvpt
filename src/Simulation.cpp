@@ -123,12 +123,20 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 {
 
 	_buildList = new BuildList(buildListFilename);
+
+
 	std::shared_ptr<GameState> gameState(new GameState());
 	std::shared_ptr<TechnologyList> technologyList(new TechnologyList());
 	std::shared_ptr<ResourceManager> resourceManager(new ResourceManager(gameState, 1.f, 1.f));
 	std::shared_ptr<TechnologyManager<RacePolicy>> techManager(new TechnologyManager<RacePolicy>(gameState));
 	std::shared_ptr<StartingConfiguration> startingConfiguration( new StartingConfiguration(std::string("./data/StartingConfiguration.txt")) );
 	std::shared_ptr<GameStateUpdate<RacePolicy>> gameStateUpdate(new GameStateUpdate<RacePolicy>(gameState,techManager));
+
+	if(techManager->isBuildListPossible(_buildList->getAsVector()) == false)
+	{
+		std::cerr << "BuildList is not possible. Simulation teminates." << std::endl;
+		exit(0);
+	}
 
 	_gameState = gameState;
 	_resourceManager = resourceManager;
