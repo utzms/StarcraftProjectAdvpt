@@ -32,14 +32,26 @@ class GameStateUpdate
 
 			PROGRESS("GSU Updating Workers");
 			//update units
+
 			std::vector<std::shared_ptr<Unit>> vanishingUnits;
+			std::vector<std::shared_ptr<Unit>> spawningUnits;
+			std::vector<std::shared_ptr<Worker>> spawningWorkers;
+
 			for (auto unitIterator : unitList)
 			{
 				if( unitIterator->timer == 0  && unitIterator->state == Unit::State::Morphing)
-				{
-					_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit(unitIterator->morphTargetName)));
-					_technologyManager->notifyCreation(_gameState->unitList.back()->getName());
+				{	
+					if (unitIterator->morphTargetName.compare(RacePolicy::getWorker()) == 0)
+					{
+						spawningWorkers.push_back(std::shared_ptr<Worker>(new Worker(unitIterator->morphTargetName)));
+					}
+					else
+					{
+						spawningUnits.push_back(std::shared_ptr<Unit>(new Unit(unitIterator->morphTargetName)));
+					}
+
 					vanishingUnits.push_back(unitIterator);
+					PROGRESS("GSU finished morphing " << unitIterator->getName() << " into " << unitIterator->morphTargetName);
 				}
 			}
 
@@ -48,9 +60,23 @@ class GameStateUpdate
 				auto unitIterator = std::find(_gameState->unitList.begin(), _gameState->unitList.end(), vanishingUnitsIterator);
 				if(unitIterator != unitList.end())
 				{
+					PROGRESS("GSU Destroyed " << (*unitIterator)->getName());
 					unitList.erase(unitIterator);
-					_technologyManager->notifyDestruction((*unitIterator)->getName());
+					_technologyManager->notifyDestruction((*unitIterator)->getName());					
 				}
+			}
+
+			for (auto spawningIterator : spawningUnits)
+			{
+				unitList.push_back(spawningIterator);
+				_technologyManager->notifyCreation(unitList.back()->getName());
+			}
+
+
+			for (auto spawningIterator : spawningWorkers)
+			{
+				workerList.push_back(spawningIterator);
+				_technologyManager->notifyCreation(workerList.back()->getName());
 			}
 
 			//update workers

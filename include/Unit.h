@@ -26,6 +26,14 @@ class Unit
 		{
 			return _name;
 		}
+
+		void timeStep()
+		{
+			if (state == State::Morphing)
+			{
+				timer--;
+			}
+		}
 };
 
 #endif // _UNIT_H_
