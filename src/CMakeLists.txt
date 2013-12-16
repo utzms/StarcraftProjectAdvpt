@@ -23,7 +23,6 @@ set ( OWN_HEADERS
   ../include/Technology.h
   ../include/TechnologyList.h
   ../include/TechnologyManager.h
-  ../include/techTreePolicy.h
   ../include/Unit.h
   ../include/Worker.h
   ../include/Entity.h )
