@@ -191,6 +191,10 @@ public:
         for(std::string entityName : buildList)
         {
             std::vector<std::shared_ptr<Technology>> techVec = findTechnology(entityName);
+            if(techVec.empty())
+            {
+                return false;
+            }
             fulfilled = false;
             for(std::shared_ptr<Technology> tech : techVec)
             {
