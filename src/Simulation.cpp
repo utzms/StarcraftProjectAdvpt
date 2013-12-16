@@ -78,6 +78,29 @@ void Simulation<RacePolicy>::removeUnit(std::shared_ptr<Unit> unitForRemoval, st
 	_technologyManager->notifyDestruction(unitName);
 }
 
+template <class RacePolicy>
+void Simulation<RacePolicy>::morphUnit(std::shared_ptr<Unit> unitForMorphing, int morphTime, std::string morphTargetName)
+{
+	if (!_technologyManager->checkIfNameIsUnit(unitForMorphing->getName()))
+	{
+		throw std::invalid_argument("Simulation::morphUnit() Entity for morphing is not a unit.");
+	}
+
+	// we know it's a Unit
+	auto unitIterator = std::find(_gameState->unitList.begin(), _gameState->unitList.end(), unitForMorphing);
+
+	if (unitIterator != _gameState->unitList.end())
+	{
+		(*unitIterator)->state = Unit::State::Morphing;
+		(*unitIterator)->timer = morphTime;
+		(*unitIterator)->morphTargetName = morphTargetName;
+	}
+	else
+	{
+		throw std::invalid_argument("Simulation::morphUnit() Unit for morphing is not in unit list.");
+	}
+}
+
 	template <class RacePolicy>
 void Simulation<RacePolicy>::timeStep()
 {
@@ -466,7 +489,8 @@ void Simulation<RacePolicy>::run()
 									if (unitIterator->getName().compare(requirementsIterator) == 0)
 									{
 										PROGRESS("Simulation::run() Deleted unit " << requirementsIterator << " as vanishing requirement for unit " << currentItem);
-										removeUnit(unitIterator, requirementsIterator);
+										//removeUnit(unitIterator, requirementsIterator);
+										morphUnit(unitIterator, entityCosts.buildTime, currentItem);
 										break;
 									}
 								}

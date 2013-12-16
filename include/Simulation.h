@@ -48,6 +48,8 @@ class Simulation
 		void removeUnit(std::shared_ptr<Unit> unitForRemoval, std::string unitName);
 		void removeWorker(std::shared_ptr<Worker> unitForRemoval, std::string unitName);
 
+		void morphUnit(std::shared_ptr<Unit> unitForMorphing, int morphTime, std::string morphTargetName);
+
         void timeStep();
 	
 	std::shared_ptr<Worker> getAvailableWorker();
