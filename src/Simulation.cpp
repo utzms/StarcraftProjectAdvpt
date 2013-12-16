@@ -134,8 +134,7 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 
 	if(techManager->isBuildListPossible(_buildList->getAsVector()) == false)
 	{
-		std::cerr << "BuildList is not possible. Simulation teminates." << std::endl;
-		exit(0);
+		throw std::invalid_argument("BuildList is invalid. Other race is tested.");
 	}
 
 	_gameState = gameState;

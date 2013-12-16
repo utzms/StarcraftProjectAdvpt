@@ -2,6 +2,7 @@
 #define _SIMULATION_H_
 
 #include <vector>
+#include <stdexcept>
 
 #include "BuildList.h"
 #include "GameState.h"

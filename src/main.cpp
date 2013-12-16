@@ -31,6 +31,7 @@ int main()
 #else
 
 #include "Simulation.cpp"
+#include <stdexcept>
 
 int main(int argc, char **argv)
 {
@@ -39,10 +40,42 @@ int main(int argc, char **argv)
 		std::cerr << "Too few arguments" << std::endl;
 	}
 	std::string argument(argv[1]);
-	Simulation<Terran> simulation(argument);
-	simulation.run();
+	
+	try
+	{
+		Simulation<Protoss> simulation(argument);
+		simulation.run();
+		return 0;
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << "Protoss Error Message: " << e.what() << std::endl;
+	}
 
-	return 0;
+	try
+	{
+		Simulation<Terran> simulation(argument);
+		simulation.run();
+		return 0;
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << "Terran Error Message: " << e.what() << std::endl;
+	}
+
+	try
+	{
+		Simulation<Zerg> simulation(argument);
+		simulation.run();
+		return 0;
+	}
+	catch (std::exception &e)
+	{
+		std::cerr << "Zerg Error Message: " << e.what() << std::endl;
+	}
+
+	std::cerr << "BuildList invalid. Cannot be built by any race." << std::endl;
+	return 1;
 }
 
 #endif
