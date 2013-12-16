@@ -39,6 +39,10 @@ class Protoss
 		{
 			return "Assimilator";
 		}
+		static std::string getSupplyProvider()
+		{
+			return "Pylon";
+		}
 };
 
 class Zerg
@@ -74,6 +78,10 @@ class Zerg
 		static std::string getGasHarvestBuilding()
 		{
 			return "Extractor";
+		}
+		static std::string getSupplyProvider()
+		{
+			return "Overlord";
 		}
 		
 };
@@ -111,6 +119,10 @@ class Terran
 		static std::string getGasHarvestBuilding()
 		{
 			return "Refinery";
+		}
+		static std::string getSupplyProvider()
+		{
+			return "SupplyDepot";
 		}
 };
 

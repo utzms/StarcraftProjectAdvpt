@@ -2,6 +2,7 @@
 #define _GAMESTATE_H_
 
 #include <vector>
+#include <iostream>
 #include <memory>
 
 #include "Worker.h"
@@ -15,7 +16,8 @@ class GameState
 		float _minerals;
 		float _gas;
 		float _energy;
-		float _supply;
+		float _supplyCount;
+		float _supplyMax;
 
 	public:
 		std::vector< std::shared_ptr<Worker> >      workerList;
@@ -27,7 +29,7 @@ class GameState
 			_minerals	=	0.0f;
 			_gas		=	0.0f;
 			_energy		=	0.0f;
-			_supply		=	0.0f;
+			_supplyCount=	0.0f;
 		}
 
         float getMinerals()
@@ -44,11 +46,20 @@ class GameState
         {
 			return _energy;
         }
+		
+        float getMaxSupply()
+        {
+			return _supplyMax;
+        }
 
         float getSupply()
         {
-			return _supply;
+			return _supplyCount;
         }
+		float getAvailableSupply()
+		{
+			return (_supplyMax-_supplyCount);
+		}
 
         void addMinerals(float value)
         {
@@ -80,14 +91,19 @@ class GameState
 			_energy -= value;
         }
 
+		void addSupplyMax(float value)
+		{
+			_supplyMax += value;
+		}
+
         void addSupply(float value)
         {
-			_supply += value;
+			_supplyCount += value;
         }
 
         void subSupply(float value)
         {
-			_supply -= value;
+			_supplyCount -= value;
         }
 };
 
