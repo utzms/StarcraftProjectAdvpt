@@ -23,9 +23,13 @@ void Simulation<RacePolicy>::buildBuilding(std::shared_ptr<Worker> workerForBuil
 {
 	std::shared_ptr<Building> buildingToBuild = std::shared_ptr<Building>(new Building(name, time));
 	_gameState->buildingList.push_back(buildingToBuild);
-	workerForBuilding->timer = time;
+	if(workerForBuilding->getName().compare(Protoss::getWorker()) != 0)
+	{
+		workerForBuilding->timer = time;
+		workerForBuilding->state = Worker::State::Constructing;
+	}
 	workerForBuilding->buildingName = name;
-	workerForBuilding->state = Worker::State::Constructing;
+
 }
 
 	template <class RacePolicy>
@@ -176,7 +180,7 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 
 	std::shared_ptr<GameState> gameState(new GameState());
 	std::shared_ptr<TechnologyList> technologyList(new TechnologyList());
-	std::shared_ptr<ResourceManager> resourceManager(new ResourceManager(gameState, 0.7f, 0.7f));
+	std::shared_ptr<ResourceManager> resourceManager(new ResourceManager(gameState, 0.35f, 0.7f));
 	std::shared_ptr<TechnologyManager<RacePolicy>> techManager(new TechnologyManager<RacePolicy>(gameState));
 	std::shared_ptr<StartingConfiguration> startingConfiguration( new StartingConfiguration(std::string("./data/StartingConfiguration.txt")) );
 	std::shared_ptr<GameStateUpdate<RacePolicy>> gameStateUpdate(new GameStateUpdate<RacePolicy>(gameState,techManager));
@@ -258,7 +262,7 @@ void Simulation<RacePolicy>::run()
 		{	
 			if(!(buildingIterator->getName().compare(RacePolicy::getGasHarvestBuilding())))
 			{		
-				neededVespeneGasWorkers += 5;
+				neededVespeneGasWorkers += 3;
 			}
 		}
 
