@@ -234,6 +234,66 @@ void Simulation<RacePolicy>::run()
 			}
 		}
 
+		// special case for zerg
+		// update larvae
+		static int larvaTimer = 0;
+		if (RacePolicy::getMainBuilding().compare("Hatchery") == 0)
+		{
+			int larvaCount = 0;
+			for (auto unitIterator : _gameState->unitList)
+			{
+				if (unitIterator->getName().compare("Larva") == 0)
+				{
+					larvaCount++;
+				}
+			}
+
+			if (larvaCount < 3)
+			{
+				if (larvaTimer == 15)
+				{
+					std::vector<std::string> larvaBuildings = _technologyManager->getBuildingsForUnitProduction("Larva");
+
+					std::shared_ptr<Building> larvaBuildingInGameState(nullptr);
+
+					for (auto larvaBuilding : larvaBuildings)
+					{
+						for (auto buildingIterator : _gameState->buildingList)
+						{
+							if (buildingIterator->getName().compare(larvaBuilding) == 0)
+							{
+								larvaBuildingInGameState = buildingIterator;
+								break;
+							}
+						}
+
+						if (larvaBuildingInGameState)
+						{
+							break;
+						}
+					}
+
+					if (!larvaBuildingInGameState)
+					{
+						throw std::invalid_argument("Simulation::run() No larva producing building :(");
+					}
+					else
+					{
+						_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
+						_technologyManager->notifyCreation("Larva");
+						break;
+					}
+
+					larvaTimer = 0;
+				}
+				else
+				{
+					larvaTimer++;
+				}
+
+			}
+		}
+
 		while (buildListState != BuildList::State::Finished)
 		{
 			if (_buildList->allItemsOk())
