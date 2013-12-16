@@ -66,7 +66,6 @@ class Simulation
 
         void run();
 
-	void startSimulation();
         ~Simulation();
 
 };

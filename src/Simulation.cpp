@@ -31,10 +31,10 @@ void Simulation<RacePolicy>::buildBuilding(std::shared_ptr<Worker> workerForBuil
 template <class RacePolicy>
 void Simulation<RacePolicy>::produceUnit(std::vector<std::string> buildingNames, std::string unitName, int time,Building::ProductionType type)
 {
-	std::vector< std::shared_ptr<Building> >& buildingList = _gameState->buildingList;
+//	std::vector< std::shared_ptr<Building> >& buildingList = _gameState->buildingList;
 	std::shared_ptr<Building> BuildingForProduction(nullptr);
 
-	for (auto buildingIterator : buildingList)
+	for (auto buildingIterator : _gameState->buildingList)
 	{
 		// at the moment, we take the first building we can get our hands on
 		// maybe later we'll want to choose which one we take...
@@ -47,7 +47,7 @@ void Simulation<RacePolicy>::produceUnit(std::vector<std::string> buildingNames,
 
 	if(!BuildingForProduction)
 	{
-		throw std::runtime_error("GameStateUpdate::produceUnit: Wrong Order placed");
+		throw std::runtime_error("Simulation::produceUnit: Wrong Order placed");
 	}
 
 	BuildingForProduction->productionType = type;
@@ -165,7 +165,7 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 
 }
 
-	template <class RacePolicy>
+template <class RacePolicy>
 void Simulation<RacePolicy>::run()
 {
 	PROGRESS("Simulation::run() starts ");
@@ -261,13 +261,14 @@ void Simulation<RacePolicy>::run()
 				if (_technologyManager->checkIfNameIsBuilding(currentItem))
 				{
 					// it is a building, so we need a worker
+					//TODO ausser bei upgrades brauchen wir hier den Worker
 					std::shared_ptr<Worker> ourWorker(nullptr);
 
 					// first check for ready workers, so we only
 					// use workers who are collecting if necessary
 					for (auto workerIterator : workerList)
 					{
-						if (workerIterator->state == Worker::State::Ready)
+						if (workerIterator->state == Worker::State::Ready || workerIterator->state == Worker::State::CollectingMinerals)
 						{
 							ourWorker = workerIterator;
 							break;
@@ -276,7 +277,7 @@ void Simulation<RacePolicy>::run()
 					// if we haven't found a ready worker, we 
 					// have to take a minerals or vespene guy
 					//TODO potentielle FEHLERQUELLE wegen vespene guy
-					if (!ourWorker)
+					if (ourWorker == nullptr)
 					{
 						for (auto workerIterator : workerList)
 						{
@@ -296,7 +297,11 @@ void Simulation<RacePolicy>::run()
 						_buildList->setCurrentItemOk();
 						std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 					}
-
+/*					else
+					{
+						std::cerr << "No Worker for building found, is that even possible?" << std::endl;
+					}
+*/
 					// if we still haven't got a worker
 					// we need to try again at a later point							
 				}
@@ -341,6 +346,7 @@ void Simulation<RacePolicy>::run()
 					{
 						PROGRESS("Simulation::run() Buildings not yet ready for unit production");
 					}
+
 				}
 				else
 				{
@@ -361,12 +367,7 @@ void Simulation<RacePolicy>::run()
 	std::cout << "Produced Minerals: " << _gameState->getMinerals() << std::endl;
 }
 
-	template <class RacePolicy>
-void Simulation<RacePolicy>::startSimulation()
-{
-}
-
-	template <class RacePolicy>
+template <class RacePolicy>
 Simulation<RacePolicy>::~Simulation()
 {
 }

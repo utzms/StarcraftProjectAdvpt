@@ -60,14 +60,14 @@ class GameStateUpdate
 							PROGRESS("a worker");
 							_gameState->workerList.push_back(std::shared_ptr<Worker>(new Worker(buildingIterator->productionUnitName)));
 							_technologyManager->notifyCreation(_gameState->workerList.back()->getName());							
-							_gameState->subSupply(unitCosts.supply);
+							_gameState->addSupply(unitCosts.supply);
 						}
                         else if (buildingIterator->productionType == Building::ProductionType::UnitOrder)
 						{
 							PROGRESS("a unit");
 							_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit(buildingIterator->productionUnitName)));
 							_technologyManager->notifyCreation(_gameState->unitList.back()->getName());
-							_gameState->subSupply(unitCosts.supply);
+							_gameState->addSupply(unitCosts.supply);
 						}
 					}
 					else if (buildingIterator->state == Building::State::UnderConstruction)
@@ -76,7 +76,7 @@ class GameStateUpdate
 						_technologyManager->notifyCreation(buildingIterator->getName());
 
 						Costs buildingCosts = _technologyManager->getEntityCosts(buildingIterator->getName());
-						_gameState->addSupply(buildingCosts.supply);
+						_gameState->addSupplyMax(buildingCosts.supply);
 					}
 
 					PROGRESS("GSU: Building " << buildingIterator->getName() << " is ready");
