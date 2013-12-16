@@ -165,15 +165,15 @@ std::ostream& operator<< (std::ostream& os, const Technology& tech)
 	os << std::setw(30) << tmp1;
 	os << std::setw(30) << tmp2;
 	os << std::setw(30) << tmp3;
+#endif
 	os << std::setw(15);
 	if (tech.existenceCount>0)
 	{
-		os << "Exists";
+		os << "Exists(" << tech.existenceCount << ")";
 	} else 
 	{
 		os << "No Instance";
 	}
-#endif
 
 	return os;
 }

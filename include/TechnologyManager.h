@@ -43,7 +43,7 @@ private:
         }
     }
 
-	inline bool checkTechnologyRequirements(std::shared_ptr<Technology> technology, bool buildListCheck)
+	inline bool checkTechnologyRequirements(std::shared_ptr<Technology> technology)
     {
        
         std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > requirements = technology->getRequirements();
@@ -54,7 +54,7 @@ private:
             fulfilled = false;
             for(auto requirement : redundantRequirements)
             {
-				if((requirement.first)->exists() || (buildListCheck && ((requirement.first)->getName().compare("Larva")  == 0)))
+				if((requirement.first)->exists())
                 {
                     fulfilled = true;
                     break;
@@ -82,7 +82,7 @@ private:
     {
         if(checkTechnologyCosts(technology))
         {
-			return checkTechnologyRequirements(technology, false);
+			return checkTechnologyRequirements(technology);
         }
         return false;
     }
@@ -111,6 +111,13 @@ public:
         PROGRESS("WRONG TM Constructor");
     }
     ~TechnologyManager(){PROGRESS("TM Destructor");}
+
+	inline bool isZerg()
+	{
+		if (findTechnology("Larva").size() > 0)
+			return true;
+		return false;
+	}
 
 
     /** Function for demanding a requirements check.
@@ -168,12 +175,21 @@ public:
 
     }
     
+	void printAll()
+	{
+		_techList.printAll();
+	}
     bool isBuildListPossible(std::vector<std::string> buildList)
     {	
 
         _techList.reset();
         auto initBuildings = _techList.findBuildingVec(RacePolicy::getMainBuilding());
         auto initUnits = _techList.findUnitVec(RacePolicy::getWorker());
+		auto larvafix = _techList.findUnitVec("Larva");
+        for (auto unit : larvafix)
+        {
+            unit->setExistence(300000);
+        } 
         for (auto building : initBuildings)
         {
             building->setExistence(1);
@@ -198,7 +214,7 @@ public:
                 {
 					// sorry for change, this is a bad overall design bug
 					// we dont have any larvae before simulation but they are a vanishing requirement
-					if(checkTechnologyRequirements(tech, true))
+					if(checkTechnologyRequirements(tech))
                     {
                         fulfilled = true;
                         notifyCreation(entityName);
@@ -218,7 +234,6 @@ public:
 								return false;
 							}
 						}
-
                         break;
                     }
                 }
