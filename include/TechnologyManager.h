@@ -83,10 +83,15 @@ private:
     inline bool checkTechnologyCosts(std::shared_ptr<Technology> technology)
     {
         if(technology->getMineralsCost() > _gameState->getMinerals() ||
-                technology->getGasCost() > _gameState->getGas() || (!checkIfNameIsBuilding(technology->getName()) && technology->getSupplyCost() > _gameState->getAvailableSupply()))
+                technology->getGasCost() > _gameState->getGas() )
         {
             return false;
         }
+        else if(!checkIfNameIsBuilding(technology->getName()) && technology->getSupplyCost() > _gameState->getAvailableSupply())
+        {
+            return false;
+        }
+
         return true;
     }
     inline bool checkTechnology(std::shared_ptr<Technology> technology)
