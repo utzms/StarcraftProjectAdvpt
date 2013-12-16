@@ -18,7 +18,7 @@ inline void temp()
 	Simulation<Terran> sim3("bluuuuub");
 }
 
-template <class RacePolicy>
+	template <class RacePolicy>
 void Simulation<RacePolicy>::buildBuilding(std::shared_ptr<Worker> workerForBuilding, std::string name ,int time)
 {
 	std::shared_ptr<Building> buildingToBuild = std::shared_ptr<Building>(new Building(name, time));
@@ -28,40 +28,21 @@ void Simulation<RacePolicy>::buildBuilding(std::shared_ptr<Worker> workerForBuil
 	workerForBuilding->state = Worker::State::Constructing;
 }
 
-template <class RacePolicy>
-void Simulation<RacePolicy>::produceUnit(std::vector<std::string> buildingNames, std::string unitName, int time,Building::ProductionType type)
+	template <class RacePolicy>
+void Simulation<RacePolicy>::produceUnit(std::shared_ptr<Building> buildingForProduction, std::string unitName, int time,Building::ProductionType type)
 {
-//	std::vector< std::shared_ptr<Building> >& buildingList = _gameState->buildingList;
-	std::shared_ptr<Building> BuildingForProduction(nullptr);
-
-	for (auto buildingIterator : _gameState->buildingList)
-	{
-		// at the moment, we take the first building we can get our hands on
-		// maybe later we'll want to choose which one we take...
-		if(( std::find(buildingNames.begin(), buildingNames.end(), buildingIterator->getName()) != buildingNames.end()) && (buildingIterator->state == Building::State::Ready))
-		{
-			BuildingForProduction = buildingIterator;
-				break;
-		}
-	}
-
-	if(!BuildingForProduction)
-	{
-		throw std::runtime_error("Simulation::produceUnit: Wrong Order placed");
-	}
-
-	BuildingForProduction->productionType = type;
-	BuildingForProduction->productionUnitName = unitName;
-	BuildingForProduction->timer = time;
-	BuildingForProduction->state = Building::State::Producing;
+	buildingForProduction->productionType = type;
+	buildingForProduction->productionUnitName = unitName;
+	buildingForProduction->timer = time;
+	buildingForProduction->state = Building::State::Producing;
 }
 
-template <class RacePolicy>
+	template <class RacePolicy>
 void Simulation<RacePolicy>::timeStep()
 {
 	std::vector< std::shared_ptr<Worker> >&      workerList   = _gameState->workerList;
 	std::vector< std::shared_ptr<Building> >&    buildingList = _gameState->buildingList;
-//	std::vector< std::shared_ptr<Unit> >&        unitList     = _gameState->unitList;
+	//	std::vector< std::shared_ptr<Unit> >&        unitList     = _gameState->unitList;
 
 	for (auto workerIterator : workerList)
 	{
@@ -76,6 +57,36 @@ void Simulation<RacePolicy>::timeStep()
 	_gameStateUpdate->timeStep();
 }
 
+template <class RacePolicy> std::shared_ptr<Worker> Simulation<RacePolicy>::getAvailableWorker()
+{
+	std::shared_ptr<Worker> ourWorker(nullptr); 
+	// first check for ready workers, so we only
+	// use workers who are collecting if necessary
+	for (auto workerIterator : _gameState->workerList)
+	{
+		if (workerIterator->state == Worker::State::Ready || workerIterator->state == Worker::State::CollectingMinerals)
+		{
+			ourWorker = workerIterator;
+			break;
+		}
+	}
+	// if we haven't found a ready worker, we 
+	// have to take a minerals or vespene guy
+	//TODO potentielle FEHLERQUELLE wegen vespene guy
+	if (ourWorker == nullptr)
+	{
+		for (auto workerIterator : _gameState->workerList)
+		{
+			if (workerIterator->state == Worker::State::CollectingMinerals || workerIterator->state == Worker::State::CollectingVespene)
+			{
+				ourWorker = workerIterator;
+				break;
+			}
+		}
+	}
+
+	return ourWorker;
+}
 /** Function starting the Simulation.
   *
   * After calling this function all required objects, including the whole GameState, the TechnologyManager and ResourceManager, are created.
@@ -138,7 +149,6 @@ void Simulation<RacePolicy>::run()
 	PROGRESS("Simulation::run() starts ");
 
 	std::vector< std::shared_ptr<Worker> >& workerList = _gameState->workerList;
-	bool vespeneHarvestingBuildingExists = false;
 
 	BuildList::State buildListState = BuildList::State::InProgress;
 	int time = 0;
@@ -154,7 +164,14 @@ void Simulation<RacePolicy>::run()
 
 		PROGRESS("Simulation::run() Resetting workers to collect resources");
 
-		vespeneHarvestingBuildingExists =	_technologyManager->buildingExists(RacePolicy::getGasHarvestBuilding());
+		int neededVespeneGasWorkers = 0;
+		for(auto buildingIterator : _gameState->buildingList)
+		{	
+			if(!(buildingIterator->getName().compare(RacePolicy::getGasHarvestBuilding())))
+			{		
+				neededVespeneGasWorkers += 5;
+			}
+		}
 
 		//TODO diese Verteilung ist bullshit, muss geaendert werden!!!
 		for(auto workerIterator : workerList)
@@ -164,9 +181,10 @@ void Simulation<RacePolicy>::run()
 					workerIterator->state == Worker::State::CollectingVespene)
 			{
 				//send ready workers to the mineralfields
-				if (time%2==0 && vespeneHarvestingBuildingExists)
+				if(neededVespeneGasWorkers !=0)				
 				{
 					workerIterator->state = Worker::State::CollectingVespene;
+					--neededVespeneGasWorkers;
 				}
 				else
 				{
@@ -205,16 +223,18 @@ void Simulation<RacePolicy>::run()
 			std::string currentItem = _buildList->current();
 
 			// check the requirements
-			bool techRequirements = _technologyManager->checkEntityRequirements(currentItem);
+			std::pair<bool, std::vector<std::string>> techRequirements; 
+			_technologyManager->checkAndGetVanishing(currentItem, techRequirements);
 
 			// if we do not meet the requirements ...
-			if (!techRequirements)
+			if (!techRequirements.first)
 			{
 				PROGRESS("Simulation::run() Requirements of " << currentItem << " not met, advancing to next item.");
 				break;
 			}
 			else
 			{
+				
 				PROGRESS("Simulation::run() Requirements of " << currentItem << " OK");
 
 				// get the costs for game state manipulation and build time
@@ -230,34 +250,9 @@ void Simulation<RacePolicy>::run()
 				{
 					// it is a building, so we need a worker
 					//TODO ausser bei upgrades brauchen wir hier den Worker
-					std::shared_ptr<Worker> ourWorker(nullptr);
+					std::shared_ptr<Worker> ourWorker = getAvailableWorker();
 
-					// first check for ready workers, so we only
-					// use workers who are collecting if necessary
-					for (auto workerIterator : workerList)
-					{
-						if (workerIterator->state == Worker::State::Ready || workerIterator->state == Worker::State::CollectingMinerals)
-						{
-							ourWorker = workerIterator;
-							break;
-						}
-					}
-					// if we haven't found a ready worker, we 
-					// have to take a minerals or vespene guy
-					//TODO potentielle FEHLERQUELLE wegen vespene guy
-					if (ourWorker == nullptr)
-					{
-						for (auto workerIterator : workerList)
-						{
-							if (workerIterator->state == Worker::State::CollectingMinerals || workerIterator->state == Worker::State::CollectingVespene)
-							{
-								ourWorker = workerIterator;
-								break;
-							}
-						}
-					}
-
-					// we have a worker, let's build something!
+								// we have a worker, let's build something!
 					if (ourWorker)
 					{
 						PROGRESS("Simulation::run() Ordering building " << currentItem);
@@ -282,13 +277,14 @@ void Simulation<RacePolicy>::run()
 
 					// get the buildings this unit can be built from
 					std::vector<std::string> buildings = _technologyManager->getBuildingsForUnitProduction(currentItem);
-
+					std::shared_ptr<Building> buildingForProduction;
 					// check if any of them are ready
 					bool buildingReady = false;
 					for (auto buildingIterator : _gameState->buildingList)
 					{							
 						if(( std::find(buildings.begin(), buildings.end(), buildingIterator->getName()) != buildings.end()) && (buildingIterator->state == Building::State::Ready))
 						{
+							buildingForProduction = buildingIterator;
 							buildingReady = true;
 							break;
 						}
@@ -301,11 +297,11 @@ void Simulation<RacePolicy>::run()
 						// design to do this better
 						if ((currentItem.compare(RacePolicy::getWorker()) == 0))
 						{
-							produceUnit(buildings, currentItem, entityCosts.buildTime, Building::ProductionType::WorkerOrder);
+							produceUnit(buildingForProduction, currentItem, entityCosts.buildTime, Building::ProductionType::WorkerOrder);
 						}
 						else
 						{
-							produceUnit(buildings, currentItem, entityCosts.buildTime, Building::ProductionType::UnitOrder);
+							produceUnit(buildingForProduction, currentItem, entityCosts.buildTime, Building::ProductionType::UnitOrder);
 						}
 
 						_buildList->setCurrentItemOk();
