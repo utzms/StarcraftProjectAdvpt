@@ -243,7 +243,8 @@ void Simulation<RacePolicy>::run()
 			// if we do not meet the requirements ...
 			if (!techRequirements)
 			{
-				PROGRESS("Simulation::run() Requirements of " << currentItem << " not met, advancing to next item.");						
+				PROGRESS("Simulation::run() Requirements of " << currentItem << " not met, advancing to next item.");
+				break;
 			}
 			else
 			{
@@ -297,11 +298,12 @@ void Simulation<RacePolicy>::run()
 						_buildList->setCurrentItemOk();
 						std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 					}
-/*					else
+					else
 					{
 						std::cerr << "No Worker for building found, is that even possible?" << std::endl;
+						break;
 					}
-*/
+
 					// if we still haven't got a worker
 					// we need to try again at a later point							
 				}
