@@ -54,13 +54,6 @@ class Simulation
          * Next the Simulation is started by entering the first timestep and proceded 
          * by executing all necessary actions in an arbitrary amount of timesteps until the GameState fits to the specifed goal.
          */
-        Simulation(std::string buildListFilename,
-					std::shared_ptr<GameState> gameState,
-					std::shared_ptr<ResourceManager> resourceManager,
-					std::shared_ptr<TechnologyManager<RacePolicy>> technologyManager,
-					std::shared_ptr<StartingConfiguration> startingConfiguration,
-					std::shared_ptr<GameStateUpdate<RacePolicy>> gameStateUpdate
-					);
 
 		Simulation(std::string buildListFilename);
 

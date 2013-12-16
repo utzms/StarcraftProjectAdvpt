@@ -38,7 +38,7 @@ class Technology
 {
 	private:
 		std::string name;
-		bool existence;
+		int existenceCount;
 
 		std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>>> requirements;
 
@@ -58,7 +58,9 @@ class Technology
 		void setGas(float gas);
 		void setSupply(float supply);
 		void setBuildTime(int time);
-		void setExistence(bool state);
+		void setExistence(int state);
+		void incExistence(void);
+		void decExistence(void);
 		std::string getName(void);
 
 

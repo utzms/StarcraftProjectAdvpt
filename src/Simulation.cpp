@@ -82,41 +82,6 @@ void Simulation<RacePolicy>::timeStep()
   * Next the Simulation is started by entering the first timestep and proceded 
   * by executing all necessary actions in an arbitrary amount of timesteps until the GameState fits to the specifed goal.
   */
-template <class RacePolicy>
-Simulation<RacePolicy>::Simulation(	std::string buildListFilename,
-                        std::shared_ptr<GameState> gameState,
-                        std::shared_ptr<ResourceManager> resourceManager,
-						std::shared_ptr<TechnologyManager<RacePolicy>> technologyManager,
-                        std::shared_ptr<StartingConfiguration> startingConfiguration,
-                        std::shared_ptr<GameStateUpdate<RacePolicy>> gameStateUpdate
-                        )
-	:_buildList(*(new BuildList(buildListFilename)))
-	,_gameState(gameState)
-	,_resourceManager(resourceManager)
-    ,_technologyManager(technologyManager)
-	,_startingConfiguration(startingConfiguration)
-	,_gameStateUpdate(gameStateUpdate)
-{
-			
-	std::vector< std::shared_ptr<Worker> >& workerList = gameState->workerList;
-	
-	for(int currentWorker = 0; currentWorker < _startingConfiguration->getInitialWorkerCount(); ++currentWorker)
-	{
-		workerList.push_back(std::shared_ptr<Worker>(new Worker("Probe")));
-		workerList[currentWorker]->state = Worker::State::CollectingMinerals;
-	}
-
-	_gameState->buildingList.push_back(std::shared_ptr<Building>(new Building("Nexus", 0)));
-	_gameState->buildingList.back()->state = Building::State::Ready;
-
-	int supplyToAdd = _technologyManager->getEntityCosts("Nexus").supply - _startingConfiguration->getInitialWorkerCount();
-
-	_gameState->addMinerals(_startingConfiguration->getInitialMinerals());
-	_gameState->addGas(_startingConfiguration->getInitialVespeneGas());
-	_gameState->addSupply(supplyToAdd);
-
-	_technologyManager->notifyCreation("Nexus");
-}
 
 template <class RacePolicy>
 Simulation<RacePolicy>::Simulation(std::string buildListFilename)
@@ -150,12 +115,14 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 	{
 		workerList.push_back(std::shared_ptr<Worker>(new Worker(RacePolicy::getWorker())));
 		workerList[currentWorker]->state = Worker::State::CollectingMinerals;
+		_technologyManager->notifyCreation(RacePolicy::getWorker());
 	}   
 
 	_gameState->buildingList.push_back(std::shared_ptr<Building>(new Building(RacePolicy::getMainBuilding(), 0)));
 	_gameState->buildingList.back()->state = Building::State::Ready;
 
 	int supplyToAdd = _technologyManager->getEntityCosts(RacePolicy::getMainBuilding()).supply;
+	_technologyManager->notifyCreation(RacePolicy::getMainBuilding());
 
 	_gameState->addMinerals(_startingConfiguration->getInitialMinerals());
 	_gameState->addGas(_startingConfiguration->getInitialVespeneGas());

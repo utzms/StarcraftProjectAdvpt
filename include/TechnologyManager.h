@@ -30,22 +30,6 @@ private:
     std::shared_ptr<GameState> _gameState;
     TechnologyList _techList;
     
-    inline void setTechnologyListToInitialState(void)
-    {   
-        _techList.reset();
-        auto initBuildings = _techList.findBuildingVec(RacePolicy::getMainBuilding());
-        auto initUnits = _techList.findUnitVec(RacePolicy::getWorker());
-        for (auto building : initBuildings)
-        {
-            building->setExistence(true);
-        }
-        for (auto unit : initUnits)
-        {
-            unit->setExistence(true);
-        }
-    }
-
-
     inline std::vector< std::shared_ptr<Technology> > findTechnology(std::string entityName)
     {
         auto technology = _techList.findBuilding(entityName);
@@ -116,7 +100,8 @@ public:
         {
             throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
         }
-        setTechnologyListToInitialState();
+
+        _techList.reset();
  
     }
 
@@ -184,10 +169,21 @@ public:
     }
     
     bool isBuildListPossible(std::vector<std::string> buildList)
-    {
-        
+    {	
+
+        _techList.reset();
+        auto initBuildings = _techList.findBuildingVec(RacePolicy::getMainBuilding());
+        auto initUnits = _techList.findUnitVec(RacePolicy::getWorker());
+        for (auto building : initBuildings)
+        {
+            building->setExistence(1);
+        }
+        for (auto unit : initUnits)
+        {
+            unit->setExistence(6);
+        } 
         bool fulfilled = false;
-        float supply = 10;
+        float supply = 4;
         for(std::string entityName : buildList)
         {
             std::vector<std::shared_ptr<Technology>> techVec = findTechnology(entityName);
@@ -204,25 +200,34 @@ public:
                     {
                         fulfilled = true;
                         notifyCreation(entityName);
-                        if(entityName.compare(RacePolicy::getMainBuilding()))
+                        if(!entityName.compare(RacePolicy::getMainBuilding()))
                         {
                             supply += 10;
                         }
-                        else if(entityName.compare(RacePolicy::getSupplyProvider())) 
+                        else if(!entityName.compare(RacePolicy::getSupplyProvider())) 
                         {
                             supply += 8;
-                        }
+                        } else 
+						{
+							supply -= tech->getSupplyCost();
+							if (supply < 0)
+							{
+								_techList.reset();
+								return false;
+							}
+						}
+
                         break;
                     }
                 }
                 if(!fulfilled) 
                 {
-                    setTechnologyListToInitialState();
+			        _techList.reset();
                     return false;
                 }
             }
         }
-        setTechnologyListToInitialState();
+        _techList.reset();
         return true;
     }
 
@@ -238,7 +243,7 @@ public:
         }
         for(auto tech : techVec)
         {
-            tech->setExistence(true);
+            tech->incExistence();
         }
     }
 
@@ -251,7 +256,7 @@ public:
         }
         for(auto tech : techVec)
         {
-            tech->setExistence(false);
+            tech->decExistence();
         }
     }
 
