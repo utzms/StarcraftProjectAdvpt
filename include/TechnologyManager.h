@@ -43,18 +43,18 @@ private:
         }
     }
 
-    inline bool checkTechnologyRequirements(std::shared_ptr<Technology> technology)
+	inline bool checkTechnologyRequirements(std::shared_ptr<Technology> technology, bool buildListCheck)
     {
        
         std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > requirements = technology->getRequirements();
         bool fulfilled = false;
 
-        for(auto redundantRequirements : requirements)
+		for(auto redundantRequirements : requirements)
         {
             fulfilled = false;
             for(auto requirement : redundantRequirements)
             {
-                if((requirement.first)->exists())
+				if((requirement.first)->exists() || (buildListCheck && ((requirement.first)->getName().compare("Larva")  == 0)))
                 {
                     fulfilled = true;
                     break;
@@ -82,7 +82,7 @@ private:
     {
         if(checkTechnologyCosts(technology))
         {
-            return checkTechnologyRequirements(technology);
+			return checkTechnologyRequirements(technology, false);
         }
         return false;
     }
@@ -138,7 +138,7 @@ public:
         return false;
     }
 
-    void checkAndGetVanishing(std::string entityName, std::pair<bool, std::vector<std::string>>& res)
+	void checkAndGetVanishing(std::string entityName, std::pair<bool, std::vector<std::string> >& res)
     {
         std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName);
         if (techVec.size() == 0)
@@ -196,7 +196,9 @@ public:
             {
                 if(checkIfNameIsBuilding(entityName) || tech->getSupplyCost() <= supply) 
                 {
-                    if(checkTechnologyRequirements(tech))   
+					// sorry for change, this is a bad overall design bug
+					// we dont have any larvae before simulation but they are a vanishing requirement
+					if(checkTechnologyRequirements(tech, true))
                     {
                         fulfilled = true;
                         notifyCreation(entityName);

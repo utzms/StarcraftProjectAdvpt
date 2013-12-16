@@ -250,7 +250,7 @@ void Simulation<RacePolicy>::run()
 
 			if (larvaCount < 3)
 			{
-				if (larvaTimer == 15)
+				if (larvaTimer == 15 || time == 0)
 				{
 					std::vector<std::string> larvaBuildings = _technologyManager->getBuildingsForUnitProduction("Larva");
 
@@ -281,7 +281,6 @@ void Simulation<RacePolicy>::run()
 					{
 						_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
 						_technologyManager->notifyCreation("Larva");
-						break;
 					}
 
 					larvaTimer = 0;
