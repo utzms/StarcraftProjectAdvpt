@@ -30,6 +30,7 @@ class GameState
 			_gas		=	0.0f;
 			_energy		=	0.0f;
 			_supplyCount=	0.0f;
+			_supplyMax  =	0.0f;
 		}
 
         float getMinerals()

@@ -173,8 +173,24 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 	_gameState->buildingList.push_back(std::shared_ptr<Building>(new Building(RacePolicy::getMainBuilding(), 0)));
 	_gameState->buildingList.back()->state = Building::State::Ready;
 
-	int supplyToAdd = _technologyManager->getEntityCosts(RacePolicy::getMainBuilding()).supply;
+	int supplyToAdd = _technologyManager->getEntityCosts(RacePolicy::getMainBuilding()).supply;	
 	_technologyManager->notifyCreation(RacePolicy::getMainBuilding());
+
+	// again special zerg handling
+	if (RacePolicy::getMainBuilding().compare("Hatchery") == 0)
+	{
+		supplyToAdd += 8;
+
+		_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Overlord")));
+		_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
+		_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
+		_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
+
+		_technologyManager->notifyCreation("Overlord");
+		_technologyManager->notifyCreation("Larva");
+		_technologyManager->notifyCreation("Larva");
+		_technologyManager->notifyCreation("Larva");
+	}
 
 	_gameState->addMinerals(_startingConfiguration->getInitialMinerals());
 	_gameState->addGas(_startingConfiguration->getInitialVespeneGas());
@@ -201,7 +217,7 @@ void Simulation<RacePolicy>::run()
 		buildListState = BuildList::State::InProgress;
 
 		PROGRESS("Simulation::run() Time " << time);
-		PROGRESS("Simulation::run() [Current resources] Minerals: " << _gameState->getMinerals() << " Gas: " << _gameState->getGas() << " Energy: " << _gameState->getEnergy() << " Supply: " << _gameState->getSupply());
+		PROGRESS("Simulation::run() [Current resources] Minerals: " << _gameState->getMinerals() << " Gas: " << _gameState->getGas() << " Energy: " << _gameState->getEnergy() << " Supply: " << _gameState->getAvailableSupply());
 
 		PROGRESS("Simulation::run() Resetting workers to collect resources");
 
@@ -250,7 +266,7 @@ void Simulation<RacePolicy>::run()
 
 			if (larvaCount < 3)
 			{
-				if (larvaTimer == 15 || time == 0)
+				if (larvaTimer == 15)
 				{
 					std::vector<std::string> larvaBuildings = _technologyManager->getBuildingsForUnitProduction("Larva");
 
@@ -341,10 +357,6 @@ void Simulation<RacePolicy>::run()
 				// get the costs for game state manipulation and build time
 				Costs entityCosts = _technologyManager->getEntityCosts(currentItem);
 
-				// reduce minerals and gas by costs
-				_gameState->subMinerals(entityCosts.minerals);
-				_gameState->subGas(entityCosts.gas);
-
 				//TODO hier muss dann noch mit Supplys geguckt werden
 				// otherwise, we find out if the item is a unit or a building
 				if (_technologyManager->checkIfNameIsBuilding(currentItem))
@@ -370,6 +382,10 @@ void Simulation<RacePolicy>::run()
 
 							// then we can set the item to ok
 							_buildList->setCurrentItemOk();
+
+							// reduce minerals and gas by costs
+							_gameState->subMinerals(entityCosts.minerals);
+							_gameState->subGas(entityCosts.gas);
 
 							// continue to the next item in the build list
 							continue;
@@ -398,6 +414,10 @@ void Simulation<RacePolicy>::run()
 							// destroy zerg worker
 							removeWorker(ourWorker, RacePolicy::getWorker());
 						}
+
+						// reduce minerals and gas by costs
+						_gameState->subMinerals(entityCosts.minerals);
+						_gameState->subGas(entityCosts.gas);
 					}
 					else
 					{
@@ -412,24 +432,6 @@ void Simulation<RacePolicy>::run()
 				}
 				else if (_technologyManager->checkIfNameIsUnit(currentItem))
 				{
-					if (!vanishingRequirements.empty())
-					{
-						// we assume that units can have only other units as vanishing
-						// requirements (not workers)
-
-						for (auto requirementsIterator : vanishingRequirements)
-						{
-							for (auto unitIterator : _gameState->unitList)
-							{
-								if (unitIterator->getName().compare(requirementsIterator) == 0)
-								{
-									removeUnit(unitIterator, requirementsIterator);
-									break;
-								}
-							}
-						}
-					}
-
 					// it is a unit, so we need to decide if it is a 
 					// worker or another unit
 					PROGRESS("Simulation::run() Ordering unit " << currentItem);
@@ -452,6 +454,29 @@ void Simulation<RacePolicy>::run()
 					// if a building is ready, we produce a unit
 					if (buildingReady)
 					{
+						if (!vanishingRequirements.empty())
+						{
+							// we assume that units can have only other units as vanishing
+							// requirements (not workers)
+
+							for (auto requirementsIterator : vanishingRequirements)
+							{
+								for (auto unitIterator : _gameState->unitList)
+								{
+									if (unitIterator->getName().compare(requirementsIterator) == 0)
+									{
+										PROGRESS("Simulation::run() Deleted unit " << requirementsIterator << " as vanishing requirement for unit " << currentItem);
+										removeUnit(unitIterator, requirementsIterator);
+										break;
+									}
+								}
+							}
+						}
+
+						// reduce minerals and gas by costs
+						_gameState->subMinerals(entityCosts.minerals);
+						_gameState->subGas(entityCosts.gas);
+
 						// this way is temporary, maybe we find a nice
 						// design to do this better
 						if ((currentItem.compare(RacePolicy::getWorker()) == 0))
@@ -469,6 +494,7 @@ void Simulation<RacePolicy>::run()
 					else
 					{
 						PROGRESS("Simulation::run() Buildings not yet ready for unit production");
+						break;
 					}
 
 				}

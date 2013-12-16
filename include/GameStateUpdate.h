@@ -67,7 +67,15 @@ class GameStateUpdate
 							PROGRESS("a unit");
 							_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit(buildingIterator->productionUnitName)));
 							_technologyManager->notifyCreation(_gameState->unitList.back()->getName());
-							_gameState->addSupply(unitCosts.supply);
+
+							if (buildingIterator->productionUnitName.compare("Overlord") == 0)
+							{
+								_gameState->addSupplyMax(8);
+							}
+							else
+							{
+								_gameState->addSupply(unitCosts.supply);
+							}
 						}
 					}
 					else if (buildingIterator->state == Building::State::UnderConstruction)

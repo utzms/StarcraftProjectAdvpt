@@ -1,3 +1,6 @@
+// This header was taken from the NuSiF exercise skeleton!
+// Why rewrite :)
+
 #ifndef DEBUG_H
 #define DEBUG_H
 
