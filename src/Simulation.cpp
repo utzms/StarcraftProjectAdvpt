@@ -263,6 +263,10 @@ void Simulation<RacePolicy>::run()
 			if(!(buildingIterator->getName().compare(RacePolicy::getGasHarvestBuilding())))
 			{		
 				neededVespeneGasWorkers += 3;
+				if (neededVespeneGasWorkers >= workerList.size())
+				{
+					neededVespeneGasWorkers -= 3;
+				}
 			}
 		}
 
@@ -289,7 +293,7 @@ void Simulation<RacePolicy>::run()
 		// special case for zerg
 		// update larvae
 		static int larvaTimer = 0;
-		if (RacePolicy::getMainBuilding().compare("Hatchery") == 0)
+		if (RacePolicy::getRace() == RaceType::Zerg)
 		{
 			int larvaCount = 0;
 			for (auto unitIterator : _gameState->unitList)
@@ -415,8 +419,31 @@ void Simulation<RacePolicy>::run()
 						if (isUpgrade)
 						{
 							// we have a building upgrade
+							std::shared_ptr<Building> buildingToBeUpgraded;
 
 							// we have to order the upgrade
+							for (auto buildingIterator : _gameState->buildingList)
+							{
+								if (buildingIterator->getName().compare(vanishingRequirements[0]) == 0)
+								{
+									buildingToBeUpgraded = buildingIterator;
+								}
+							}
+
+							if (!buildingToBeUpgraded)
+							{
+								throw std::runtime_error("Simulation::run() Couldn't find building in building list when trying to upgrade");
+							}
+
+							buildingToBeUpgraded->upgradeTimer = entityCosts.buildTime;
+							buildingToBeUpgraded->upgradeState = Building::UpgradeState::Upgrading;
+							buildingToBeUpgraded->targetUpgradeName = currentItem;
+
+							if (buildingToBeUpgraded->getName().compare(RacePolicy::getMainBuilding()) == 0)
+							{
+								// we have a main building upgrade
+								//RacePolicy::upgradeMainBuilding(currentItem);
+							}
 
 							// then we can set the item to ok
 							_buildList->setCurrentItemOk();
@@ -424,6 +451,8 @@ void Simulation<RacePolicy>::run()
 							// reduce minerals and gas by costs
 							_gameState->subMinerals(entityCosts.minerals);
 							_gameState->subGas(entityCosts.gas);
+
+							std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 							// continue to the next item in the build list
 							continue;
@@ -433,6 +462,8 @@ void Simulation<RacePolicy>::run()
 							// Zerg worker wants to build something
 							vanishingZergWorker = true;
 						}
+
+
 					}
 
 					// it is a building, so we need a worker
@@ -558,8 +589,6 @@ void Simulation<RacePolicy>::run()
 		timeStep();
 	}
 
-
-	std::cout << "Produced Minerals: " << _gameState->getMinerals() << std::endl;
 }
 
 template <class RacePolicy>
