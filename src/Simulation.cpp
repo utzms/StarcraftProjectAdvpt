@@ -155,11 +155,12 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 	_gameState->buildingList.push_back(std::shared_ptr<Building>(new Building(RacePolicy::getMainBuilding(), 0)));
 	_gameState->buildingList.back()->state = Building::State::Ready;
 
-	int supplyToAdd = _technologyManager->getEntityCosts(RacePolicy::getMainBuilding()).supply - _startingConfiguration->getInitialWorkerCount();
+	int supplyToAdd = _technologyManager->getEntityCosts(RacePolicy::getMainBuilding()).supply;
 
 	_gameState->addMinerals(_startingConfiguration->getInitialMinerals());
 	_gameState->addGas(_startingConfiguration->getInitialVespeneGas());
-	_gameState->addSupply(supplyToAdd);
+	_gameState->addSupplyMax(supplyToAdd);
+	_gameState->addSupply(_startingConfiguration->getInitialWorkerCount());
 
 
 }
@@ -188,6 +189,7 @@ void Simulation<RacePolicy>::run()
 
 		vespeneHarvestingBuildingExists =	_technologyManager->buildingExists(RacePolicy::getGasHarvestBuilding());
 
+		//TODO diese Verteilung ist bullshit, muss geaendert werden!!!
 		for(auto workerIterator : workerList)
 		{
 			if( workerIterator->state == Worker::State::Ready ||
@@ -254,6 +256,7 @@ void Simulation<RacePolicy>::run()
 				_gameState->subMinerals(entityCosts.minerals);
 				_gameState->subGas(entityCosts.gas);
 
+				//TODO hier muss dann noch mit Supplys geguckt werden
 				// otherwise, we find out if the item is a unit or a building
 				if (_technologyManager->checkIfNameIsBuilding(currentItem))
 				{
@@ -272,6 +275,7 @@ void Simulation<RacePolicy>::run()
 					}
 					// if we haven't found a ready worker, we 
 					// have to take a minerals or vespene guy
+					//TODO potentielle FEHLERQUELLE wegen vespene guy
 					if (!ourWorker)
 					{
 						for (auto workerIterator : workerList)
