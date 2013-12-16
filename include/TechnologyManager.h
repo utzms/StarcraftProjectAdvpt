@@ -83,7 +83,7 @@ private:
     inline bool checkTechnologyCosts(std::shared_ptr<Technology> technology)
     {
         if(technology->getMineralsCost() > _gameState->getMinerals() ||
-                technology->getGasCost() > _gameState->getGas() || (!checkIfNameIsBuilding(technology->getName()) && technology->getSupplyCost() > _gameState->getSupply()))
+                technology->getGasCost() > _gameState->getGas() || (!checkIfNameIsBuilding(technology->getName()) && technology->getSupplyCost() > _gameState->getAvailableSupply()))
         {
             return false;
         }
@@ -182,58 +182,39 @@ public:
     {
         
         bool fulfilled = false;
+        float supply = 10;
         for(std::string entityName : buildList)
         {
             std::vector<std::shared_ptr<Technology>> techVec = findTechnology(entityName);
             fulfilled = false;
             for(std::shared_ptr<Technology> tech : techVec)
             {
-
-                if(checkTechnologyRequirements(tech)) 
+                if(checkIfNameIsBuilding(entityName) || tech->getSupplyCost() <= supply) 
                 {
-                    fulfilled = true;
-                    notifyCreation(entityName);
-                    break;
+                    if(checkTechnologyRequirements(tech))   
+                    {
+                        fulfilled = true;
+                        notifyCreation(entityName);
+                        if(entityName.compare(RacePolicy::getMainBuilding()))
+                        {
+                            supply += 10;
+                        }
+                        else if(entityName.compare(RacePolicy::getSupplyProvider())) 
+                        {
+                            supply += 8;
+                        }
+                        break;
+                    }
                 }
-            }
-            if(!fulfilled) 
-            {
-                setTechnologyListToInitialState();
-                return false;
+                if(!fulfilled) 
+                {
+                    setTechnologyListToInitialState();
+                    return false;
+                }
             }
         }
         setTechnologyListToInitialState();
         return true;
-                
-        /*
-        for (size_t i = 0; i < buildList.size(); ++i)
-        {
-            auto testPossible = findUnitVec(buildList[i]);
-            if (testPossible.empty())
-            {
-                testPossible = findBuildingVec(buildList[i]);
-            }
-            if (testPossible.empty())
-            {
-                std::cerr << "FATAL ERROR: Couldnt find Technology: " << buildList[i] << std::endl;
-                return false;
-            }
-            for (size_t vec=0; vec < testPossible.size(); ++vec)
-            {
-                std::string progress = "Checking: " + testPossible[vec]->getName();
-                PROGRESS(progress);
-                if (checkRequirements(testPossible[vec]->getRequirements()) == false)
-                {
-                    return false;
-                } else
-                {
-                    testPossible[vec]->setExistence(true);
-                }
-            }
-        }
-        //when finished, call reset()
-        //either here or after the calling function
-        return true; */
     }
 
     /** Functions for notifying state-changes in entities.
