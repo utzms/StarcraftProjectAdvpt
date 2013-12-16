@@ -26,13 +26,6 @@ out=$(OBJPATH)worker.o\
 all: OPT += -DNDEBUG
 all: exe
 
-test2: OPT += -DNDEBUG -DTECHTREETEST
-test2: exe
-
-test: OPT += -DTECHTREETEST
-test: OPT += -DDEBUG
-test: exe
-
 debug: OPT += -DDEBUG
 debug: exe
 
