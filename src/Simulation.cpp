@@ -56,7 +56,6 @@ void Simulation<RacePolicy>::removeWorker(std::shared_ptr<Worker> unitForRemoval
 		throw std::invalid_argument("Simulation::removeUnit() Worker for removal is not in worker list.");
 	}
 
-	//TODO hier ist noch ein subSupply. Soll das wirklich drin sein?
 	_gameState->subSupply(1.f);
 
 	_technologyManager->notifyDestruction(unitName);
@@ -151,7 +150,7 @@ template <class RacePolicy> std::shared_ptr<Worker> Simulation<RacePolicy>::getA
 	// if we haven't found a ready worker, we 
 	// have to take a minerals or vespene guy
 	//TODO potentielle FEHLERQUELLE wegen vespene guy
-	if (ourWorker == nullptr)
+/*	if (ourWorker == nullptr)
 	{
 		for (auto workerIterator : _gameState->workerList)
 		{
@@ -162,7 +161,7 @@ template <class RacePolicy> std::shared_ptr<Worker> Simulation<RacePolicy>::getA
 			}
 		}
 	}
-
+*/
 	return ourWorker;
 }
 /** Function starting the Simulation.
@@ -271,7 +270,6 @@ void Simulation<RacePolicy>::run()
 			}
 		}
 
-		//TODO diese Verteilung sollte besser gemacht werden, dementsprechend wohl weiter unten noch schauen, wenns ein Vespene-Abbau-Gebaeude ist, dann muessen genuegend Worker abgestellt werden
 		for(auto workerIterator : workerList)
 		{
 			if( workerIterator->state == Worker::State::Ready ||
