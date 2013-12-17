@@ -56,6 +56,7 @@ void Simulation<RacePolicy>::removeWorker(std::shared_ptr<Worker> unitForRemoval
 		throw std::invalid_argument("Simulation::removeUnit() Worker for removal is not in worker list.");
 	}
 
+	//TODO hier ist noch ein subSupply. Soll das wirklich drin sein?
 	_gameState->subSupply(1.f);
 
 	_technologyManager->notifyDestruction(unitName);
@@ -257,7 +258,7 @@ void Simulation<RacePolicy>::run()
 
 		PROGRESS("Simulation::run() Resetting workers to collect resources");
 
-		int neededVespeneGasWorkers = 0;
+		unsigned int neededVespeneGasWorkers = 0;
 		for(auto buildingIterator : _gameState->buildingList)
 		{	
 			if(!(buildingIterator->getName().compare(RacePolicy::getGasHarvestBuilding())))
@@ -270,7 +271,7 @@ void Simulation<RacePolicy>::run()
 			}
 		}
 
-		//TODO diese Verteilung ist bullshit, muss geaendert werden!!!
+		//TODO diese Verteilung sollte besser gemacht werden, dementsprechend wohl weiter unten noch schauen, wenns ein Vespene-Abbau-Gebaeude ist, dann muessen genuegend Worker abgestellt werden
 		for(auto workerIterator : workerList)
 		{
 			if( workerIterator->state == Worker::State::Ready ||
@@ -399,7 +400,7 @@ void Simulation<RacePolicy>::run()
 				// get the costs for game state manipulation and build time
 				Costs entityCosts = _technologyManager->getEntityCosts(currentItem);
 
-				//TODO hier muss dann noch mit Supplys geguckt werden
+				//TODO hier muss dann noch mit Supplys geguckt werden..ich glaube, das wrid noch nicht gemacht, oder seh ich das nur nicht?
 				// otherwise, we find out if the item is a unit or a building
 				if (_technologyManager->checkIfNameIsBuilding(currentItem))
 				{
@@ -467,7 +468,6 @@ void Simulation<RacePolicy>::run()
 					}
 
 					// it is a building, so we need a worker
-					//TODO ausser bei upgrades brauchen wir hier den Worker
 					std::shared_ptr<Worker> ourWorker = getAvailableWorker();
 
 								// we have a worker, let's build something!
@@ -495,9 +495,9 @@ void Simulation<RacePolicy>::run()
 					}
 
 
-
-					// if we still haven't got a worker
-					// we need to try again at a later point							
+				//TODO hier auch mit den Supplys....bin mir nicht sicher, aber ich seh zumindest nicht, wo das gemacht wird.
+				// if we still haven't got a worker
+				// we need to try again at a later point		
 				}
 				else if (_technologyManager->checkIfNameIsUnit(currentItem))
 				{
