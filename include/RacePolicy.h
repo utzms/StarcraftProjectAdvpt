@@ -5,9 +5,22 @@
 #include <iostream>
 #include <string>
 
+
+enum class RaceType
+{
+	Protoss,
+	Terran,
+	Zerg
+};
+
 class Protoss
 {
     public:
+		static RaceType getRace()
+		{
+			return RaceType::Protoss;
+		}
+
         static std::string unitPath1()
 		{
             return "../data/Protoss/units.txt";
@@ -31,6 +44,11 @@ class Protoss
 		{
 			return "Nexus";
 		}
+
+//		static void upgradeMainBuilding(std::string newName)
+//		{
+//		}
+
 		static std::string getWorker()
 		{
 			return "Probe";
@@ -48,6 +66,11 @@ class Protoss
 class Zerg
 {
     public:
+		static RaceType getRace()
+		{
+			return RaceType::Zerg;
+		}
+
         static std::string unitPath1()
 		{
 			return "../data/Zerg/units.txt";
@@ -71,6 +94,9 @@ class Zerg
 		{
 			return "Hatchery";
 		}
+
+
+
 		static std::string getWorker()
 		{
 			return "Drone";
@@ -89,6 +115,10 @@ class Zerg
 class Terran
 {
     public:
+		static RaceType getRace()
+		{
+			return RaceType::Terran;
+		}
         static std::string unitPath1()
 		{
 			return "../data/Terran/units.txt";

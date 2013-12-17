@@ -23,9 +23,13 @@ void Simulation<RacePolicy>::buildBuilding(std::shared_ptr<Worker> workerForBuil
 {
 	std::shared_ptr<Building> buildingToBuild = std::shared_ptr<Building>(new Building(name, time));
 	_gameState->buildingList.push_back(buildingToBuild);
-	workerForBuilding->timer = time;
+	if(workerForBuilding->getName().compare(Protoss::getWorker()) != 0)
+	{
+		workerForBuilding->timer = time;
+		workerForBuilding->state = Worker::State::Constructing;
+	}
 	workerForBuilding->buildingName = name;
-	workerForBuilding->state = Worker::State::Constructing;
+
 }
 
 	template <class RacePolicy>
@@ -51,6 +55,8 @@ void Simulation<RacePolicy>::removeWorker(std::shared_ptr<Worker> unitForRemoval
 	{
 		throw std::invalid_argument("Simulation::removeUnit() Worker for removal is not in worker list.");
 	}
+
+	_gameState->subSupply(1.f);
 
 	_technologyManager->notifyDestruction(unitName);
 }
@@ -99,6 +105,8 @@ void Simulation<RacePolicy>::morphUnit(std::shared_ptr<Unit> unitForMorphing, in
 	{
 		throw std::invalid_argument("Simulation::morphUnit() Unit for morphing is not in unit list.");
 	}
+
+	PROGRESS("Simulation::morphUnit() started morphing " << unitForMorphing->getName() << " into " << morphTargetName);
 }
 
 	template <class RacePolicy>
@@ -106,11 +114,16 @@ void Simulation<RacePolicy>::timeStep()
 {
 	std::vector< std::shared_ptr<Worker> >&      workerList   = _gameState->workerList;
 	std::vector< std::shared_ptr<Building> >&    buildingList = _gameState->buildingList;
-	//	std::vector< std::shared_ptr<Unit> >&        unitList     = _gameState->unitList;
+	std::vector< std::shared_ptr<Unit> >&        unitList     = _gameState->unitList;
 
 	for (auto workerIterator : workerList)
 	{
 		workerIterator->timeStep();
+	}
+
+	for (auto unitIterator : unitList)
+	{
+		unitIterator->timeStep();
 	}
 
 	for (auto buildingIterator : buildingList)
@@ -167,7 +180,7 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 
 	std::shared_ptr<GameState> gameState(new GameState());
 	std::shared_ptr<TechnologyList> technologyList(new TechnologyList());
-	std::shared_ptr<ResourceManager> resourceManager(new ResourceManager(gameState, 0.7f, 0.7f));
+	std::shared_ptr<ResourceManager> resourceManager(new ResourceManager(gameState, 0.35f, 0.7f));
 	std::shared_ptr<TechnologyManager<RacePolicy>> techManager(new TechnologyManager<RacePolicy>(gameState));
 	std::shared_ptr<StartingConfiguration> startingConfiguration( new StartingConfiguration(std::string("./data/StartingConfiguration.txt")) );
 	std::shared_ptr<GameStateUpdate<RacePolicy>> gameStateUpdate(new GameStateUpdate<RacePolicy>(gameState,techManager));
@@ -249,7 +262,11 @@ void Simulation<RacePolicy>::run()
 		{	
 			if(!(buildingIterator->getName().compare(RacePolicy::getGasHarvestBuilding())))
 			{		
-				neededVespeneGasWorkers += 5;
+				neededVespeneGasWorkers += 3;
+				if (neededVespeneGasWorkers >= workerList.size())
+				{
+					neededVespeneGasWorkers -= 3;
+				}
 			}
 		}
 
@@ -276,7 +293,7 @@ void Simulation<RacePolicy>::run()
 		// special case for zerg
 		// update larvae
 		static int larvaTimer = 0;
-		if (RacePolicy::getMainBuilding().compare("Hatchery") == 0)
+		if (RacePolicy::getRace() == RaceType::Zerg)
 		{
 			int larvaCount = 0;
 			for (auto unitIterator : _gameState->unitList)
@@ -289,7 +306,7 @@ void Simulation<RacePolicy>::run()
 
 			if (larvaCount < 3)
 			{
-				if (larvaTimer == 15)
+				if (larvaTimer >= 15)
 				{
 					std::vector<std::string> larvaBuildings = _technologyManager->getBuildingsForUnitProduction("Larva");
 
@@ -326,10 +343,12 @@ void Simulation<RacePolicy>::run()
 				}
 				else
 				{
-					larvaTimer++;
+
 				}
 
 			}
+
+			larvaTimer++;
 		}
 
 		while (buildListState != BuildList::State::Finished)
@@ -400,8 +419,31 @@ void Simulation<RacePolicy>::run()
 						if (isUpgrade)
 						{
 							// we have a building upgrade
+							std::shared_ptr<Building> buildingToBeUpgraded;
 
 							// we have to order the upgrade
+							for (auto buildingIterator : _gameState->buildingList)
+							{
+								if (buildingIterator->getName().compare(vanishingRequirements[0]) == 0)
+								{
+									buildingToBeUpgraded = buildingIterator;
+								}
+							}
+
+							if (!buildingToBeUpgraded)
+							{
+								throw std::runtime_error("Simulation::run() Couldn't find building in building list when trying to upgrade");
+							}
+
+							buildingToBeUpgraded->upgradeTimer = entityCosts.buildTime;
+							buildingToBeUpgraded->upgradeState = Building::UpgradeState::Upgrading;
+							buildingToBeUpgraded->targetUpgradeName = currentItem;
+
+							if (buildingToBeUpgraded->getName().compare(RacePolicy::getMainBuilding()) == 0)
+							{
+								// we have a main building upgrade
+								//RacePolicy::upgradeMainBuilding(currentItem);
+							}
 
 							// then we can set the item to ok
 							_buildList->setCurrentItemOk();
@@ -409,6 +451,8 @@ void Simulation<RacePolicy>::run()
 							// reduce minerals and gas by costs
 							_gameState->subMinerals(entityCosts.minerals);
 							_gameState->subGas(entityCosts.gas);
+
+							std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 							// continue to the next item in the build list
 							continue;
@@ -418,6 +462,8 @@ void Simulation<RacePolicy>::run()
 							// Zerg worker wants to build something
 							vanishingZergWorker = true;
 						}
+
+
 					}
 
 					// it is a building, so we need a worker
@@ -457,7 +503,7 @@ void Simulation<RacePolicy>::run()
 				{
 					// it is a unit, so we need to decide if it is a 
 					// worker or another unit
-					PROGRESS("Simulation::run() Ordering unit " << currentItem);
+					PROGRESS("Simulation::run() Trying unit " << currentItem);
 
 					// get the buildings this unit can be built from
 					std::vector<std::string> buildings = _technologyManager->getBuildingsForUnitProduction(currentItem);
@@ -474,29 +520,33 @@ void Simulation<RacePolicy>::run()
 						}
 					}
 
-					// if a building is ready, we produce a unit
-					if (buildingReady)
+					// no archon for now, only zerg morphs
+					if (vanishingRequirements.size() == 1)
 					{
-						if (!vanishingRequirements.empty())
-						{
-							// we assume that units can have only other units as vanishing
-							// requirements (not workers)
+						// we assume that units can have only other units as vanishing
+						// requirements (not workers)
 
-							for (auto requirementsIterator : vanishingRequirements)
+						for (auto unitIterator : _gameState->unitList)
+						{
+							if ((unitIterator->getName().compare(vanishingRequirements[0]) == 0) && (unitIterator->state == Unit::State::Ready))
 							{
-								for (auto unitIterator : _gameState->unitList)
-								{
-									if (unitIterator->getName().compare(requirementsIterator) == 0)
-									{
-										PROGRESS("Simulation::run() Deleted unit " << requirementsIterator << " as vanishing requirement for unit " << currentItem);
-										//removeUnit(unitIterator, requirementsIterator);
-										morphUnit(unitIterator, entityCosts.buildTime, currentItem);
-										break;
-									}
-								}
+								//PROGRESS("Simulation::run() Deleted unit " << vanishingRequirements[0] << " as vanishing requirement for unit " << currentItem);
+								//removeUnit(unitIterator, requirementsIterator);
+								morphUnit(unitIterator, entityCosts.buildTime, currentItem);
+
+								_gameState->subMinerals(entityCosts.minerals);
+								_gameState->subGas(entityCosts.gas);
+
+								_buildList->setCurrentItemOk();
+								std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+
+								break;
 							}
 						}
-
+					}
+					// if a building is ready, we produce a unit
+					else if (buildingReady)
+					{
 						// reduce minerals and gas by costs
 						_gameState->subMinerals(entityCosts.minerals);
 						_gameState->subGas(entityCosts.gas);
@@ -521,6 +571,8 @@ void Simulation<RacePolicy>::run()
 						break;
 					}
 
+					break;
+
 				}
 				else
 				{
@@ -537,8 +589,6 @@ void Simulation<RacePolicy>::run()
 		timeStep();
 	}
 
-
-	std::cout << "Produced Minerals: " << _gameState->getMinerals() << std::endl;
 }
 
 template <class RacePolicy>

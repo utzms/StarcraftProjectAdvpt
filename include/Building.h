@@ -24,15 +24,31 @@ class Building
             Producing
         };
 
+		enum class UpgradeState
+		{
+			Ready,
+			Upgrading
+		};
+
 		State state;
 		int	timer;
+
+
+
+
 		std::string productionUnitName;
 		ProductionType productionType;
+
+		UpgradeState upgradeState;
+		int upgradeTimer;
+		std::string targetUpgradeName;
 
 		Building(std::string name, int buildTime)
 			:_name(name)
 			,state(State::UnderConstruction)
 			,timer(buildTime)
+			,upgradeState(UpgradeState::Ready)
+			,upgradeTimer(0)
 		{
 		}
 
@@ -41,6 +57,11 @@ class Building
 			if (state != State::Ready)
 			{
 				timer--;
+			}
+
+			if (upgradeState != UpgradeState::Ready)
+			{
+				upgradeTimer--;
 			}
         }
 

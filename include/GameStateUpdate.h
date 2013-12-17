@@ -32,14 +32,26 @@ class GameStateUpdate
 
 			PROGRESS("GSU Updating Workers");
 			//update units
+
 			std::vector<std::shared_ptr<Unit>> vanishingUnits;
+			std::vector<std::shared_ptr<Unit>> spawningUnits;
+			std::vector<std::shared_ptr<Worker>> spawningWorkers;
+
 			for (auto unitIterator : unitList)
 			{
 				if( unitIterator->timer == 0  && unitIterator->state == Unit::State::Morphing)
-				{
-					_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit(unitIterator->morphTargetName)));
-					_technologyManager->notifyCreation(_gameState->unitList.back()->getName());
+				{	
+					if (unitIterator->morphTargetName.compare(RacePolicy::getWorker()) == 0)
+					{
+						spawningWorkers.push_back(std::shared_ptr<Worker>(new Worker(unitIterator->morphTargetName)));
+					}
+					else
+					{
+						spawningUnits.push_back(std::shared_ptr<Unit>(new Unit(unitIterator->morphTargetName)));
+					}
+
 					vanishingUnits.push_back(unitIterator);
+					PROGRESS("GSU finished morphing " << unitIterator->getName() << " into " << unitIterator->morphTargetName);
 				}
 			}
 
@@ -48,9 +60,23 @@ class GameStateUpdate
 				auto unitIterator = std::find(_gameState->unitList.begin(), _gameState->unitList.end(), vanishingUnitsIterator);
 				if(unitIterator != unitList.end())
 				{
+					PROGRESS("GSU Destroyed " << (*unitIterator)->getName());
 					unitList.erase(unitIterator);
-					_technologyManager->notifyDestruction((*unitIterator)->getName());
+					_technologyManager->notifyDestruction((*unitIterator)->getName());					
 				}
+			}
+
+			for (auto spawningIterator : spawningUnits)
+			{
+				unitList.push_back(spawningIterator);
+				_technologyManager->notifyCreation(unitList.back()->getName());
+			}
+
+
+			for (auto spawningIterator : spawningWorkers)
+			{
+				workerList.push_back(spawningIterator);
+				_technologyManager->notifyCreation(workerList.back()->getName());
 			}
 
 			//update workers
@@ -68,9 +94,29 @@ class GameStateUpdate
 			//update buildings
 			for (auto buildingIterator : buildingList)
 			{
-				if(buildingIterator->timer == 0)
+				if (buildingIterator->upgradeTimer == 0)
 				{
 					PROGRESS("GSU: Building " << buildingIterator->getName() << " timer == 0");
+					if (buildingIterator->upgradeState == Building::UpgradeState::Upgrading)
+					{
+						Building::State tempState = buildingIterator->state;
+						int tempTimer = buildingIterator->timer;
+						std::string unitName = buildingIterator->productionUnitName;
+						Building::ProductionType tempType = buildingIterator->productionType;
+
+						_technologyManager->notifyCreation(buildingIterator->targetUpgradeName);
+						buildingIterator = std::shared_ptr<Building>(new Building(buildingIterator->targetUpgradeName, 0));
+
+						buildingIterator->state = tempState;
+						buildingIterator->timer = tempTimer;
+						buildingIterator->productionUnitName = unitName;
+						buildingIterator->productionType = tempType;
+					}
+				}
+
+				if(buildingIterator->timer == 0)
+				{
+
 					if (buildingIterator->state == Building::State::Producing)
 					{						
 						PROGRESS("GSU: Building " << buildingIterator->getName() << " has produced");

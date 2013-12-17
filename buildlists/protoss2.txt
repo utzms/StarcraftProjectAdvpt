@@ -5,5 +5,5 @@ Assimilator
 Gateway
 Cybernetics Core
 Stargate
-Fleat Beacon
+Fleet Beacon
 Mothership
