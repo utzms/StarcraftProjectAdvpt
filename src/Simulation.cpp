@@ -179,7 +179,6 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 
 
 	std::shared_ptr<GameState> gameState(new GameState());
-	std::shared_ptr<TechnologyList> technologyList(new TechnologyList());
 	std::shared_ptr<ResourceManager> resourceManager(new ResourceManager(gameState, 0.35f, 0.7f));
 	std::shared_ptr<TechnologyManager<RacePolicy>> techManager(new TechnologyManager<RacePolicy>(gameState));
 	std::shared_ptr<StartingConfiguration> startingConfiguration( new StartingConfiguration(std::string("./data/StartingConfiguration.txt")) );
@@ -299,7 +298,7 @@ void Simulation<RacePolicy>::run()
 			{
 				if (unitIterator->getName().compare("Larva") == 0)
 				{
-					larvaCount++;
+					++larvaCount;
 				}
 			}
 
@@ -347,7 +346,7 @@ void Simulation<RacePolicy>::run()
 
 			}
 
-			larvaTimer++;
+			++larvaTimer;
 		}
 
 		while (buildListState != BuildList::State::Finished)
