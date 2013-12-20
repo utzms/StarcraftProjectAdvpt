@@ -62,6 +62,11 @@ public:
 		_builtList.resize(_nameList.size(), false);
 		_currentItemOk = _builtList.begin();
     }
+	~BuildList()
+	{
+		_nameList.clear();
+		_builtList.clear();
+	}
 
     std::string current()
     {

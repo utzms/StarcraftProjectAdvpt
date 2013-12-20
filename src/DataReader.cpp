@@ -29,6 +29,7 @@ DataReader::~DataReader()
 #endif
 	if (file.is_open())
 	{
+		delete input;
 		file.close();
 	}
 }

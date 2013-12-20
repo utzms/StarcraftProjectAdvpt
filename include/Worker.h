@@ -28,6 +28,7 @@ class Worker
 			:_name(name)
 			,state(State::Ready)
 		{
+			timer=0;
 		}
 
 		void timeStep()

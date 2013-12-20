@@ -15,7 +15,7 @@ TechnologyList::TechnologyList(std::string unitPathIn, std::string buildPath)
 TechnologyList::~TechnologyList()
 {
 	PROGRESS("TL Destructor");
-	//cleanAll();
+	cleanAll();
 }
 
 void TechnologyList::cleanAll()
@@ -542,8 +542,7 @@ void TechnologyList::initBuildingList(std::string buildList)
 		}
 		stream >> buildCostSupply;
 
-		Technology *t = new Technology(buildName,buildCostMinerals,buildCostGas,buildCostSupply,buildBuildTime);
-		std::shared_ptr<Technology> tech(t);
+		std::shared_ptr<Technology> tech(new Technology(buildName,buildCostMinerals,buildCostGas,buildCostSupply,buildBuildTime));
 		buildings.insert( std::pair<std::string, std::shared_ptr<Technology>>(buildName,
 					tech));
 
