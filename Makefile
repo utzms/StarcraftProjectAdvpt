@@ -26,6 +26,9 @@ out=$(OBJPATH)worker.o\
 all: OPT += -DNDEBUG
 all: exe
 
+debug_deep: OPT += -DDEBUG_DEEP
+debug_deep: debug
+
 debug: OPT += -DDEBUG
 debug: exe
 

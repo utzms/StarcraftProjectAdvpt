@@ -29,372 +29,157 @@ void TechnologyList::cleanAll()
 
 void TechnologyList::cleanUnresolved()
 {
-	if (!(unresolvedBuildingRequirements.size() == 0))
+	if (!(unresolvedBuildingRequirements.empty()))
 		unresolvedBuildingRequirements.clear();
-	if (!(unresolvedUnitRequirements.size() == 0))
+	if (!(unresolvedUnitRequirements.empty()))
 		unresolvedUnitRequirements.clear();
+}
+
+void TechnologyList::linkRequirement(std::shared_ptr<Technology> &tech, std::vector<std::vector<std::string>> in, RequirementType T)
+{
+	for (size_t j = 0; j < in.size(); ++j)
+	{
+		std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>> sources;
+		for (size_t i = 0; i < in[j].size(); ++i)
+		{
+			std::shared_ptr<Technology> requirement;
+			std::pair<std::shared_ptr<Technology>,RequirementType> commit;
+			commit.second=T;
+			if ((requirement=findTechnology(in[j][i]))==NULL)
+			{
+				std::cerr << "Fatal error: No instance of Technology: " << in[j][i] << std::endl;
+				return;
+			}
+			commit.first = requirement;
+			sources.push_back(commit);
+		}
+		tech->addRequirement(sources);
+	}
+}
+
+void TechnologyList::linkRequirement(std::shared_ptr<Technology> &tech, std::vector<std::string> in, RequirementType T)
+{
+		std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>> sources;
+		for (size_t i = 0; i < in.size(); ++i)
+		{
+			std::shared_ptr<Technology> requirement;
+			std::pair<std::shared_ptr<Technology>,RequirementType> commit;
+			commit.second=T;
+			if ((requirement=findTechnology(in[i]))==NULL)
+			{
+				std::cerr << "Fatal error: No instance of Technology: " << in[i] << std::endl;
+				return;
+			}
+			commit.first = requirement;
+			sources.push_back(commit);
+		}
+		tech->addRequirement(sources);
+}
+
+void TechnologyList::tokenizeString(std::vector<std::string> &out, std::string in, char sep)
+{
+	size_t from=0,to=0;
+	std::string sub;
+	do 
+	{
+		to = in.find(sep);
+		sub = in.substr(from,to);
+		if (sub.compare("0") != 0)
+			out.push_back(sub);
+		in=in.substr(to+1,std::string::npos);
+	} while (to!=std::string::npos);
 }
 
 void TechnologyList::initRest()
 {
-#ifdef DEBUG
+#ifdef DEBUG_DEEP
 	std::cout << "INIT REST of TechnolgyList" << std::endl;
 #endif
 	std::string requirements;
 	std::string vanish;
 	std::string buildFrom;
 
-	size_t from,fromfrom,to,toto;
-
 	auto unitIt = unresolvedUnitRequirements.begin();
 	for (; unitIt != unresolvedUnitRequirements.end(); ++unitIt)
 	{
-		std::vector<std::string> fixedRequirements;
-		std::vector<std::vector<std::string>> orRequirements;
-
 		std::shared_ptr<Technology> tech = unitIt->first;
 		requirements = unitIt->second.req;
 		vanish = unitIt->second.vanish;
 		buildFrom = unitIt->second.buildFrom;
-		//requirement check
+		/*
+		 * Requirement Check:
+		 */
+		std::vector<std::string> require;
+		tokenizeString(require, requirements, ',');
+		std::vector<std::vector<std::string>> oneOfMany;
+		for (size_t i = 0; i < require.size(); ++i)
 		{
-			from=0;
-			to=0;
-			std::string sub;
-			do
+			std::vector<std::string> tmp;
+			tokenizeString(tmp, require[i], '/');
+			if (!(tmp.empty()))
 			{
-				to=requirements.find(",");
-				sub = requirements.substr(from,to);
-				//checken ob eine "eine von vielen" requirement ist
-				if (sub.find("/")!=std::string::npos)
-				{
-					std::vector<std::string> orReq;
-					std::string subsub;
-					toto=0;
-					fromfrom=0;
-					do
-					{
-						toto=sub.find("/");
-						subsub=sub.substr(fromfrom,toto);
-						orReq.push_back(subsub);
-						sub=sub.substr(toto+1,std::string::npos);
-					} while(toto != std::string::npos);
-					orRequirements.push_back(orReq);
-				} else
-				{
-					if (sub != "0")
-						fixedRequirements.push_back(sub);
-				}
-				requirements=requirements.substr(to+1,std::string::npos);
-			} while (to!=std::string::npos);
-			//add requirements to Technology
-			for (size_t i = 0; i < fixedRequirements.size(); ++i)
-			{
-				std::shared_ptr<Technology> source;
-                std::pair<std::shared_ptr<Technology>, RequirementType> commit;
-                commit.second = RequirementType::Existence;
-				if ((source=findUnit(fixedRequirements[i]))==NULL)
-				{
-					//its a building
-					if ((source=findBuilding(fixedRequirements[i]))==NULL)
-					{
-						std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
-					} else
-					{
-						commit.first = source;
-						tech->addRequirement(commit);
-					}
-				} else
-				{
-					commit.first = source;
-					tech->addRequirement(commit);
-				}
+				oneOfMany.push_back(tmp);
 			}
-			for (size_t i = 0; i < orRequirements.size(); ++i)
-			{
-                std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>> sources;
-				for (size_t j = 0; j < orRequirements[i].size(); ++j)
-				{
-					std::shared_ptr<Technology> source;
-                    std::pair<std::shared_ptr<Technology>,RequirementType> commit;
-                    commit.second = RequirementType::Existence;
-					if ((source=findUnit(orRequirements[i][j]))==NULL)
-					{
-						//its a building
-						if ((source=findBuilding(orRequirements[i][j]))==NULL)
-						{
-							std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
-						} else
-						{
-							commit.first = source;
-							sources.push_back(commit);
-						}
-					} else
-					{
-						commit.first = source;
-						sources.push_back(commit);
-					}
-				}
-				tech->addRequirement(sources);
-			}
-			orRequirements.clear();
-			fixedRequirements.clear();
 		}
+		linkRequirement(tech, oneOfMany, RequirementType::Existence);
 		/*
 		 * Build From Check:
-		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-		 * Care, using fixed- and orRequirements, dont mix it, because of the name
 		 */
-		{
-			from=0;
-			to=0;
-			std::string sub;
-			std::vector<std::string> orReq;
-			do
-			{
-				to=buildFrom.find(",");
-				sub=buildFrom.substr(from,to);
-				if (sub != "0")
-					orReq.push_back(sub);
-				buildFrom=buildFrom.substr(to+1,std::string::npos);
-			} while (to!=std::string::npos);
-			orRequirements.push_back(orReq);
-			for (size_t i = 0; i < orRequirements.size(); ++i)
-			{
-                std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>> sources;
-
-				for (size_t j = 0; j < orRequirements[i].size(); ++j)
-				{
-					std::shared_ptr<Technology> source;
-                    std::pair<std::shared_ptr<Technology>,RequirementType> commit;
-
-                    commit.second = RequirementType::ForProduction;
-
-                    if ((source = findUnit(orRequirements[i][j]))==NULL)
-					{
-						//its a building
-						if ((source=findBuilding(orRequirements[i][j]))==NULL)
-						{
-							std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
-						} else
-						{
-							commit.first = source;
-							sources.push_back(commit);
-						}
-					} else
-					{
-						commit.first = source;
-						sources.push_back(commit);
-					}
-				}
-				tech->addRequirement(sources);
-			}
-			orRequirements.clear();
-			fixedRequirements.clear();
-		} //end buildFrom check
+		std::vector<std::string> build;
+		tokenizeString(build, buildFrom, ',');
+		linkRequirement(tech, build, RequirementType::ForProduction);
 		/*
 		 * Vanish Check:
-		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-		 * Care, using fixed- and orRequirements, dont mix it, because of the name
 		 */
-		{
-			from=0;
-			to=0;
-			std::string sub;
-			std::vector<std::string> orReq;
-			do
-			{
-				to=vanish.find(",");
-				sub=vanish.substr(from,to);
-				if (sub != "0")
-					orReq.push_back(sub);
-				vanish=vanish.substr(to+1,std::string::npos);
-			} while (to!=std::string::npos);
-			orRequirements.push_back(orReq);
-			for (size_t i = 0; i < orRequirements.size(); ++i)
-			{
-                std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>> sources;
-				for (size_t j = 0; j < orRequirements[i].size(); ++j)
-				{
-					std::shared_ptr<Technology> source;
-                    std::pair<std::shared_ptr<Technology>,RequirementType> commit;
-
-                    commit.second = RequirementType::Vanishing;
-
-					if ((source=findUnit(orRequirements[i][j]))==NULL)
-					{
-						//its a building
-						if ((source=findBuilding(orRequirements[i][j]))==NULL)
-						{
-							std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
-						} else
-						{
-							commit.first = source;
-							sources.push_back(commit);
-						}
-					} else
-					{
-						commit.first = source;
-						sources.push_back(commit);
-					}
-				}
-				tech->addRequirement(sources);
-			}
-			orRequirements.clear();
-			fixedRequirements.clear();
-		} //end buildFrom check
+		std::vector<std::string> van;
+		tokenizeString(van, vanish, ',');
+		linkRequirement(tech, van, RequirementType::Vanishing);
 	} //end unit it for loop
-
 
 	//here starts the building list
 	auto buildIt = unresolvedBuildingRequirements.begin();
 	for (; buildIt != unresolvedBuildingRequirements.end(); ++buildIt)
 	{
-		std::vector<std::string> fixedRequirements;
-		std::vector<std::vector<std::string>> orRequirements;
 		std::shared_ptr<Technology> tech = buildIt->first;
 		requirements = buildIt->second.req;
 		vanish = buildIt->second.vanish;
-		buildFrom = buildIt->second.buildFrom;
-		//requirement check
+		/*
+		 * Requirement Check:
+		 */
+		std::vector<std::string> require;
+		tokenizeString(require, requirements, ',');
+		std::vector<std::vector<std::string>> oneOfMany;
+		for (size_t i = 0; i < require.size(); ++i)
 		{
-			from=0;
-			to=0;
-			std::string sub;
-			do
+			std::vector<std::string> tmp;
+			tokenizeString(tmp, require[i], '/');
+			if (!(tmp.empty()))
 			{
-				to=requirements.find(",");
-				sub = requirements.substr(from,to);
-				//checken ob eine "eine von vielen" requirement ist
-				if (sub.find("/")!=std::string::npos)
-				{
-					std::vector<std::string> orReq;
-					std::string subsub;
-					toto=0;
-					fromfrom=0;
-					do
-					{
-						toto=sub.find("/");
-						subsub=sub.substr(fromfrom,toto);
-						orReq.push_back(subsub);
-						sub=sub.substr(toto+1,std::string::npos);
-					} while(toto != std::string::npos);
-					orRequirements.push_back(orReq);
-				} else
-				{
-					if (sub != "0")
-						fixedRequirements.push_back(sub);
-				}
-				if (to != std::string::npos)
-					requirements=requirements.substr(to+1,std::string::npos);
-			} while (to!=std::string::npos);
-			//add requirements to Technology
-			for (size_t i = 0; i < fixedRequirements.size(); ++i)
-			{
-				std::shared_ptr<Technology> source;
-                std::pair<std::shared_ptr<Technology>,RequirementType> commit;
-                commit.second = RequirementType::Existence;
-				if ((source=findUnit(fixedRequirements[i]))==NULL)
-				{
-					//its a building
-					if ((source=findBuilding(fixedRequirements[i]))==NULL)
-					{
-						std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
-					} else
-					{
-						commit.first = source;
-						tech->addRequirement(commit);
-					}
-				} else
-				{
-					commit.first = source;
-					tech->addRequirement(commit);
-				}
+				oneOfMany.push_back(tmp);
 			}
 		}
-		for (size_t i = 0; i < orRequirements.size(); ++i)
-		{
-            std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>> sources;
-			for (size_t j = 0; j < orRequirements[i].size(); ++j)
-			{
-				std::shared_ptr<Technology> source;
-                std::pair<std::shared_ptr<Technology>,RequirementType> commit;
-                commit.second = RequirementType::Existence;
-				if ((source=findUnit(orRequirements[i][j]))==NULL)
-				{
-					//its a building
-					if ((source=findBuilding(orRequirements[i][j]))==NULL)
-					{
-						std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
-					} else
-					{
-						commit.first = source;
-						sources.push_back(commit);
-					}
-				} else
-				{
-					commit.first = source;
-					sources.push_back(commit);
-				}
-			}
-			tech->addRequirement(sources);
-		}
-			orRequirements.clear();
-			fixedRequirements.clear();
+		linkRequirement(tech, oneOfMany, RequirementType::Existence);
 		/*
 		 * Vanish Check:
-		 * !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
-		 * Care, using fixed- and orRequirements, dont mix it, because of the name
 		 */
-		{
-			from=0;
-			to=0;
-			std::string sub;
-			std::vector<std::string> orReq;
-			do
-			{
-				to=vanish.find(",");
-				sub=vanish.substr(from,to);
-				//checken ob eine "eine von vielen" requirement ist
-				if (sub != "0")
-					orReq.push_back(sub);
-				vanish=vanish.substr(to+1,std::string::npos);
-			} while (to!=std::string::npos);
-			orRequirements.push_back(orReq);
-			for (size_t i = 0; i < orRequirements.size(); ++i)
-			{
-                std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>> sources;
-				for (size_t j = 0; j < orRequirements[i].size(); ++j)
-				{
-					std::shared_ptr<Technology> source;
-                    std::pair<std::shared_ptr<Technology>,RequirementType> commit;
-                    commit.second = RequirementType::Vanishing;
-					if ((source=findUnit(orRequirements[i][j]))==NULL)
-					{
-						//its a building
-						if ((source=findBuilding(orRequirements[i][j]))==NULL)
-						{
-							std::cerr << "Fatal error: No instance of Technology: " << fixedRequirements[i] << std::endl;
-						} else
-						{
-							commit.first = source;
-							sources.push_back(commit);
-						}
-					} else
-					{
-						commit.first = source;
-						sources.push_back(commit);
-					}
-				}
-				tech->addRequirement(sources);
-			}
-			orRequirements.clear();
-			fixedRequirements.clear();
-		} //end vanish check
+		std::vector<std::string> van;
+		tokenizeString(van, vanish, ',');
+		linkRequirement(tech, van, RequirementType::Vanishing);
 	}
 	PROGRESS("TL Init done")
+		cleanUnresolved();
+}
 
-	cleanUnresolved();
+	template <typename T>
+inline bool TechnologyList::streamToVariable(std::stringstream &stream, T &x)
+{
+	if (!(stream.good()))
+	{   
+		std::cerr << "TechnologyList::streamToVariable: stream not good, probably no valid line"<<std::endl;
+		return false;
+	}
+	stream >> x;
+	return true;
 }
 
 void TechnologyList::initUnitList(std::string unitList)
@@ -417,58 +202,26 @@ void TechnologyList::initUnitList(std::string unitList)
 		std::stringstream stream;
 
 		stream << line;
-		if (!(stream.good()))
-		{
-			std::cerr << "INIT UNIT LIST : stream not good, probably no valid line"<<std::endl;
+		if (!(streamToVariable(stream, unitName)))
 			continue;
-		}
-		stream >> unitName;
+		if (!(streamToVariable(stream, unitCostMinerals)))
+			continue;
+		if (!(streamToVariable(stream, unitCostGas)))
+			continue;
+		if (!(streamToVariable(stream, unitCostSupply)))
+			continue;
+		if (!(streamToVariable(stream, unitBuildTime)))
+			continue;
+		if (!(streamToVariable(stream, buildFrom)))
+			continue;
+		if (!(streamToVariable(stream, requirements)))
+			continue;
+		if (!(streamToVariable(stream, vanish)))
+			continue;
 		if (unitName == "Unit")
 			continue;
-		if (!(stream.good()))
-		{
-			std::cerr << "INIT UNIT LIST : stream not good, probably no valid line"<<std::endl;
-			continue;
-		}
-		stream >> unitCostMinerals;
-		if (!(stream.good()))
-		{
-			std::cerr << "INIT UNIT LIST : stream not good, probably no valid line"<<std::endl;
-			continue;
-		}
-		stream >> unitCostGas;
-		if (!(stream.good()))
-		{
-			std::cerr << "INIT UNIT LIST : stream not good, probably no valid line"<<std::endl;
-			continue;
-		}
-		stream >> unitCostSupply;
-		if (!(stream.good()))
-		{
-			std::cerr << "INIT UNIT LIST : stream not good, probably no valid line"<<std::endl;
-			continue;
-		}
-		stream >> unitBuildTime;
-		if (!(stream.good()))
-		{
-			std::cerr << "INIT UNIT LIST : stream not good, probably no valid line"<<std::endl;
-			continue;
-		}
-		stream >> buildFrom;
-		if (!(stream.good()))
-		{
-			std::cerr << "INIT UNIT LIST : stream not good, probably no valid line"<<std::endl;
-			continue;
-		}
-		stream >> requirements;
-		if (!(stream.good()))
-		{
-			std::cerr << "INIT UNIT LIST : stream not good, probably no valid line"<<std::endl;
-			continue;
-		}
-		stream >> vanish;
 
-		std::shared_ptr<Technology> tech(new Technology(unitName,unitCostMinerals,unitCostGas,unitCostSupply,unitBuildTime));
+		std::shared_ptr<Technology> tech = std::make_shared<Technology>(unitName,unitCostMinerals,unitCostGas,unitCostSupply,unitBuildTime);
 
 		units.insert( std::pair<std::string, std::shared_ptr<Technology>>(unitName,
 					tech));
@@ -478,10 +231,8 @@ void TechnologyList::initUnitList(std::string unitList)
 		rest.vanish=vanish;
 		rest.buildFrom=buildFrom;
 
-		auto unresolve = std::pair<std::shared_ptr<Technology>, requirementRest>(tech,rest);
-
-		unresolvedUnitRequirements.insert(unresolve);
-
+		std::pair<std::shared_ptr<Technology>, requirementRest> unresolve(tech,rest);
+		unresolvedUnitRequirements.push_front(unresolve);
 	}
 	if (callRest)
 		initRest();
@@ -506,67 +257,34 @@ void TechnologyList::initBuildingList(std::string buildList)
 		std::stringstream stream;
 
 		stream << line;
-		if (!(stream.good()))
-		{
-			std::cerr << "INIT BUILDING LIST : stream not good, probably no valid line"<<std::endl;
+		if (!(streamToVariable(stream, buildName)))
 			continue;
-		}
-		stream >> buildName;
+		if (!(streamToVariable(stream, buildCostMinerals)))
+			continue;
+		if (!(streamToVariable(stream, buildCostGas)))
+			continue;
+		if (!(streamToVariable(stream, buildBuildTime)))
+			continue;
+		if (!(streamToVariable(stream, buildCostSupply)))
+			continue;
+		if (!(streamToVariable(stream, requirements)))
+			continue;
+		if (!(streamToVariable(stream, vanish)))
+			continue;
 		if (buildName == "Building")
-		{
 			continue;
-		}
 
-		if (!(stream.good()))
-		{
-			std::cerr << "INIT BUILDING LIST : stream not good, probably no valid line"<<std::endl;
-			continue;
-		}
-		stream >> buildCostMinerals;
-		if (!(stream.good()))
-		{
-			std::cerr << "INIT BUILDING LIST : stream not good, probably no valid line"<<std::endl;
-			continue;
-		}
-		stream >> buildCostGas;
-		if (!(stream.good()))
-		{
-			std::cerr << "INIT BUILDING LIST : stream not good, probably no valid line"<<std::endl;
-			continue;
-		}
-		stream >> buildBuildTime;
-		if (!(stream.good()))
-		{
-			std::cerr << "INIT BUILDING LIST : stream not good, probably no valid line"<<std::endl;
-			continue;
-		}
-		stream >> buildCostSupply;
+		std::shared_ptr<Technology> tech = std::make_shared<Technology>(buildName,buildCostMinerals,buildCostGas,buildCostSupply,buildBuildTime);
 
-		std::shared_ptr<Technology> tech(new Technology(buildName,buildCostMinerals,buildCostGas,buildCostSupply,buildBuildTime));
 		buildings.insert( std::pair<std::string, std::shared_ptr<Technology>>(buildName,
 					tech));
-
-		if (!(stream.good()))
-		{
-			std::cerr << "INIT BUILDING LIST : stream not good, probably no valid line"<<std::endl;
-			continue;
-		}
-		stream >> requirements;
-		if (!(stream.good()))
-		{
-			std::cerr << "INIT BUILDING LIST : stream not good, probably no valid line"<<std::endl;
-			continue;
-		}
-		stream >> vanish;
 
 		struct requirementRest rest;
 		rest.req=requirements;
 		rest.vanish=vanish;
 
-		auto unresolve = std::pair<std::shared_ptr<Technology>, requirementRest>(tech,rest);
-
-		unresolvedBuildingRequirements.insert(unresolve);
-
+		std::pair<std::shared_ptr<Technology>, requirementRest> unresolve(tech,rest);
+		unresolvedBuildingRequirements.push_front(unresolve);
 	}
 	if (callRest)
 		initRest();
@@ -625,7 +343,6 @@ void TechnologyList::printAll()
 	}
 	std::cout << std::endl;
 	std::cout << std::endl;
-	std::cout << std::endl;
 }
 
 
@@ -638,7 +355,7 @@ std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 	if (count == 0)
 	{
 		lastKey="PlaceHolder";
-#ifdef DEBUG
+#ifdef DEBUG_DEEP
 		std::cerr << "Nothing found in building list with key:\t" << key << std::endl;
 #endif
 		return NULL;
@@ -652,7 +369,7 @@ std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 				return (*it).second;
 			} else
 			{
-#ifdef DEBUG
+#ifdef DEBUG_DEEP
 				std::cout << "No other building with key:\t" << key << " found" << std::endl;
 #endif
 				lastKey = "PlaceHolder";
@@ -676,7 +393,7 @@ std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 	if (count == 0)
 	{
 		lastKey="PlaceHolder";
-#ifdef DEBUG
+#ifdef DEBUG_DEEP
 		std::cerr << "Nothing found in unit list with key:\t" << key << std::endl;
 #endif
 		return NULL;
@@ -690,7 +407,7 @@ std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 				return (*it).second;
 			} else
 			{
-#ifdef DEBUG
+#ifdef DEBUG_DEEP
 				std::cout << "No other unit with key:\t" << key << " found\t" << count << std::endl;
 #endif
 				lastKey = "PlaceHolder";
@@ -703,5 +420,15 @@ std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 			return (*it).second;
 		}
 	}
+}
+
+std::shared_ptr<Technology> TechnologyList::findTechnology(std::string key)
+{
+	std::shared_ptr<Technology> tech;
+	if ((tech=findUnit(key))!=NULL)
+		return tech;
+	if ((tech=findBuilding(key))!=NULL)
+		return tech;
+	return NULL;
 }
 

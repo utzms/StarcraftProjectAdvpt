@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <map>
+#include <forward_list>
 #include <string>
 #include <sstream>
 #include <memory>
@@ -27,8 +28,10 @@ class TechnologyList
 
 		void initRest();
 
-		std::map<std::shared_ptr<Technology>, requirementRest> unresolvedBuildingRequirements;
-		std::map<std::shared_ptr<Technology>, requirementRest> unresolvedUnitRequirements;
+		//std::map<std::shared_ptr<Technology>, requirementRest> unresolvedBuildingRequirements;
+		//std::map<std::shared_ptr<Technology>, requirementRest> unresolvedUnitRequirements;
+		std::forward_list<std::pair<std::shared_ptr<Technology>, requirementRest>> unresolvedBuildingRequirements;
+		std::forward_list<std::pair<std::shared_ptr<Technology>, requirementRest>> unresolvedUnitRequirements;
 
 		std::multimap<std::string, std::shared_ptr<Technology> > units;
 		std::multimap<std::string, std::shared_ptr<Technology> > buildings;
@@ -38,6 +41,13 @@ class TechnologyList
 		TechnologyList();
 		~TechnologyList();
 
+		void linkRequirement(std::shared_ptr<Technology> &tech, std::vector<std::string> in, RequirementType T);
+		void linkRequirement(std::shared_ptr<Technology> &tech, std::vector<std::vector<std::string>> in, RequirementType T);
+		void tokenizeString(std::vector<std::string> &out, std::string in, char sep);
+		std::shared_ptr<Technology> findTechnology(std::string);
+
+		template <typename T>
+		inline bool streamToVariable(std::stringstream &stream, T &x);
 		void cleanUnresolved();
 		void cleanAll();
 		void reset();

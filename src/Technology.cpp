@@ -142,7 +142,7 @@ std::ostream& operator<< (std::ostream& os, const Technology& tech)
 		if (tech.requirements[it][j].second == RequirementType::Existence)
 		{
 			tmp = &tmp1;
-		} else if (tech.requirements[it][j].second == RequirementType::Vanishing)
+		} else if (tech.requirements[it][j].second == RequirementType::ForProduction)
 		{
 			tmp = &tmp2;
 		} else
