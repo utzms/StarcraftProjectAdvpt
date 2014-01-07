@@ -149,7 +149,6 @@ template <class RacePolicy> std::shared_ptr<Worker> Simulation<RacePolicy>::getA
 	}
 	// if we haven't found a ready worker, we 
 	// have to take a minerals or vespene guy
-	//TODO potentielle FEHLERQUELLE wegen vespene guy
 /*	if (ourWorker == nullptr)
 	{
 		for (auto workerIterator : _gameState->workerList)
@@ -397,7 +396,6 @@ void Simulation<RacePolicy>::run()
 				// get the costs for game state manipulation and build time
 				Costs entityCosts = _technologyManager->getEntityCosts(currentItem);
 
-				//TODO hier muss dann noch mit Supplys geguckt werden..ich glaube, das wrid noch nicht gemacht, oder seh ich das nur nicht?
 				// otherwise, we find out if the item is a unit or a building
 				if (_technologyManager->checkIfNameIsBuilding(currentItem))
 				{
@@ -491,8 +489,6 @@ void Simulation<RacePolicy>::run()
 						break;
 					}
 
-
-				//TODO hier auch mit den Supplys....bin mir nicht sicher, aber ich seh zumindest nicht, wo das gemacht wird.
 				// if we still haven't got a worker
 				// we need to try again at a later point		
 				}
