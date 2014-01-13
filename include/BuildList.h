@@ -60,7 +60,7 @@ public:
     {
         readBuildList(filename);
         // shouldn't builtList be initialized here with false completely?
-        _builtList.resize(_nameList.size(), false);
+        _builtList.assign(_nameList.size(), false);
         _currentItemOk = _builtList.begin();
     }
     ~BuildList()
