@@ -21,17 +21,22 @@ class BuildlistOptimizer
 {
 
 private:
+        /* naming convention:
+          m : member variable
+          c : constant
+          ...
+        */
         map<int, BuildList> mPopulation;
         std::hash<string> mHashGen;
         int mTimeLimit;
 
-        void crossover(float reproductionRate);
-        void mutate(float mutationRate);
-        void select(float selectionRate);
+        inline void crossover(float reproductionRate);
+        inline void mutate(float mutationRate);
+        inline void select(float selectionRate);
 
 
 public:
-        BuildlistOptimizer(int timeLimit);
+        BuildlistOptimizer(int timeLimit, size_t individualSize);
 
         /*initializes the population with random individuals until the population size reaches initPopSize*/
         void initialize(int initPopSize);
@@ -40,19 +45,19 @@ public:
         void clear(void);
 
         /* optimizes a buildList by mutating, crossing over and selecting the fittest individuals */
-        void optimize(float reproductionRate, float mutationRate, float selectionRate);
+        void optimize(int generations, float reproductionRate, float mutationRate, float selectionRate);
 
         /* combined use of initialize and optimize */
-        void initializeAndOptimize(int initPopSize, float reproductionRate, float mutationRate, float selectionRate);
+        void initializeAndOptimize(int initPopSize, int generations, float reproductionRate, float mutationRate, float selectionRate);
 
         /* adds a specific individual to the population */
         void addIndividual(BuildList buildlist);
 
-        /* get the group of the fittest individuals with size number */
+        /* get the group of size number of the fittest individuals, together with their corresponding fitness value */
         void getFittestGroup(int number, vector< pair<int,BuildList> >& res);
 
         /* get the overall fittest individual */
-        shared_ptr< pair<int,BuildList> > getFittestIndividual(void);
+        shared_ptr< BuildList > getFittestIndividual(void);
 
 };
 
