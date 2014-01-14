@@ -55,12 +55,12 @@
    if( !(X) ) {  internal::assertFct ( (X), #X, "", __FILE__, __LINE__ ); }
 
 
-#define PROGRESS(MSG) /*\
+#define PROGRESS(MSG) \
 	{ \
 		std::stringstream ss;  \
 		ss << MSG; \
 		internal::progressFct(ss.str()); \
-	}*/
+	}
 
 #else
 

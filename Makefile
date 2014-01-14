@@ -3,7 +3,7 @@
 
 CC=g++
 OPT=-g -std=c++11 -Wall -Wshadow -Wextra -pedantic
-LIBS=
+LIBS=-fopenmp
 INCPATH=./include/
 SRCPATH=./src/
 INC=-I$(INCPATH)
@@ -25,6 +25,13 @@ out=$(OBJPATH)worker.o\
 
 all: OPT += -DNDEBUG
 all: exe
+
+geneticDebug: OPT += -DDEBUG
+geneticDebug: OPT += -DGENETIC
+geneticDebug: exe
+
+genetic: OPT += -DGENETIC
+genetic: all
 
 debug_deep: OPT += -DDEBUG_DEEP
 debug_deep: debug

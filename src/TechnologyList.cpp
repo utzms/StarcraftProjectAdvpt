@@ -18,6 +18,50 @@ TechnologyList::~TechnologyList()
 	cleanAll();
 }
 
+TechnologyList::TechnologyList(TechnologyList &other)
+{
+	PROGRESS("TL CopyConstructor");
+	if (&other != this)
+	{
+		this->units = other.units;
+		this->buildings = other.buildings;
+		this->initialized = other.initialized;
+		this->unitPath = other.unitPath;
+		this->buildingPath = other.buildingPath;
+		this->unresolvedBuildingRequirements = other.unresolvedBuildingRequirements;
+		for (auto &it : this->units)
+		{   
+			it.second->setExistence(0);
+		}   
+		for (auto &it : this->buildings)
+		{   
+			it.second->setExistence(0);
+		}  
+	}
+}
+
+TechnologyList::TechnologyList(const TechnologyList &other)
+{
+	PROGRESS("TL CopyConstructor");
+	if (&other != this)
+	{
+		this->units = other.units;
+		this->buildings = other.buildings;
+		this->initialized = other.initialized;
+		this->unitPath = other.unitPath;
+		this->buildingPath = other.buildingPath;
+		this->unresolvedBuildingRequirements = other.unresolvedBuildingRequirements;
+		for (auto &it : this->units)
+		{   
+			it.second->setExistence(0);
+		}   
+		for (auto &it : this->buildings)
+		{   
+			it.second->setExistence(0);
+		}  
+	}
+}
+
 void TechnologyList::cleanAll()
 {
 	cleanUnresolved();
@@ -59,21 +103,21 @@ void TechnologyList::linkRequirement(std::shared_ptr<Technology> &tech, std::vec
 
 void TechnologyList::linkRequirement(std::shared_ptr<Technology> &tech, std::vector<std::string> in, RequirementType T)
 {
-		std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>> sources;
-		for (size_t i = 0; i < in.size(); ++i)
+	std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>> sources;
+	for (size_t i = 0; i < in.size(); ++i)
+	{
+		std::shared_ptr<Technology> requirement;
+		std::pair<std::shared_ptr<Technology>,RequirementType> commit;
+		commit.second=T;
+		if ((requirement=findTechnology(in[i]))==NULL)
 		{
-			std::shared_ptr<Technology> requirement;
-			std::pair<std::shared_ptr<Technology>,RequirementType> commit;
-			commit.second=T;
-			if ((requirement=findTechnology(in[i]))==NULL)
-			{
-				std::cerr << "Fatal error: No instance of Technology: " << in[i] << std::endl;
-				return;
-			}
-			commit.first = requirement;
-			sources.push_back(commit);
+			std::cerr << "Fatal error: No instance of Technology: " << in[i] << std::endl;
+			return;
 		}
-		tech->addRequirement(sources);
+		commit.first = requirement;
+		sources.push_back(commit);
+	}
+	tech->addRequirement(sources);
 }
 
 void TechnologyList::tokenizeString(std::vector<std::string> &out, std::string in, char sep)
@@ -175,7 +219,7 @@ inline bool TechnologyList::streamToVariable(std::stringstream &stream, T &x)
 {
 	if (!(stream.good()))
 	{   
-		std::cerr << "TechnologyList::streamToVariable: stream not good, probably no valid line"<<std::endl;
+		//std::cerr << "TechnologyList::streamToVariable: stream not good, probably no valid line"<<std::endl;
 		return false;
 	}
 	stream >> x;
@@ -420,6 +464,47 @@ std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 			return (*it).second;
 		}
 	}
+}
+
+void TechnologyList::initRandomGenerator(int seed, std::string SpecialOne, int weight)
+{
+	PROGRESS("RandomGenerator INIT");
+
+	randomEngine = std::minstd_rand0(seed);
+	if (!(initialized))
+	{
+		std::cerr << "TechList not yet initialized, cant create RandomEngine" << std::endl;
+		return;
+	}
+	for(auto &it : units)
+	{
+		if (it.second->getName()==SpecialOne)
+		{
+			for (int i = 0; i < weight; ++i)
+				techNames.push_back(it.second->getName());
+		} else
+		{
+			techNames.push_back(it.second->getName());
+		}
+	}
+	for(auto &it : buildings)
+	{
+		if (it.second->getName()==SpecialOne)
+		{
+			for (int i = 0; i < weight; ++i)
+				techNames.push_back(it.second->getName());
+		} else
+		{
+			techNames.push_back(it.second->getName());
+		}
+	}
+}
+
+std::string TechnologyList::getRandomTechnology()
+{
+	unsigned int num = randomEngine()%techNames.size();
+	std::cout << num << "\t";
+	return techNames[num];
 }
 
 std::shared_ptr<Technology> TechnologyList::findTechnology(std::string key)

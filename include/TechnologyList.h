@@ -8,7 +8,9 @@
 #include <string>
 #include <sstream>
 #include <memory>
+#include <random>
 
+#include "Debug.h"
 #include "Technology.h"
 #include "DataReader.h"
 
@@ -23,8 +25,12 @@ class TechnologyList
 	};
 	private:
 		bool initialized;
+		//needed global variables for the random Engine
+		std::minstd_rand0 randomEngine;
+		int technologyCount;
+		std::vector<std::string> techNames;
+
 		std::string buildingPath, unitPath;
-		std::vector<std::vector<std::shared_ptr<Technology>>> passedRequirements;
 
 		void initRest();
 
@@ -39,7 +45,12 @@ class TechnologyList
 	public:
 		TechnologyList(std::string buildingPath, std::string unitPath);
 		TechnologyList();
+		TechnologyList(const TechnologyList &);
+		TechnologyList(TechnologyList &);
 		~TechnologyList();
+
+		void initRandomGenerator(int seed, std::string SpecialOne="", int weight=0);
+		std::string getRandomTechnology();
 
 		void linkRequirement(std::shared_ptr<Technology> &tech, std::vector<std::string> in, RequirementType T);
 		void linkRequirement(std::shared_ptr<Technology> &tech, std::vector<std::vector<std::string>> in, RequirementType T);
@@ -69,6 +80,29 @@ class TechnologyList
 
 		std::shared_ptr<Technology> findUnit(std::string key);
 		std::shared_ptr<Technology> findBuilding(std::string key);
+
+		TechnologyList & operator= (const TechnologyList & other) 
+		{
+			PROGRESS("COPY ASSIGNMENT");
+			if (&other != this)
+			{
+				this->units = other.units;
+				this->buildings = other.buildings;
+				this->initialized = other.initialized;
+				this->unitPath = other.unitPath;
+				this->buildingPath = other.buildingPath;
+				this->unresolvedBuildingRequirements = other.unresolvedBuildingRequirements;
+				for (auto &it : this->units)
+				{
+					it.second->setExistence(0);
+				}
+				for (auto &it : this->buildings)
+				{
+					it.second->setExistence(0);
+				}
+			}
+			return *this;
+		}
 };
 
 #endif
