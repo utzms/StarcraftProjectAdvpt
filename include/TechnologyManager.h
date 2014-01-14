@@ -105,6 +105,21 @@ public:
  
     }
 
+    TechnologyManager(const TechnologyList& techList)
+    {
+            _techList = techList;
+            _gameState = std::make_shared<GameState>(new GameState());
+            _techList.reset();
+    }
+
+    TechnologyManager(const TechnologyManager& techManager)
+    {
+            _techList = techManager._techList;
+            _gameState = techManager._gameState;
+            _techList.reset();
+
+    }
+
     //sry jonas, testzweck only. No problem
     TechnologyManager()
     {
