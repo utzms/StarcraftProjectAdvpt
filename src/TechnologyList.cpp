@@ -344,6 +344,7 @@ void TechnologyList::reset()
 	{
 		(it).second->setExistence(false);
 	}
+	techNames.clear();
 	findUnit("reset");
 	findBuilding("reset");
 }
@@ -503,7 +504,6 @@ void TechnologyList::initRandomGenerator(int seed, std::string SpecialOne, int w
 std::string TechnologyList::getRandomTechnology()
 {
 	unsigned int num = randomEngine()%techNames.size();
-	std::cout << num << "\t";
 	return techNames[num];
 }
 

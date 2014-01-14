@@ -63,6 +63,15 @@ public:
         _builtList.assign(_nameList.size(), false);
         _currentItemOk = _builtList.begin();
     }
+
+	BuildList(std::vector<std::string> nameList)
+		:_nameList(nameList)
+		,_currentItem(_nameList.begin())
+	{
+        _builtList.assign(_nameList.size(), false);
+        _currentItemOk = _builtList.begin();
+	}
+
     ~BuildList()
     {
         _nameList.clear();

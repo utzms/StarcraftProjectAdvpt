@@ -116,10 +116,10 @@ public:
         _techList.reset();
     }
 
-    TechnologyManager(const TechnologyList& techList)
+    TechnologyManager(const TechnologyList &techList)
     {
             _techList = techList;
-            _gameState = std::make_shared<GameState>(new GameState());
+            _gameState = std::make_shared<GameState>();
             _techList.reset();
     }
 

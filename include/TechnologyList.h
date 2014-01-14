@@ -27,7 +27,6 @@ class TechnologyList
 		bool initialized;
 		//needed global variables for the random Engine
 		std::minstd_rand0 randomEngine;
-		int technologyCount;
 		std::vector<std::string> techNames;
 
 		std::string buildingPath, unitPath;

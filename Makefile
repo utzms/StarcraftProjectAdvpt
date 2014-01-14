@@ -17,6 +17,7 @@ objects=$(SRCPATH)main.cpp\
 		$(OBJPATH)technology.o\
 		$(OBJPATH)simulation.o\
 		$(OBJPATH)technologylist.o\
+		$(OBJPATH)buildlistgenerator.o\
 		$(INCPATH)InitTechTree.hpp
 
 out=$(OBJPATH)worker.o\
@@ -78,6 +79,8 @@ $(OBJPATH)technologylist.o: $(INCPATH)TechnologyList.h $(SRCPATH)TechnologyList.
 $(OBJPATH)resourcemanager.o: $(SRCPATH)ResourceManager.cpp $(INCPATH)ResourceManager.h
 	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)resourcemanager.o $(SRCPATH)ResourceManager.cpp	
 
+$(OBJPATH)buildlistgenerator.o: $(INCPATH)BuildListGenerator.h $(SRCPATH)BuildListGenerator.cpp
+	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)buildlistgenerator.o $(SRCPATH)BuildListGenerator.cpp
 
 clean:
 	rm -rf $(OBJPATH) $(BINPATH)

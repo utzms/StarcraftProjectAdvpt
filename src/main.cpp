@@ -53,6 +53,7 @@ int main(int argc, char **argv)
 #else
 
 #include "InitTechTree.hpp"
+#include "BuildListGenerator.cpp"
 #include "Simulation.cpp"
 #include <stdexcept>
 
@@ -102,19 +103,10 @@ int main(int argc, char *argv[])
 {
 	TechnologyList a;
 	InitTechTree<Protoss>(&a).initTechTree();
-	TechnologyList b = a;
-	for (int i = 0; i < 200000; ++i)
-	{
-		a = b;
-		b = a;
-	}
-	a.initRandomGenerator(21, "Probe", 18);
-	b.initRandomGenerator(21);
-	for (int i = 0; i < 200; ++i)
-	{
-		std::cout << a.getRandomTechnology() << std::endl;
-	}
-	//return initialCall(argc, argv);
+	BuildListGenerator<Protoss> build(a);
+	build.initRandomGenerator("Probe",4);
+	std::vector<std::shared_ptr<BuildList>> vec;
+	vec = build.buildManyRandomLists(1000,8);
 	return  0;
 }
 #endif
