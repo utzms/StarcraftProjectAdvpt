@@ -105,6 +105,17 @@ public:
  
     }
 
+    TechnologyManager(std::shared_ptr<GameState> initialGameState, const TechnologyList& techList)
+            :_gameState(initialGameState)
+    {
+        if(!_gameState)
+        {
+            throw std::invalid_argument("Can not pass nullptr as initial argument");
+        }
+        _techList = techList;
+        _techList.reset();
+    }
+
     TechnologyManager(const TechnologyList& techList)
     {
             _techList = techList;
@@ -112,6 +123,8 @@ public:
             _techList.reset();
     }
 
+
+    // Copy-Constructor
     TechnologyManager(const TechnologyManager& techManager)
     {
             _techList = techManager._techList;
