@@ -16,8 +16,8 @@ using std::vector;
 using std::shared_ptr;
 using std::map;
 
-template <class FitnessPolicy>
-class BuildlistOptimizer
+template <class RacePolicy, class FitnessPolicy>
+class BuildlistOptimizer : public RacePolicy, public FitnessPolicy
 {
 
 private:
