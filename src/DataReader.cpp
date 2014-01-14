@@ -16,7 +16,9 @@ DataReader::DataReader(std::string path)
 	pathToFile = path;
 	if (!(file.open(pathToFile.c_str(), std::ios::in)))
 	{
+#ifdef DEBUG
 		std::cerr << "ERROR DataReader - Constructor: couldnt open file " << path.c_str() << std::endl;
+#endif
 		return;
 	}
 	input = new std::istream(&file);
