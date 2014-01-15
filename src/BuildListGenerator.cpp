@@ -20,7 +20,7 @@ BuildListGenerator<RacePolicy>::BuildListGenerator()
 	localTester = new TechnologyManager<RacePolicy>(&this->copyFrom);
 }
 template <class RacePolicy>
-BuildListGenerator<RacePolicy>::BuildListGenerator(TechnologyList &techList)
+BuildListGenerator<RacePolicy>::BuildListGenerator(const TechnologyList &techList)
 {
 	this->copyFrom = techList;
 	copyFrom.reset();

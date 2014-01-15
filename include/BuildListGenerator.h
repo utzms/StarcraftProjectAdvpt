@@ -26,7 +26,7 @@ class BuildListGenerator
 		BuildListGenerator();
 		//no check, if techList is invalid/broken
 		//this class demands a complete and working copy!!! Otherwise use standard Constructor
-		BuildListGenerator(TechnologyList &techList);
+		BuildListGenerator(const TechnologyList &techList);
 
 		//SpecialOne and weight are for weighting one Special Unit/Building with higher Priority in RandomGenerator
 		//=> this Unit/Buildin is more likely to be found in a List

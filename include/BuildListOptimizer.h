@@ -7,17 +7,19 @@
 #include <memory>
 #include <vector>
 #include <utility>
+#include <chrono>
 #include "Simulation.h"
 #include "BuildList.h"
-
+#include "BuildListGenerator.h"
+#include "TechnologyList.h"
 
 using std::string;
 using std::vector;
 using std::shared_ptr;
-using std::map;
+using std::multimap;
 
 template <class RacePolicy, class FitnessPolicy>
-class BuildlistOptimizer : public RacePolicy, public FitnessPolicy
+class BuildListOptimizer : public RacePolicy, public FitnessPolicy
 {
 
 private:
@@ -26,9 +28,13 @@ private:
           c : constant
           ...
         */
-        map<int, BuildList> mPopulation;
+        multimap<int, BuildList> mPopulation;
         std::hash<string> mHashGen;
         int mTimeLimit;
+        size_t mIndividualSize;
+        TechnologyList<RacePolicy> mTechList;
+        BuildListGenerator<RacePolicy> mBuildListGen;
+
 
         inline void crossover(float reproductionRate);
         inline void mutate(float mutationRate);
@@ -36,7 +42,9 @@ private:
 
 
 public:
-        BuildlistOptimizer(int timeLimit, size_t individualSize);
+
+        BuildListOptimizer(int timeLimit, size_t individualSize);
+        BuildListOptimizer() {} // dummy Default-Constructor
 
         /*initializes the population with random individuals until the population size reaches initPopSize*/
         void initialize(int initPopSize);
@@ -54,7 +62,7 @@ public:
         void addIndividual(BuildList buildlist);
 
         /* get the group of size number of the fittest individuals, together with their corresponding fitness value */
-        void getFittestGroup(int number, vector< pair<int,BuildList> >& res);
+        void getFittestGroup(int groupSize, vector< pair<int,BuildList> >& res);
 
         /* get the overall fittest individual */
         shared_ptr< BuildList > getFittestIndividual(void);
