@@ -35,14 +35,14 @@ class Push
 		}
 
 		//returns the rating of the buildlist counting hard constraints
-		int rateBuildListHard(const SimulationResult &simulationResult)
+		int rateBuildListHard(const std::map<int, std::string> &resultList)
 		{
 			int rating = 0;
 			//count targets in the list
-			for(auto &i : simulationResult->resultList)
+			for(auto i = resultList.begin(); i < resultList.end(); i++)
 			{
 				//TODO if simulation doesn't quit after the time constraint, this should be checked here
-				if(m_Target.compare(simulationResult->resultList.second) == 0)
+				if(m_Target.compare(i.second) == 0)
 				{
 					PROGRESS("Found target in the list");
 					++rating;
@@ -54,11 +54,24 @@ class Push
 		}
 
 		//returns the rating of the buildlist counting soft contraints
-		int rateBuildListSoft(const SimulationResult &simulationResult)
+		int rateBuildListSoft(const std::map<int, std::string> &resultList, std::string worker, std::vector<std::string> requirements)
 		{
-			//TODO minerals, vespene, number of workers,...
+			//number of workers, number of production buildings...
 			int rating = 0;
-			
+			for(auto i = resultList.begin(); i < resultList.end(); i++)
+			{
+				if(worker.compare(i.second) == 0)
+				{
+					++rating;
+				}
+				for(auto j = requirements.begin(); j < requirements.end(); j++)
+				{
+					if(requirements[j].compare(i.second))
+					{
+						++rating;
+					}
+				}
+			}
 
 			return rating;
 		}
@@ -86,15 +99,15 @@ class Rush
 		}
 
 		//returns the rating of the buildlist counting hard constraints
-		int rateBuildListHard(const SimulationResult &simulationResult)
+		int rateBuildListHard(const std::map<int, std::string> &resultList)
 		{
 			int rating = 0;
 			int count = 0;
-			for(auto &i : simulationResult->resultList)
+			for(auto i = resultList.begin(); i < resultList.end(); i++)
 			{
 				//TODO if simulation doesn't quit after the number constraint, this should be checked here
 				//TODO the time aspekt should be added to the rating
-				if(m_Target.compare(simulationResult->resultList.second) == 0)
+				if(m_Target.compare(i.second) == 0)
 				{
 					PROGRESS("Found target in the list");
 					++count;
@@ -102,11 +115,7 @@ class Rush
 				}
 				if(count >= m_SecondConstraint)
 				{
-					rating += 30; //testwert
-				}
-				else //not very nice...
-				{
-					rating -= 5; //testwert
+					rating += 50; //testwert
 				}
 				//TODO maybe the rest of the list should be deleted 
 			}
@@ -116,11 +125,26 @@ class Rush
 		}
 
 		//returns the rating of the buildlist counting soft constraints
-		int rateBuildListSoft(const SimulationResult &simulationResult)
+		int rateBuildListSoft(const std::map<int, std::string> &resultList, std::string worker, std::vector<std::string> requirements)
 		{
-			//TODO minerals, vespene, number of workers,...
+			//number of workers, number of production buildings...
 			int rating = 0;
+			for(auto i = resultList.begin(); i < resultList.end(); i++)
+			{
+				if(worker.compare(i.second) == 0)
+				{
+					++rating;
+				}
+				for(auto j = requirements.begin(); j < requirements.end(); j++)
+				{
+					if(requirements[j].compare(i.second))
+					{
+						++rating;
+					}
+				}
+			}
 
+            return rating;
 
 			return rating;
 		}
