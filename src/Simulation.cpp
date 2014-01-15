@@ -233,6 +233,13 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 
 
 }
+/* Constructor for use in BuildListOptimizer */
+template<class RacePolicy>
+Simulation<RacePolicy>::Simulation(std::shared_ptr<BuildList> buildList, const TechnologyList& techList)
+{
+    // TODO
+}
+
 
 template <class RacePolicy>
 void Simulation<RacePolicy>::run()
@@ -583,9 +590,12 @@ void Simulation<RacePolicy>::run()
 	}
 
 }
+/* run() method for use in BuildListOptimizer */
+
 template <class RacePolicy>
-SimulationResult Simulation<RacePolicy>::run(const TechnologyList& techList)
+SimulationResult Simulation<RacePolicy>::runAndGetResult()
 {
+        // TODO
         return SimulationResult();
 }
 
