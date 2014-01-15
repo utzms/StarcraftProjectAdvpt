@@ -28,8 +28,10 @@ private:
           c : constant
           ...
         */
-        multimap<int, BuildList> mPopulation;
+        multimap< int, vector<string> > mPopulation;
         std::hash<string> mHashGen;
+        string mTarget;
+        int mNumber;
         int mTimeLimit;
         size_t mIndividualSize;
         TechnologyList<RacePolicy> mTechList;
@@ -43,8 +45,51 @@ private:
 
 public:
 
-        BuildListOptimizer(int timeLimit, size_t individualSize);
+        BuildListOptimizer(string target, int number, int timeLimit, size_t individualSize);
+        BuildListOptimizer(string target, int number, size_t individualSize);
+        BuildListOptimizer(string target, int timeLimit, size_t individualSize);
         BuildListOptimizer() {} // dummy Default-Constructor
+
+        void setIndividualSize(size_t newSize)
+        {
+            mIndividualSize = newSize;
+        }
+
+        void setTarget(string target)
+        {
+            mTarget = target;
+        }
+
+        void setNumber(int number)
+        {
+            mNumber = number;
+        }
+
+        void setTimeLimit(int timeLimit)
+        {
+            mTimeLimit = timeLimit;
+        }
+
+        size_t getIndividualSize()
+        {
+            return mIndividualSize;
+        }
+
+        string getTarget()
+        {
+            return mTarget;
+        }
+
+        int getNumber()
+        {
+            return mNumber;
+        }
+
+        int getTimeLimit()
+        {
+            return mTimeLimit;
+        }
+
 
         /*initializes the population with random individuals until the population size reaches initPopSize*/
         void initialize(int initPopSize);

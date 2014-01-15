@@ -593,10 +593,10 @@ void Simulation<RacePolicy>::run()
 /* run() method for use in BuildListOptimizer */
 
 template <class RacePolicy>
-SimulationResult Simulation<RacePolicy>::runAndGetResult()
+std::map<int, std::string> Simulation<RacePolicy>::runAndGetResult()
 {
         // TODO
-        return SimulationResult();
+        return std::map<int, std::string>;
 }
 
 template <class RacePolicy>

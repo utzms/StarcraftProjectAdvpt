@@ -26,13 +26,8 @@
  *
  */
 
-struct SimulationResult
-{
-        std::map<int, std::string> resultList;
-        float minerals;
-        float gas;
-        int supply;
-};
+
+
 
 template <class RacePolicy>
 class Simulation
@@ -80,7 +75,7 @@ public:
 
         void run();
         /* run() method for use in BuildListOptimizer */
-        SimulationResult runAndGetResult();
+        std::map<int,std::string> runAndGetResult();
         ~Simulation();
 
 };
