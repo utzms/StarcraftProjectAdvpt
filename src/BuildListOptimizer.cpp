@@ -1,5 +1,7 @@
 #include "../include/BuildListOptimizer.h"
 
+using std::pair;
+
 inline void dummy()
 {
         BuildListOptimizer<TerranPolicy, RushPolicy> dummy1();
@@ -29,7 +31,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::select(float selectio
 
 
 template <RacePolicy, FitnessPolicy>
-BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(int timeLimit, size_t individualSize)
+BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(string target, int timeLimit, size_t individualSize)
         : nTimeLimit(timeLimit), nIndividualSize(individualSize)
 {
         if(!InitTechTree<RacePolicy>(&mTechList).initTechTree())
@@ -45,6 +47,14 @@ BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(int timeLimit,
 template <RacePolicy, FitnessPolicy>
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(int initPopSize)
 {
+        FitnessPolicy fitnessPolicy(mTarget, mTimeLimit, mNumber);
+        for(int i = mPopulation; i < initPopSize; ++i)
+        {
+                shared_ptr<BuildList> bl = mBuildListGen.getOneRandomList(mIndividualSize);
+                map<int,string> simRes = Simulation(bl, mTechList).runAndGetResult();
+                mPopulation.insert(std::pair<fitnessPolicy.rateBuildListHard(simRes));
+        }
+
 
 }
 
