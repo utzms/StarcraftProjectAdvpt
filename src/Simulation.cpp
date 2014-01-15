@@ -583,6 +583,11 @@ void Simulation<RacePolicy>::run()
 	}
 
 }
+template <class RacePolicy>
+SimulationResult Simulation<RacePolicy>::run(const TechnologyList& techList)
+{
+        return SimulationResult();
+}
 
 template <class RacePolicy>
 Simulation<RacePolicy>::~Simulation()

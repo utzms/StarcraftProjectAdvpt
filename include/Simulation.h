@@ -3,10 +3,12 @@
 
 #include <vector>
 #include <stdexcept>
+#include <map>
 
 #include "BuildList.h"
 #include "GameState.h"
 #include "ResourceManager.h"
+#include "TechnologyList.h"
 #include "TechnologyManager.h"
 #include "StartingConfiguration.h"
 #include "Entity.h"
@@ -24,9 +26,18 @@
  *
  */
 
+struct SimulationResult
+{
+        std::map<int, std::string> resultList;
+        float minerals;
+        float gas;
+        int supply;
+};
+
 template <class RacePolicy>
 class Simulation
 {
+
 	private:
 		//BuildList& _buildList;
 		std::unique_ptr <BuildList> _buildList;
@@ -65,7 +76,7 @@ class Simulation
 		Simulation(std::string buildListFilename);
 
         void run();
-
+        SimulationResult run(const TechnologyList& techList);
         ~Simulation();
 
 };
