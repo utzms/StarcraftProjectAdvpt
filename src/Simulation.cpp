@@ -518,28 +518,41 @@ void Simulation<RacePolicy>::run()
 					}
 
 					// no archon for now, only zerg morphs
-					if (vanishingRequirements.size() == 1)
+                    if (vanishingRequirements.size() > 0)
 					{
 						// we assume that units can have only other units as vanishing
 						// requirements (not workers)
-
+                        int morphCounter = 0;
 						for (auto unitIterator : _gameState->unitList)
 						{
-							if ((unitIterator->getName().compare(vanishingRequirements[0]) == 0) && (unitIterator->state == Unit::State::Ready))
-							{
-								//PROGRESS("Simulation::run() Deleted unit " << vanishingRequirements[0] << " as vanishing requirement for unit " << currentItem);
-								//removeUnit(unitIterator, requirementsIterator);
-								morphUnit(unitIterator, entityCosts.buildTime, currentItem);
+                            for(auto vanishingRequirementsIterator : vanishingRequirements)
+                            {
+                                if ((unitIterator->getName().compare(vanishingRequirementsIterator) == 0) && (unitIterator->state == Unit::State::Ready))
+                                {
+                                    //PROGRESS("Simulation::run() Deleted unit " << vanishingRequirements[0] << " as vanishing requirement for unit " << currentItem);
+                                    //removeUnit(unitIterator, requirementsIterator);
+                                    morphUnit(unitIterator, entityCosts.buildTime, currentItem);
+                                    morphCounter++;
+                                    PROGRESS("morphCounter: " << morphCounter);
+                                    if(morphCounter == vanishingRequirements.size())
+                                    {
+                                        PROGRESS("morphCounter reached vanishingSize:" << vanishingRequirements.size() );
+                                        break;
+                                    }
+                                    _gameState->subMinerals(entityCosts.minerals);
+                                    _gameState->subGas(entityCosts.gas);
 
-								_gameState->subMinerals(entityCosts.minerals);
-								_gameState->subGas(entityCosts.gas);
+                                    _buildList->setCurrentItemOk();
+                                    std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+                                }
 
-								_buildList->setCurrentItemOk();
-								std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
-
-								break;
-							}
+                            }
 						}
+
+                        if(morphCounter != vanishingRequirements.size())
+                        {
+                            throw std::runtime_error("Simulation::run: morphCount != vanishingRequirements");
+                        }
 					}
 					// if a building is ready, we produce a unit
 					else if (buildingReady)
