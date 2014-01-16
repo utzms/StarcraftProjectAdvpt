@@ -36,19 +36,29 @@ class GameStateUpdate
 			std::vector<std::shared_ptr<Unit>> vanishingUnits;
 			std::vector<std::shared_ptr<Unit>> spawningUnits;
 			std::vector<std::shared_ptr<Worker>> spawningWorkers;
+            bool archonSpawned = false;
 
 			for (auto unitIterator : unitList)
 			{
+
 				if( unitIterator->timer == 0  && unitIterator->state == Unit::State::Morphing)
 				{	
-					if (unitIterator->morphTargetName.compare(RacePolicy::getWorker()) == 0)
+                    if (unitIterator->morphTargetName.compare(RacePolicy::getWorker()) == 0)
 					{
 						spawningWorkers.push_back(std::shared_ptr<Worker>(new Worker(unitIterator->morphTargetName)));
 					}
-					else
-					{
-						spawningUnits.push_back(std::shared_ptr<Unit>(new Unit(unitIterator->morphTargetName)));
-					}
+                    else if (unitIterator->morphTargetName.compare("Archon") == 0)
+                    {
+                        if(!archonSpawned)
+                        {
+                             spawningUnits.push_back(std::shared_ptr<Unit>(new Unit(unitIterator->morphTargetName)));
+                             archonSpawned = true;
+                        }
+                    }
+                    else
+                    {
+                             spawningUnits.push_back(std::shared_ptr<Unit>(new Unit(unitIterator->morphTargetName)));
+                    }
 
 					vanishingUnits.push_back(unitIterator);
 					PROGRESS("GSU finished morphing " << unitIterator->getName() << " into " << unitIterator->morphTargetName);
