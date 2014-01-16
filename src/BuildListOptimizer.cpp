@@ -14,46 +14,41 @@ inline void dummy()
 
 
 template <RacePolicy, FitnessPolicy>
-inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(float reproductionRate)
-{
-
-}
-template <RacePolicy, FitnessPolicy>
-inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(float mutationRate)
-{
-
-}
-template <RacePolicy, FitnessPolicy>
-inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::select(float selectionRate)
+inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(string target, int targetSize, int timeLimit, float reproductionRate)
 {
 
 }
 
+template <RacePolicy, FitnessPolicy>
+inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(string target, int targetSize, int timeLimit, float mutationRate)
+{
+
+}
+template <RacePolicy, FitnessPolicy>
+inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::select(string target, int targetSize, int timeLimit, float selectionRate)
+{
+
+}
 
 template <RacePolicy, FitnessPolicy>
-BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(string target, int timeLimit, size_t individualSize)
-        : nTimeLimit(timeLimit), nIndividualSize(individualSize)
+BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(size_t individualSize)
+    : nIndividualSize(individualSize)
 {
-        if(!InitTechTree<RacePolicy>(&mTechList).initTechTree())
-        {
-            throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
-        }
-        mBuildListGen(mTechList);
-
+    mBuildListGen(mTechManager.getTechnologyList());
 }
 
 
 /*initializes the population with random individuals until the population size reaches initPopSize*/
 template <RacePolicy, FitnessPolicy>
-void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(int initPopSize)
+void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(string target, int targetSize, int timeLimit, int initPopSize)
 {
-        FitnessPolicy fitnessPolicy(mTarget, mTimeLimit, mNumber);
-        for(int i = mPopulation; i < initPopSize; ++i)
-        {
-                shared_ptr<BuildList> bl = mBuildListGen.getOneRandomList(mIndividualSize);
-                map<int,string> simRes = Simulation(bl, mTechList).runAndGetResult();
-                mPopulation.insert(std::pair<fitnessPolicy.rateBuildListHard(simRes));
-        }
+    FitnessPolicy fitnessPolicy(mTarget, mTimeLimit, mNumber);
+    for(int i = mPopulation; i < initPopSize; ++i)
+    {
+        shared_ptr<BuildList> bl = mBuildListGen.getOneRandomList(mIndividualSize);
+        map<int,string> simRes = Simulation(bl, mTechList).run(timeLimit);
+        //mPopulation.insert(std::pair<fitnessPolicy.rateBuildListHard(simRes),)
+    }
 
 
 }
@@ -67,14 +62,22 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::clear(void)
 
 /* optimizes a buildList by mutating, crossing over and selecting the fittest individuals */
 template <RacePolicy, FitnessPolicy>
-void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(int generations, float reproductionRate, float mutationRate, float selectionRate)
+void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(string target, int targetSize, int timeLimit, int generations, float reproductionRate, float mutationRate, float selectionRate)
+{
+
+}
+
+
+/* combined use of initialize and optimize */
+template <RacePolicy, FitnessPolicy>
+void BuildListOptimizer<RacePolicy, FitnessPolicy>::clearInitializeAndOptimize(string target, int targetSize, int timeLimit, int initPopSize, int generations, float reproductionRate, float mutationRate, float selectionRate)
 {
 
 }
 
 /* combined use of initialize and optimize */
 template <RacePolicy, FitnessPolicy>
-void BuildListOptimizer<RacePolicy, FitnessPolicy>::initializeAndOptimize(int initPopSize, int generations, float reproductionRate, float mutationRate, float selectionRate)
+void BuildListOptimizer<RacePolicy, FitnessPolicy>::initializeAndOptimize(string target, int targetSize, int timeLimit, int initPopSize, int generations, float reproductionRate, float mutationRate, float selectionRate)
 {
 
 }

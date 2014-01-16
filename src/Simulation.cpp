@@ -593,10 +593,10 @@ void Simulation<RacePolicy>::run()
 /* run() method for use in BuildListOptimizer */
 
 template <class RacePolicy>
-std::map<int, std::string> Simulation<RacePolicy>::runAndGetResult()
+std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 {
         // TODO
-        return std::map<int, std::string>;
+        return std::map<int, std::string>();
 }
 
 template <class RacePolicy>
