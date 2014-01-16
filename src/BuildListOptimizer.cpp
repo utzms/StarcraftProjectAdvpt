@@ -14,25 +14,36 @@ inline void dummy()
 
 
 template <RacePolicy, FitnessPolicy>
-inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(string target, int targetSize, int timeLimit, float reproductionRate)
+inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(string target, int nTargets, int timeLimit, int reproductionRate)
 {
 
 }
 
 template <RacePolicy, FitnessPolicy>
-inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(string target, int targetSize, int timeLimit, float mutationRate)
+inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(string target, int nTargets, int timeLimit, int mutationRate)
 {
+        if(mutationRate >= accuracy)
+        {
+                throw std::invalid_argument("The mutation Rate must be lower than the maximum value. Choose a lower rate or adapt the accuracy.");
+        }
+        int nmutants = mPopulation.size()*mutationRate / mAccuracy;
 
 }
-template <RacePolicy, FitnessPolicy>
-inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::select(string target, int targetSize, int timeLimit, float selectionRate)
-{
 
+template <RacePolicy, FitnessPolicy>
+inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::select(int selectionRate)
+{
+        if(selectionRate >= accuracy)
+        {
+                throw std::invalid_argument("The selection Rate must be lower than the maximum value. Choose a lower rate or adapt the accuracy.");
+        }
+        int threshold = (mPopulation.size()*selectionRate)/mAccuracy;
+        mPopulation.erase(mPopulation.lower_bound(threshold), mPopulation.end());
 }
 
 template <RacePolicy, FitnessPolicy>
-BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(size_t individualSize)
-    : nIndividualSize(individualSize)
+BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(int accuracy, size_t individualSize)
+    : mAccuracy(accuracy), mIndividualSize(individualSize)
 {
     mBuildListGen(mTechManager.getTechnologyList());
 }
@@ -40,29 +51,28 @@ BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(size_t individ
 
 /*initializes the population with random individuals until the population size reaches initPopSize*/
 template <RacePolicy, FitnessPolicy>
-void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(string target, int targetSize, int timeLimit, int initPopSize)
+void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(string target, int nTargets, int timeLimit, int initPopSize)
 {
-    FitnessPolicy fitnessPolicy(mTarget, mTimeLimit, mNumber);
+    FitnessPolicy fitnessPolicy(target, timeLimit, nTargets);
     for(int i = mPopulation; i < initPopSize; ++i)
     {
         shared_ptr<BuildList> bl = mBuildListGen.getOneRandomList(mIndividualSize);
         map<int,string> simRes = Simulation(bl, mTechList).run(timeLimit);
-        //mPopulation.insert(std::pair<fitnessPolicy.rateBuildListHard(simRes),)
+        mPopulation.insert(std::pair<int,BuildList>(fitnessPolicy.rateBuildListHard(simRes),*bl));
     }
-
-
 }
+
 
 /* clears the whole population by terminating (sic!) all individuals */
 template <RacePolicy, FitnessPolicy>
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::clear(void)
 {
-
+        mPopulation.clear();
 }
 
 /* optimizes a buildList by mutating, crossing over and selecting the fittest individuals */
 template <RacePolicy, FitnessPolicy>
-void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(string target, int targetSize, int timeLimit, int generations, float reproductionRate, float mutationRate, float selectionRate)
+void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(string target, int nTargets, int timeLimit, int generations, int reproductionRate, int mutationRate, int selectionRate)
 {
 
 }
@@ -70,14 +80,14 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(string target, int 
 
 /* combined use of initialize and optimize */
 template <RacePolicy, FitnessPolicy>
-void BuildListOptimizer<RacePolicy, FitnessPolicy>::clearInitializeAndOptimize(string target, int targetSize, int timeLimit, int initPopSize, int generations, float reproductionRate, float mutationRate, float selectionRate)
+void BuildListOptimizer<RacePolicy, FitnessPolicy>::clearInitializeAndOptimize(string target, int nTargets, int timeLimit, int initPopSize, int generations, int reproductionRate, int mutationRate, int selectionRate)
 {
 
 }
 
 /* combined use of initialize and optimize */
 template <RacePolicy, FitnessPolicy>
-void BuildListOptimizer<RacePolicy, FitnessPolicy>::initializeAndOptimize(string target, int targetSize, int timeLimit, int initPopSize, int generations, float reproductionRate, float mutationRate, float selectionRate)
+void BuildListOptimizer<RacePolicy, FitnessPolicy>::initializeAndOptimize(string target, int nTargets, int timeLimit, int initPopSize, int generations, int reproductionRate, int mutationRate, int selectionRate)
 {
 
 }
