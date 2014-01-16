@@ -44,7 +44,7 @@ bool BuildListGenerator<RacePolicy>::checkBuildListPossibility(std::vector<std::
 template <class RacePolicy>
 void BuildListGenerator<RacePolicy>::initRandomGenerator(std::string SpecialOne, int weight)
 {
-	copyFrom.initRandomGenerator(2221,SpecialOne,weight);
+    copyFrom.initRandomGenerator(std::chrono::system_clock::now().time_since_epoch().count(),SpecialOne,weight);
 }
 
 template <class RacePolicy>

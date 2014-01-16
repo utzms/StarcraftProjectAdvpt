@@ -8,8 +8,11 @@
 #include <vector>
 #include <utility>
 #include <chrono>
+#include <random>
 #include <algorithm>
 #include <stdexcept>
+#include <cstdlib>
+#include <set>
 #include "Simulation.h"
 #include "BuildList.h"
 #include "BuildListGenerator.h"
@@ -19,6 +22,7 @@ using std::string;
 using std::vector;
 using std::shared_ptr;
 using std::multimap;
+using std::set;
 
 struct Individual
 {
@@ -28,6 +32,18 @@ struct Individual
     Individual(int hardSkills_init, int softSkills_init, vector<string> genes_init)
         : hardSkills(fitness_init), softSkills(softSkills_init), genes(genes_init)
     {}
+
+    size_t calculateDistance(const Individual& ind1, const Individual& ind2)
+    {
+            size_t res;
+            std::hash<string> hashGen;
+            size_t len = ind1.genes.size() < ind2.genes.size() ? ind1.genes.size() : ind2.genes.size();
+            for(size_t i = 0; i < len; ++i)
+            {
+                    res += (len-i) * std::abs(ind1.genes[i]-ind2.genes[i]);
+            }
+            return res;
+    }
 
     bool operator>(const Individual& ind1, const Individual& ind2)
     {
@@ -73,7 +89,6 @@ private:
           ...
         */
         vector<Individual> mPopulation;
-        std::hash<string> mHashGen;
         int mAccuracy;
         size_t mIndividualSize;
         TechnologyManager<RacePolicy> mTechManager;
