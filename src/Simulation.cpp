@@ -525,7 +525,7 @@ void Simulation<RacePolicy>::run()
 					{
 						// we assume that units can have only other units as vanishing
 						// requirements (not workers)
-                        int morphCounter = 0;
+                        unsigned int morphCounter = 0;
 						for (auto unitIterator : _gameState->unitList)
 						{
                             for(auto vanishingRequirementsIterator : vanishingRequirements)
