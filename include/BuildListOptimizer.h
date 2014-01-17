@@ -29,21 +29,12 @@ struct Individual
     int hardSkills;
     int softSkills;
     vector<string> genes;
+
     Individual(int hardSkills_init, int softSkills_init, vector<string> genes_init)
         : hardSkills(fitness_init), softSkills(softSkills_init), genes(genes_init)
     {}
 
-    size_t calculateDistance(const Individual& ind1, const Individual& ind2)
-    {
-            size_t res;
-            std::hash<string> hashGen;
-            size_t len = ind1.genes.size() < ind2.genes.size() ? ind1.genes.size() : ind2.genes.size();
-            for(size_t i = 0; i < len; ++i)
-            {
-                    res += (len-i) * std::abs(ind1.genes[i]-ind2.genes[i]);
-            }
-            return res;
-    }
+
 
     bool operator>(const Individual& ind1, const Individual& ind2)
     {
@@ -51,7 +42,8 @@ struct Individual
         {
             return true;
         }
-        return ind1.softSkills > ind2.softSkills;
+        return ind1.hardSkills == ind2.hardSkills ? ind1.softSkills > ind2.softSkills : false;
+
     }
 
     bool operator<(const Individual& ind1, const Individual& ind2)
@@ -60,7 +52,7 @@ struct Individual
         {
             return true;
         }
-        return ind1.softSkills < ind2.softSkills;
+        return ind1.hardSkills == ind2.hardSkills ? ind1.softSkills < ind2.softSkills : false;
 
     }
     bool operator==(const Individual& ind1, const Individual& ind2)
@@ -68,7 +60,7 @@ struct Individual
         return ind1.hardSkills == ind2.hardSkills && ind1.softSkills == ind2.hardSkills;
     }
 
-    friend ostream& operator<<(ostream& out, const Individual& ind)
+    ostream& operator<<(ostream& out, const Individual& ind)
     {
             for(string gene : ind.genes)
             {
@@ -102,6 +94,18 @@ private:
         inline void mutate(string target, int ntargets, int timeLimit, int mutationRate);
         inline void select(int selectionRate);
 
+        inline size_t calculateDistance(const Individual& ind1, const Individual& ind2)
+        {
+            size_t res;
+            std::hash<string> hashGen;
+            size_t len = ind1.genes.size() < ind2.genes.size() ? ind1.genes.size() : ind2.genes.size();
+            for(size_t i = 0; i < len; ++i)
+            {
+                res += (len-i) * std::abs(ind1.genes[i]-ind2.genes[i]);
+            }
+            return res;
+        }
+
 
 public:
 
@@ -130,7 +134,6 @@ public:
         }
 
 
-
         /*initializes the population with random individuals until the population size reaches initPopSize*/
         void initialize(string target, int ntargets, int timeLimit, int initPopSize);
 
@@ -147,7 +150,7 @@ public:
         void clearInitializeAndOptimize(string target, int ntargets, int timeLimit, int initPopSize, int generations, int reproductionRate, int mutationRate, int selectionRate);
 
         /* adds a specific individual to the population */
-        void addIndividual(vector<std::string> individiual);
+        void addIndividual(string target, int ntargets, int timeLimit, shared_ptr<BuildList> buildList);
 
         /* get the group of size number of the fittest individuals, together with their corresponding fitness value */
         vector<Individual> getFittestGroup(int groupSize);
