@@ -104,9 +104,10 @@ int main(int argc, char *argv[])
 	TechnologyList a;
 	InitTechTree<Protoss>(&a).initTechTree();
 	BuildListGenerator<Protoss> build(a);
-	build.initRandomGenerator("Probe",4);
+	build.initRandomGenerator("Marine",10);
 	std::vector<std::shared_ptr<BuildList>> vec;
-	vec = build.buildManyRandomLists(1000,8);
+	vec = build.buildManyRandomLists(30000,30);
+	
 	return  0;
 }
 #endif

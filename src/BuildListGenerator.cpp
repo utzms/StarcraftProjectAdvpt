@@ -54,11 +54,54 @@ std::shared_ptr<BuildList> BuildListGenerator<RacePolicy>::buildOneRandomList(in
 	std::shared_ptr<BuildList> list;
 	do
 	{
+		localTester = new TechnologyManager<RacePolicy>(this->copyFrom);
 		stringList.clear();
+		int supply = 4;
 		for (int i = 0; i < length; ++i)
 		{
-			stringList.push_back(copyFrom.getRandomTechnology());
-		//	std::cout << stringList[i] << std::endl;
+			std::string in;
+			bool checked = false;
+			do
+			{
+				in = copyFrom.getRandomTechnology();
+				std::vector<std::shared_ptr<Technology>> tmp = localTester->findTechnology(in);
+				for (int j=0;j<tmp.size();++j)
+				{
+					checked=localTester->checkTechnologyRequirements(tmp[j]);
+					if (checked == true)
+					{
+						if(!in.compare(RacePolicy::getMainBuilding()))
+						{   
+							supply += 10; 
+						}   
+						else if(!in.compare(RacePolicy::getSupplyProvider()))
+						{   
+							supply += 8;
+						} else
+						{   
+							supply -= tmp[j]->getSupplyCost();
+							if (supply < 0)
+							{   
+								checked = false;
+							} else
+							{
+								checked = true;
+								break;
+							}
+						} 
+					}
+					break;
+				}
+			} while (checked == false);
+			localTester->notifyCreation(in);
+			stringList.push_back(in);
+		}
+		//shouldnt reach this one
+		if (checkBuildListPossibility(stringList)==false)
+		{
+			std::cerr << "DU BIST SCHEISSE" << std::endl;
+			for (int j=0;j<stringList.size();++j)
+				std::cout << stringList.at(j) << std::endl;
 		}
 	} while (checkBuildListPossibility(stringList) == false);
 	list = std::make_shared<BuildList>(stringList);
@@ -73,7 +116,8 @@ std::vector<std::shared_ptr<BuildList>> BuildListGenerator<RacePolicy>::buildMan
 	for (int i = 0; i < population; ++i)
 	{
 		buildlistVector.push_back(buildOneRandomList(length));
-		std::cout << i << "\t done" << std::endl;
+		if (i%1000==0)
+			std::cout << i << "\t done" << std::endl;
 	}
 	return buildlistVector;
 }

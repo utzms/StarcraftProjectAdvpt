@@ -479,6 +479,9 @@ void TechnologyList::initRandomGenerator(int seed, std::string SpecialOne, int w
 	}
 	for(auto &it : units)
 	{
+		if (techNames.size()>0)
+			if (it.second->getName()==techNames.back())
+				continue;
 		if (it.second->getName()==SpecialOne)
 		{
 			for (int i = 0; i < weight; ++i)
@@ -490,6 +493,9 @@ void TechnologyList::initRandomGenerator(int seed, std::string SpecialOne, int w
 	}
 	for(auto &it : buildings)
 	{
+		if (techNames.size()>0)
+			if (it.second->getName()==techNames.back())
+				continue;
 		if (it.second->getName()==SpecialOne)
 		{
 			for (int i = 0; i < weight; ++i)
