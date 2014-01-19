@@ -18,6 +18,7 @@
 #include "BuildListGenerator.h"
 #include "TechnologyList.h"
 #include "RacePolicy.h"
+#include "FitnessPolicy.h"
 
 using std::string;
 using std::vector;
