@@ -55,6 +55,8 @@ int main(int argc, char **argv)
 #include "InitTechTree.hpp"
 #include "BuildListGenerator.cpp"
 #include "Simulation.cpp"
+#include "FitnessPolicy.h"
+
 #include <stdexcept>
 
 int initialCall(int argc, char *argv[])

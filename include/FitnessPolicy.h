@@ -5,8 +5,8 @@
 #include <iostream>
 #include <string>
 
-#include <Debug.h>
-#include <Simulation.h>
+#include "Debug.h"
+#include "Simulation.h"
 
 enum class FitnessType
 {
@@ -39,7 +39,7 @@ class Push
 		{
 			int rating = 0;
 			//count targets in the list
-			for(auto i = resultList.begin(); i < resultList.end(); i++)
+			for(auto i : resultList)
 			{
 				//TODO if simulation doesn't quit after the time constraint, this should be checked here
 				if(m_Target.compare(i.second) == 0)
@@ -58,15 +58,15 @@ class Push
 		{
 			//number of workers, number of production buildings...
 			int rating = 0;
-			for(auto i = resultList.begin(); i < resultList.end(); i++)
+			for(auto i : resultList)
 			{
 				if(worker.compare(i.second) == 0)
 				{
 					++rating;
 				}
-				for(auto j = requirements.begin(); j < requirements.end(); j++)
+				for(auto j : requirements)
 				{
-					if(requirements[j].compare(i.second))
+					if(j.compare(i.second))
 					{
 						++rating;
 					}
@@ -85,6 +85,7 @@ class Rush
 		std::string m_Target;
 		int m_Time;
 		int m_Number; //its the number of targets
+		int m_SecondConstraint;
 
 		Rush(std::string target, int time, int number)
 		{
@@ -103,7 +104,8 @@ class Rush
 		{
 			int rating = 0;
 			int count = 0;
-			for(auto i = resultList.begin(); i < resultList.end(); i++)
+			m_SecondConstraint=400;
+			for(auto i : resultList)
 			{
 				//TODO if simulation doesn't quit after the number constraint, this should be checked here
 				//TODO the time aspekt should be added to the rating
@@ -129,26 +131,22 @@ class Rush
 		{
 			//number of workers, number of production buildings...
 			int rating = 0;
-			for(auto i = resultList.begin(); i < resultList.end(); i++)
+			for(auto i : resultList)
 			{
 				if(worker.compare(i.second) == 0)
 				{
 					++rating;
 				}
-				for(auto j = requirements.begin(); j < requirements.end(); j++)
+				for(auto j : requirements)
 				{
-					if(requirements[j].compare(i.second))
+					if(j.compare(i.second))
 					{
 						++rating;
 					}
 				}
 			}
-
             return rating;
-
-			return rating;
 		}
-
 };
 
 #endif
