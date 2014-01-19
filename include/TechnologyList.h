@@ -27,6 +27,7 @@ class TechnologyList
 		bool initialized;
 		//needed global variables for the random Engine
 		std::minstd_rand0 randomEngine;
+		std::uniform_int_distribution<int> uniformDist;
 		std::vector<std::string> techNames;
 
 		std::string buildingPath, unitPath;
@@ -48,7 +49,7 @@ class TechnologyList
 		TechnologyList(TechnologyList &);
 		~TechnologyList();
 
-		void initRandomGenerator(int seed, std::string SpecialOne="", int weight=0);
+		void initRandomGenerator(size_t seed, std::string SpecialOne="", int weight=0);
 		std::string getRandomTechnology();
 
 		void linkRequirement(std::shared_ptr<Technology> &tech, std::vector<std::string> in, RequirementType T);

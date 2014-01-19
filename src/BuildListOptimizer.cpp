@@ -12,6 +12,9 @@ inline void dummy()
         BuildListOptimizer<Terran, Push> dummy4();
         BuildListOptimizer<Protoss, Push> dummy5();
         BuildListOptimizer<Zerg, Push> dummy6();
+        BuildListOptimizer<Terran, Debug> dummy7();
+        BuildListOptimizer<Protoss, Debug> dummy8();
+        BuildListOptimizer<Zerg, Debug> dummy9();
 }
 
 
@@ -149,6 +152,8 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::select(int selectionR
         throw std::invalid_argument("The selection Rate must be lower than the maximum value. Choose a lower rate or adapt the accuracy.");
     }
     int threshold = (mPopulation.size()*selectionRate)/mAccuracy;
+	if (threshold <= 0)
+		return;
     mPopulation.erase(mPopulation.begin(), mPopulation.end()-threshold);
 }
 
@@ -156,8 +161,8 @@ template <class RacePolicy, class FitnessPolicy>
 BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(int accuracy, size_t individualSize)
     : mAccuracy(accuracy), mIndividualSize(individualSize)
 {
-    mTechManager();
-    mBuildListGen(mTechManager.getTechnologyList());
+    mTechManager = TechnologyManager<RacePolicy>();
+    mBuildListGen = BuildListGenerator<RacePolicy>(mTechManager.getTechnologyList());
     mBuildListGen.initRandomGenerator();
 }
 
@@ -169,8 +174,9 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(string target, in
     FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
     for(int i = mPopulation.size(); i < initPopSize; ++i)
     {
-        shared_ptr<BuildList> bl = mBuildListGen.getOneRandomList(mIndividualSize);
-        map<int,string> simRes = Simulation<RacePolicy>(bl, mTechManager.getTechnologyList()).run(timeLimit);
+        shared_ptr<BuildList> bl = mBuildListGen.buildOneRandomList(mIndividualSize);
+	//    map<int,string> simRes = Simulation<RacePolicy>(bl, mTechManager.getTechnologyList()).run(timeLimit);
+		map<int,string> simRes;
         mPopulation.push_back(Individual(fitnessPolicy.rateBuildListHard(simRes),
                                          fitnessPolicy.rateBuildListSoft(simRes, RacePolicy::getWorker(), mTechManager.getEntityRequirements(target)), bl->getAsVector()));
     }
@@ -196,6 +202,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(string target, int 
                 crossover(target, ntargets, timeLimit, reproductionRate);
                 sortPopulation();
         }
+		std::cout << mPopulation.size() << std::endl;
 }
 
 
@@ -232,14 +239,16 @@ template <class RacePolicy, class FitnessPolicy>
 vector<Individual> BuildListOptimizer<RacePolicy, FitnessPolicy>::getFittestGroup(int groupSize)
 {
     sortPopulation();
-    vector<Individual> res(groupSize);
-    for(auto rit = mPopulation.rbegin(); --groupSize >= 0 && rit != mPopulation.rend() ; ++rit)
+    vector<Individual> res;
+	if (mPopulation.size() < groupSize)
+	{
+		throw std::invalid_argument("@BuildListOptimizer::getFittestGroup: Lower population than requested groupSize!");
+	}
+	for (int i = mPopulation.size()-1; i >= mPopulation.size()-groupSize; --i)
     {
-            res.push_back(*rit);
+            res.push_back(mPopulation.at(i));
     }
     return res;
-
-
 }
 
 /* get the overall fittest individual */
@@ -247,6 +256,5 @@ template <class RacePolicy, class FitnessPolicy>
 Individual BuildListOptimizer<RacePolicy, FitnessPolicy>::getFittestIndividual(void)
 {
         sortPopulation();
-        return mPopulation.end();
-
+        return *(mPopulation.rbegin());
 }

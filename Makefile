@@ -6,9 +6,11 @@ OPT=-g -std=c++11 -Wall -Wshadow -Wextra -pedantic
 LIBS=-fopenmp
 INCPATH=./include/
 SRCPATH=./src/
-INC=-I$(INCPATH)
+INC=-I$(INCPATH) -I$(SRCPATH)
 BINPATH=./bin/
 OBJPATH=./obj/
+
+#OPT += -O2
 
 objects=$(SRCPATH)main.cpp\
 		$(OBJPATH)debug.o\
@@ -18,22 +20,16 @@ objects=$(SRCPATH)main.cpp\
 		$(OBJPATH)simulation.o\
 		$(OBJPATH)technologylist.o\
 		$(OBJPATH)buildlistgenerator.o\
-		$(OBJPATH)buildlistoptimizer.o\
+		$(INCPATH)FitnessPolicy.h\
 		$(INCPATH)InitTechTree.hpp
 
 out=$(OBJPATH)worker.o\
 		$(OBJPATH)building.o\
 		$(OBJPATH)technologyManager.o\
+		$(OBJPATH)buildlistoptimizer.o\
 
 all: OPT += -DNDEBUG
 all: exe
-
-geneticDebug: OPT += -DDEBUG
-geneticDebug: OPT += -DGENETIC
-geneticDebug: exe
-
-genetic: OPT += -DGENETIC
-genetic: all
 
 debug_deep: OPT += -DDEBUG_DEEP
 debug_deep: debug
@@ -46,9 +42,6 @@ pathmaker:
 
 exe: pathmaker $(objects)
 	$(CC) $(OPT) $(INC) $(LIBS) -o $(BINPATH)runme $(objects)
-
-#exe: pathmaker $(SRCPATH)main.cpp $(OBJPATH)simulation.o $(OBJPATH)gameState.o $(OBJPATH)worker.o $(OBJPATH)building.o $(OBJPATH)technologyManager.o $(OBJPATH)dataReader.o $(OBJPATH)technology.o $(OBJPATH)technologylist.o $(INCPATH)InitTechTree.hpp
-#	$(CC) $(OPT) $(INC) $(LIBS) -o $(BINPATH)runme $(SRCPATH)main.cpp $(OBJPATH)simulation.o $(OBJPATH)gameState.o $(OBJPATH)worker.o $(OBJPATH)building.o $(OBJPATH)technologyManager.o $(OBJPATH)dataReader.o $(OBJPATH)technology.o $(OBJPATH)technologylist.o $(INCPATH)InitTechTree.hpp
 
 $(OBJPATH)debug.o: $(INCPATH)Debug.h $(SRCPATH)Debug.cpp
 	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)debug.o $(SRCPATH)Debug.cpp

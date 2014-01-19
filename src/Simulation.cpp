@@ -455,7 +455,7 @@ void Simulation<RacePolicy>::run()
 							_gameState->subMinerals(entityCosts.minerals);
 							_gameState->subGas(entityCosts.gas);
 
-							std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+							//std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 							// continue to the next item in the build list
 							continue;
@@ -478,7 +478,7 @@ void Simulation<RacePolicy>::run()
 						PROGRESS("Simulation::run() Ordering building " << currentItem);
 						buildBuilding(ourWorker, currentItem, entityCosts.buildTime);
 						_buildList->setCurrentItemOk();
-						std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+						//std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 						if (vanishingZergWorker)
 						{
@@ -546,7 +546,7 @@ void Simulation<RacePolicy>::run()
                                     _gameState->subGas(entityCosts.gas);
 
                                     _buildList->setCurrentItemOk();
-                                    std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+                     //               std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
                                 }
 
                             }
@@ -576,7 +576,7 @@ void Simulation<RacePolicy>::run()
 						}
 
 						_buildList->setCurrentItemOk();
-						std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+					//	std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 					}
 					else
 					{

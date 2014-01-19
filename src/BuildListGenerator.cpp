@@ -17,7 +17,7 @@ BuildListGenerator<RacePolicy>::BuildListGenerator()
 		throw std::runtime_error("TechnologyList initialization failed.");
 	}
 	copyFrom.reset();
-	localTester = new TechnologyManager<RacePolicy>(&this->copyFrom);
+	localTester = new TechnologyManager<RacePolicy>(this->copyFrom);
 }
 template <class RacePolicy>
 BuildListGenerator<RacePolicy>::BuildListGenerator(const TechnologyList &techList)
@@ -44,7 +44,9 @@ bool BuildListGenerator<RacePolicy>::checkBuildListPossibility(std::vector<std::
 template <class RacePolicy>
 void BuildListGenerator<RacePolicy>::initRandomGenerator(std::string SpecialOne, int weight)
 {
-    copyFrom.initRandomGenerator(std::chrono::system_clock::now().time_since_epoch().count(),SpecialOne,weight);
+	size_t tmp = std::chrono::system_clock::now().time_since_epoch().count();
+	std::cout << "For Debug Purpose: BuildListGenerator-Seed: " << tmp << std::endl;
+    copyFrom.initRandomGenerator(tmp,SpecialOne,weight);
 }
 
 template <class RacePolicy>
@@ -65,7 +67,7 @@ std::shared_ptr<BuildList> BuildListGenerator<RacePolicy>::buildOneRandomList(in
 			{
 				in = copyFrom.getRandomTechnology();
 				std::vector<std::shared_ptr<Technology>> tmp = localTester->findTechnology(in);
-				for (int j=0;j<tmp.size();++j)
+				for (unsigned int j=0;j<tmp.size();++j)
 				{
 					checked=localTester->checkTechnologyRequirements(tmp[j]);
 					if (checked == true)
@@ -99,8 +101,8 @@ std::shared_ptr<BuildList> BuildListGenerator<RacePolicy>::buildOneRandomList(in
 		//shouldnt reach this one
 		if (checkBuildListPossibility(stringList)==false)
 		{
-			std::cerr << "DU BIST SCHEISSE" << std::endl;
-			for (int j=0;j<stringList.size();++j)
+			std::cerr << "Nicht gut, kaputte RandomList" << std::endl;
+			for (unsigned int j=0;j<stringList.size();++j)
 				std::cout << stringList.at(j) << std::endl;
 		}
 	} while (checkBuildListPossibility(stringList) == false);

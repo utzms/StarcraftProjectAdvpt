@@ -13,10 +13,11 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <set>
-#include "Simulation.h"
+
+#include "Simulation.cpp"
 #include "BuildList.h"
-#include "BuildListGenerator.h"
-#include "TechnologyList.h"
+#include "BuildListGenerator.cpp"
+#include "TechnologyManager.h"
 #include "RacePolicy.h"
 #include "FitnessPolicy.h"
 
@@ -37,18 +38,7 @@ struct Individual
     {}
 
 
-
-    bool operator>(const Individual& ind)
-    {
-        if(ind.hardSkills > this->hardSkills)
-        {
-            return true;
-        }
-        return ind.hardSkills == this->hardSkills ? ind.softSkills > this->softSkills : false;
-
-    }
-
-    bool operator<(const Individual& ind)
+    bool operator>(const Individual& ind) const
     {
         if(ind.hardSkills < this->hardSkills)
         {
@@ -57,23 +47,42 @@ struct Individual
         return ind.hardSkills == this->hardSkills ? ind.softSkills < this->softSkills : false;
 
     }
-    bool operator==(const Individual& ind)
+
+    bool operator<(const Individual& ind) const
+    {
+        if(ind.hardSkills > this->hardSkills)
+        {
+            return true;
+        }
+        return ind.hardSkills == this->hardSkills ? ind.softSkills > this->softSkills : false;
+
+    }
+    bool operator==(const Individual& ind) const
     {
         return ind.hardSkills == this->hardSkills && ind.softSkills == this->hardSkills;
     }
 
-    std::ostream& operator<<(std::ostream& out)
+    friend std::ostream& operator<<(std::ostream& out, const Individual& ind);
+    friend std::ostream& operator<<(std::ostream& out, const vector<Individual>& inds);
+};
+    std::ostream& operator<<(std::ostream& out, const Individual& ind)
     {
-            for(string gene : genes)
+            for(string gene : ind.genes)
             {
                     out << gene << std::endl;
             }
+			out << "Score: " << ind.hardSkills << "\t-\t" << ind.softSkills << std::endl;
             return out;
     }
-};
+    std::ostream& operator<<(std::ostream& out, const vector<Individual>& inds)
+	{
+		for (auto i : inds)
+			out << i;
+		return out;
+	}
 
 template <class RacePolicy, class FitnessPolicy>
-class BuildListOptimizer : public RacePolicy, public FitnessPolicy
+class BuildListOptimizer : public RacePolicy //, public FitnessPolicy
 {
 
 private:
@@ -111,54 +120,60 @@ private:
 
 public:
 
-        BuildListOptimizer(int accuracy, size_t individualSize);
-        BuildListOptimizer() {} // dummy Default-Constructor
+		BuildListOptimizer(int accuracy, size_t individualSize);
+		BuildListOptimizer()// dummy Default-Constructor
+		{
+			mAccuracy=100;
+			mIndividualSize=20;
+			mTechManager = TechnologyManager<RacePolicy>();
+			mBuildListGen = BuildListGenerator<RacePolicy>(mTechManager.getTechnologyList());
+			mBuildListGen.initRandomGenerator();
+		}
+
+		void setAccuracy(int accuracy)
+		{
+			mAccuracy = accuracy;
+		}
+
+		int getAccuracy(int accuracy)
+		{
+			return mAccuracy;
+		}
+
+		void setIndividualSize(size_t newSize)
+		{
+			mIndividualSize = newSize;
+		}
+
+		size_t getIndividualSize()
+		{
+			return mIndividualSize;
+		}
 
 
-        void setAccuracy(int accuracy)
-        {
-            mAccuracy = accuracy;
-        }
+		/*initializes the population with random individuals until the population size reaches initPopSize*/
+		void initialize(string target, int ntargets, int timeLimit, int initPopSize);
 
-        int getAccuracy(int accuracy)
-        {
-            return mAccuracy;
-        }
+		/* clears the whole population by terminating (sic!) all individuals */
+		void clear(void);
 
-        void setIndividualSize(size_t newSize)
-        {
-            mIndividualSize = newSize;
-        }
+		/* optimizes a buildList by mutating, crossing over and selecting the fittest individuals */
+		void optimize(string target, int ntargets, int timeLimit, int generations, int reproductionRate, int mutationRate, int selectionRate);
 
-        size_t getIndividualSize()
-        {
-            return mIndividualSize;
-        }
+		/* combined use of initialize and optimize */
+		void initializeAndOptimize(string target, int ntargets, int timeLimit, int initPopSize, int generations, int reproductionRate, int mutationRate, int selectionRate);
 
+		/* combined use of clear, initialize and optimize */
+		void clearInitializeAndOptimize(string target, int ntargets, int timeLimit, int initPopSize, int generations, int reproductionRate, int mutationRate, int selectionRate);
 
-        /*initializes the population with random individuals until the population size reaches initPopSize*/
-        void initialize(string target, int ntargets, int timeLimit, int initPopSize);
+		/* adds a specific individual to the population */
+		void addIndividual(string target, int ntargets, int timeLimit, shared_ptr<BuildList> buildList);
 
-        /* clears the whole population by terminating (sic!) all individuals */
-        void clear(void);
+		/* get the group of size number of the fittest individuals, together with their corresponding fitness value */
+		vector<Individual> getFittestGroup(int groupSize);
 
-        /* optimizes a buildList by mutating, crossing over and selecting the fittest individuals */
-        void optimize(string target, int ntargets, int timeLimit, int generations, int reproductionRate, int mutationRate, int selectionRate);
-
-        /* combined use of initialize and optimize */
-        void initializeAndOptimize(string target, int ntargets, int timeLimit, int initPopSize, int generations, int reproductionRate, int mutationRate, int selectionRate);
-
-        /* combined use of clear, initialize and optimize */
-        void clearInitializeAndOptimize(string target, int ntargets, int timeLimit, int initPopSize, int generations, int reproductionRate, int mutationRate, int selectionRate);
-
-        /* adds a specific individual to the population */
-        void addIndividual(string target, int ntargets, int timeLimit, shared_ptr<BuildList> buildList);
-
-        /* get the group of size number of the fittest individuals, together with their corresponding fitness value */
-        vector<Individual> getFittestGroup(int groupSize);
-
-        /* get the overall fittest individual */
-        Individual getFittestIndividual(void);
+		/* get the overall fittest individual */
+		Individual getFittestIndividual(void);
 
 };
 

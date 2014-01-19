@@ -11,9 +11,46 @@
 enum class FitnessType
 {
 	Push,
+	Debug,
 	Rush
 };
 
+
+class Debug
+{
+	public:
+		std::string m_Target;
+		int m_Time; //its the time limit
+		int m_Number;
+
+		Debug(std::string target, int time, int number)
+		{
+			m_Target = target;
+			m_Time = time;
+			m_Number = number;
+		}
+
+		FitnessType getFitnessType()
+		{
+			return FitnessType::Debug;
+		}
+
+		//returns the rating of the buildlist counting hard constraints
+		int rateBuildListHard(const std::map<int, std::string> &resultList)
+		{
+			static int rating = 0;
+
+			return ++rating;
+		}
+
+		//returns the rating of the buildlist counting soft contraints
+		int rateBuildListSoft(const std::map<int, std::string> &resultList, std::string worker, std::vector<std::string> requirements)
+		{
+			//number of workers, number of production buildings...
+			static int rating = 50000000;
+			return rating--;
+		}
+};
 //how many targets can be built in a given time
 class Push
 {

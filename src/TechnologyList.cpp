@@ -467,7 +467,7 @@ std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 	}
 }
 
-void TechnologyList::initRandomGenerator(int seed, std::string SpecialOne, int weight)
+void TechnologyList::initRandomGenerator(size_t seed, std::string SpecialOne, int weight)
 {
 	PROGRESS("RandomGenerator INIT");
 
@@ -505,12 +505,14 @@ void TechnologyList::initRandomGenerator(int seed, std::string SpecialOne, int w
 			techNames.push_back(it.second->getName());
 		}
 	}
+	uniformDist = std::uniform_int_distribution<int>(0,techNames.size()-1);
 }
 
 std::string TechnologyList::getRandomTechnology()
 {
-	unsigned int num = randomEngine()%techNames.size();
-	return techNames[num];
+	//unsigned int num = randomEngine()%techNames.size();
+	//return techNames[num];
+	return techNames[uniformDist(randomEngine)];
 }
 
 std::shared_ptr<Technology> TechnologyList::findTechnology(std::string key)
