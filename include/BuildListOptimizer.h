@@ -17,6 +17,7 @@
 #include "BuildList.h"
 #include "BuildListGenerator.h"
 #include "TechnologyList.h"
+#include "RacePolicy.h"
 
 using std::string;
 using std::vector;
@@ -31,38 +32,38 @@ struct Individual
     vector<string> genes;
 
     Individual(int hardSkills_init, int softSkills_init, vector<string> genes_init)
-        : hardSkills(fitness_init), softSkills(softSkills_init), genes(genes_init)
+        : hardSkills(hardSkills_init), softSkills(softSkills_init), genes(genes_init)
     {}
 
 
 
-    bool operator>(const Individual& ind1, const Individual& ind2)
+    bool operator>(const Individual& ind)
     {
-        if(ind1.hardSkills > ind2.hardSkills)
+        if(ind.hardSkills > this->hardSkills)
         {
             return true;
         }
-        return ind1.hardSkills == ind2.hardSkills ? ind1.softSkills > ind2.softSkills : false;
+        return ind.hardSkills == this->hardSkills ? ind.softSkills > this->softSkills : false;
 
     }
 
-    bool operator<(const Individual& ind1, const Individual& ind2)
+    bool operator<(const Individual& ind)
     {
-        if(ind1.hardSkills < ind2.hardSkills)
+        if(ind.hardSkills < this->hardSkills)
         {
             return true;
         }
-        return ind1.hardSkills == ind2.hardSkills ? ind1.softSkills < ind2.softSkills : false;
+        return ind.hardSkills == this->hardSkills ? ind.softSkills < this->softSkills : false;
 
     }
-    bool operator==(const Individual& ind1, const Individual& ind2)
+    bool operator==(const Individual& ind)
     {
-        return ind1.hardSkills == ind2.hardSkills && ind1.softSkills == ind2.hardSkills;
+        return ind.hardSkills == this->hardSkills && ind.softSkills == this->hardSkills;
     }
 
-    ostream& operator<<(ostream& out, const Individual& ind)
+    std::ostream& operator<<(std::ostream& out)
     {
-            for(string gene : ind.genes)
+            for(string gene : genes)
             {
                     out << gene << std::endl;
             }
@@ -101,7 +102,7 @@ private:
             size_t len = ind1.genes.size() < ind2.genes.size() ? ind1.genes.size() : ind2.genes.size();
             for(size_t i = 0; i < len; ++i)
             {
-                res += (len-i) * std::abs(ind1.genes[i]-ind2.genes[i]);
+                res += (len-i) * std::abs(hashGen(ind1.genes[i])-hashGen(ind2.genes[i]));
             }
             return res;
         }

@@ -1,20 +1,20 @@
-#include "../include/BuildListOptimizer.h"
+#include "BuildListOptimizer.h"
 
 
 using std::pair;
 
 inline void dummy()
 {
-        BuildListOptimizer<TerranPolicy, RushPolicy> dummy1();
-        BuildListOptimizer<ProtossPolicy, RushPolicy> dummy2();
-        BuildListOptimizer<ZergPolicy, RushPolicy> dummy3();
-        BuildListOptimizer<TerranPolicy, PushPolicy> dummy4();
-        BuildListOptimizer<ProtossPolicy, PushPolicy> dummy5();
-        BuildListOptimizer<ZergPolicy, PushPolicy> dummy6();
+        BuildListOptimizer<Terran, Rush> dummy1();
+        BuildListOptimizer<Protoss, Rush> dummy2();
+        BuildListOptimizer<Zerg, Rush> dummy3();
+        BuildListOptimizer<Terran, Push> dummy4();
+        BuildListOptimizer<Protoss, Push> dummy5();
+        BuildListOptimizer<Zerg, Push> dummy6();
 }
 
 
-template <RacePolicy, FitnessPolicy>
+template <class RacePolicy, class FitnessPolicy>
 inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(string target, int ntargets, int timeLimit, int reproductionRate)
 {
     std::minstd_rand0 generator1(std::chrono::system_clock::now().time_since_epoch().count());
@@ -25,7 +25,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(string targ
     auto chooseIndividual = std::bind(distribution1, generator1);
     auto coin =  std::bind(distribution2, generator2);
 
-    if(reproductionRate >= accuracy)
+    if(reproductionRate >= mAccuracy)
     {
         throw std::invalid_argument("The reproduction Rate must be lower than the maximum value. Choose a lower rate or adapt the accuracy.");
     }
@@ -93,7 +93,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(string targ
 
 }
 
-template <RacePolicy, FitnessPolicy>
+template <class RacePolicy, class FitnessPolicy>
 inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(string target, int ntargets, int timeLimit, int mutationRate)
 {
 
@@ -136,7 +136,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(string target,
     }
 }
 
-template <RacePolicy, FitnessPolicy>
+template <class RacePolicy, class FitnessPolicy>
 inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::select(int selectionRate)
 {
     if(selectionRate >= accuracy)
@@ -147,7 +147,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::select(int selectionR
     mPopulation.erase(mPopulation.begin(), mPopulation.end()-threshold);
 }
 
-template <RacePolicy, FitnessPolicy>
+template <class RacePolicy, class FitnessPolicy>
 BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(int accuracy, size_t individualSize)
     : mAccuracy(accuracy), mIndividualSize(individualSize)
 {
@@ -157,7 +157,7 @@ BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(int accuracy, 
 
 
 /*initializes the population with random individuals until the population size reaches initPopSize*/
-template <RacePolicy, FitnessPolicy>
+template <class RacePolicy, class FitnessPolicy>
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(string target, int ntargets, int timeLimit, int initPopSize)
 {
     FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
@@ -173,14 +173,14 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(string target, in
 
 
 /* clears the whole population by terminating (sic!) all individuals */
-template <RacePolicy, FitnessPolicy>
+template <class RacePolicy, class FitnessPolicy>
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::clear(void)
 {
     mPopulation.clear();
 }
 
 /* optimizes a buildList by mutating, crossing over and selecting the fittest individuals */
-template <RacePolicy, FitnessPolicy>
+template <class RacePolicy, class FitnessPolicy>
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(string target, int ntargets, int timeLimit, int generations, int reproductionRate, int mutationRate, int selectionRate)
 {
         while(--generations >= 0)
@@ -194,7 +194,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(string target, int 
 
 
 /* combined use of initialize and optimize */
-template <RacePolicy, FitnessPolicy>
+template <class RacePolicy, class FitnessPolicy>
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::clearInitializeAndOptimize(string target, int ntargets, int timeLimit, int initPopSize, int generations, int reproductionRate, int mutationRate, int selectionRate)
 {
         clear();
@@ -204,7 +204,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::clearInitializeAndOptimize(s
 }
 
 /* combined use of initialize and optimize */
-template <RacePolicy, FitnessPolicy>
+template <class RacePolicy, class FitnessPolicy>
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::initializeAndOptimize(string target, int ntargets, int timeLimit, int initPopSize, int generations, int reproductionRate, int mutationRate, int selectionRate)
 {
         initialize(target, ntargets, timeLimit, initPopSize);
@@ -212,7 +212,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initializeAndOptimize(string
 }
 
 /* adds a specific individual to the population */
-template <RacePolicy, FitnessPolicy>
+template <class RacePolicy, class FitnessPolicy>
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::addIndividual(string target, int ntargets, int timeLimit, shared_ptr<BuildList> buildList )
 {
     FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
@@ -222,7 +222,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::addIndividual(string target,
 }
 
 /* get the group of size number of the fittest individuals, together with their corresponding fitness value */
-template <RacePolicy, FitnessPolicy>
+template <class RacePolicy, class FitnessPolicy>
 vector<Individual> BuildListOptimizer<RacePolicy, FitnessPolicy>::getFittestGroup(int groupSize)
 {
     sortPopulation();
@@ -237,7 +237,7 @@ vector<Individual> BuildListOptimizer<RacePolicy, FitnessPolicy>::getFittestGrou
 }
 
 /* get the overall fittest individual */
-template <RacePolicy, FitnessPolicy>
+template <class RacePolicy, class FitnessPolicy>
 Individual BuildListOptimizer<RacePolicy, FitnessPolicy>::getFittestIndividual(void)
 {
         sortPopulation();
