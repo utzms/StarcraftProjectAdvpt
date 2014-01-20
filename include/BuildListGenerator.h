@@ -32,10 +32,10 @@ class BuildListGenerator
 		//SpecialOne and weight are for weighting one Special Unit/Building with higher Priority in RandomGenerator
 		//=> this Unit/Buildin is more likely to be found in a List
 		void initRandomGenerator(std::string SpecialOne="", int weight=0);
-
+                std::string getRandomTechnologyName();
 		//length = wanted buildListSize
 		std::shared_ptr<BuildList> buildOneRandomList(int length);
-		std::vector<std::shared_ptr<BuildList>> buildManyRandomLists(int population, int length);
+        std::vector<std::shared_ptr<BuildList>> buildManyRandomLists(int population, int length);
 			
 };
 

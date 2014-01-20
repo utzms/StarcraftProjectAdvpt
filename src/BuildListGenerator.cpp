@@ -50,6 +50,12 @@ void BuildListGenerator<RacePolicy>::initRandomGenerator(std::string SpecialOne,
 }
 
 template <class RacePolicy>
+std::string BuildListGenerator<RacePolicy>::getRandomTechnologyName()
+{
+        return copyFrom.getRandomTechnology();
+}
+
+template <class RacePolicy>
 std::shared_ptr<BuildList> BuildListGenerator<RacePolicy>::buildOneRandomList(int length)
 {
 	std::vector<std::string> stringList;

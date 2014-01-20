@@ -72,6 +72,7 @@ public:
 
         _techList.reset();
 
+
     }
 
     TechnologyManager(std::shared_ptr<GameState> initialGameState, const TechnologyList& techList)
@@ -106,6 +107,7 @@ public:
         {
             unit->setExistence(6);
         }
+
     }
 
 
@@ -118,10 +120,10 @@ public:
 
     }
 
+
     //Standard Constructor
     TechnologyManager()
     {
-        PROGRESS("WRONG TM Constructor");
         if(!InitTechTree<RacePolicy>(&_techList).initTechTree())
         {
             throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
@@ -129,6 +131,7 @@ public:
         _gameState = std::make_shared<GameState>();
 
         _techList.reset();
+
 
     }
 

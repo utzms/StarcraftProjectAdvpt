@@ -147,8 +147,13 @@ public:
 
 		size_t getIndividualSize()
 		{
-			return mIndividualSize;
-		}
+            return mIndividualSize;
+                }
+
+                size_t getPopulationSize()
+                {
+                        return mPopulation.size();
+                }
 
 
 		/*initializes the population with random individuals until the population size reaches initPopSize*/
