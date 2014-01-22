@@ -60,7 +60,7 @@ public:
     TechnologyManager(std::shared_ptr<GameState> initialGameState)
         :_gameState(initialGameState)
     {
-        PROGRESS("TM Constructor");
+        //PROGRESS("TM Constructor");
         if(!_gameState)
         {
             throw std::invalid_argument("Can not pass nullptr as initial argument");
@@ -135,7 +135,7 @@ public:
 
     }
 
-    ~TechnologyManager(){PROGRESS("TM Destructor");}
+    ~TechnologyManager(){/*PROGRESS("TM Destructor")*/;}
 
     inline bool checkTechnologyRequirements(std::shared_ptr<Technology> technology)
     {
@@ -170,6 +170,20 @@ public:
             return _techList.findBuildingVec(entityName);
         }
     }
+
+    bool technologyExists(std::string name)
+    {
+            auto technology = _techList.findBuilding(name);
+            if(technology == nullptr) {
+                    technology = _techList.findUnit(name);
+                    if(technology == nullptr)
+                    {
+                            return false;
+                    }
+            }
+            return true;
+    }
+
     inline bool isZerg()
     {
         if (findTechnology("Larva").size() > 0)
@@ -199,7 +213,7 @@ public:
         }
         for(auto tech : techVec)
         {
-            PROGRESS("NEXT TECHNOLOGY WILL BE TESTED");
+            //PROGRESS("NEXT TECHNOLOGY WILL BE TESTED");
             if(TechnologyManager::checkTechnology(tech))
             {
                 return true;

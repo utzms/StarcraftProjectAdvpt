@@ -20,6 +20,7 @@
 #include "TechnologyManager.h"
 #include "RacePolicy.h"
 #include "FitnessPolicy.h"
+#include "Debug.h"
 
 using std::string;
 using std::vector;
