@@ -523,9 +523,10 @@ void Simulation<RacePolicy>::run()
 						// we assume that units can have only other units as vanishing
 						// requirements (not workers)
                         int morphCounter = 0;
-						for (auto unitIterator : _gameState->unitList)
-						{
-                            for(auto vanishingRequirementsIterator : vanishingRequirements)
+
+                        for(auto vanishingRequirementsIterator : vanishingRequirements)
+                        {
+                            for (auto unitIterator : _gameState->unitList)
                             {
                                 if ((unitIterator->getName().compare(vanishingRequirementsIterator) == 0) && (unitIterator->state == Unit::State::Ready))
                                 {
@@ -536,18 +537,18 @@ void Simulation<RacePolicy>::run()
                                     PROGRESS("morphCounter: " << morphCounter);
                                     if(morphCounter == vanishingRequirements.size())
                                     {
+                                        _gameState->subMinerals(entityCosts.minerals);
+                                        _gameState->subGas(entityCosts.gas);
+
+                                        _buildList->setCurrentItemOk();
+                                        std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
                                         PROGRESS("morphCounter reached vanishingSize:" << vanishingRequirements.size() );
                                         break;
                                     }
-                                    _gameState->subMinerals(entityCosts.minerals);
-                                    _gameState->subGas(entityCosts.gas);
 
-                                    _buildList->setCurrentItemOk();
-                                    std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
                                 }
-
                             }
-						}
+                        }
 
                         if(morphCounter != vanishingRequirements.size())
                         {
