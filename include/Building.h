@@ -5,18 +5,16 @@
 
 class Building
 {
-	public:
-		enum class ProductionType
-		{
-			WorkerOrder,
-			UnitOrder
-		};
-
 	private:
 		std::string _name;
 
-
 	public:
+        enum class ProductionType
+        {
+            WorkerOrder,
+            UnitOrder
+        };
+
         enum class State
         {
             UnderConstruction,
@@ -30,18 +28,24 @@ class Building
 			Upgrading
 		};
 
+        enum class BoostState
+        {
+            NotBoosted,
+            Boosted
+        };
+
 		State state;
-		int	timer;
+        UpgradeState upgradeState;
+        BoostState boostState;
 
-
-
+        int	timer;
+        int upgradeTimer;
+        int boostTimer;
 
 		std::string productionUnitName;
-		ProductionType productionType;
+        std::string targetUpgradeName;
 
-		UpgradeState upgradeState;
-		int upgradeTimer;
-		std::string targetUpgradeName;
+		ProductionType productionType;
 
 		Building(std::string name, int buildTime)
 			:_name(name)
@@ -49,19 +53,37 @@ class Building
 			,timer(buildTime)
 			,upgradeState(UpgradeState::Ready)
 			,upgradeTimer(0)
+            ,boostState(BoostState::NotBoosted)
+            ,boostTimer(0)
 		{
 		}
 
         void timeStep()
         {
+
+            int decreasingValue = 1;
+            if(boostState == BoostState::Boosted)
+            {
+                boostTimer--;
+                decreasingValue = 2;
+            }
+
 			if (state != State::Ready)
 			{
-				timer--;
-			}
+                timer -= decreasingValue;
+                if(timer < 0)
+                {
+                    timer = 0;
+                }
+            }
 
 			if (upgradeState != UpgradeState::Ready)
 			{
-				upgradeTimer--;
+                upgradeTimer -= decreasingValue;
+                if(upgradeTimer < 0)
+                {
+                    upgradeTimer = 0;
+                }
 			}
         }
 

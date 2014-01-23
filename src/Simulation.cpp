@@ -517,7 +517,6 @@ void Simulation<RacePolicy>::run()
 						}
 					}
 
-					// no archon for now, only zerg morphs
                     if (vanishingRequirements.size() > 0)
 					{
 						// we assume that units can have only other units as vanishing
@@ -528,7 +527,7 @@ void Simulation<RacePolicy>::run()
                         {
                             for (auto unitIterator : _gameState->unitList)
                             {
-                                if ((unitIterator->getName().compare(vanishingRequirementsIterator) == 0) && (unitIterator->state == Unit::State::Ready))
+                                if ((unitIterator->getName().compare(vanishingRequirementsIterator) == 0) && (unitIterator->state == Unit::State::Ready) && morphCounter < vanishingRequirements.size())
                                 {
                                     //PROGRESS("Simulation::run() Deleted unit " << vanishingRequirements[0] << " as vanishing requirement for unit " << currentItem);
                                     //removeUnit(unitIterator, requirementsIterator);

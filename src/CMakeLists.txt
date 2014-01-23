@@ -26,6 +26,7 @@ set ( OWN_HEADERS
   ../include/Unit.h
   ../include/Worker.h
   ../include/Entity.h
+    ../include/Energizer.h
   ../include/RacePolicy.h )
   
   
