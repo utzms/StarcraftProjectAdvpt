@@ -213,8 +213,8 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(string target, in
         throw std::invalid_argument("@BuildListOptimizer::initialize: The initial population size must be greater zero. The passed value is: "+std::to_string(initPopSize));
     }
 
-    vector<future<shared_ptr<BuildList>>> buildListFutureVec(4/*initPopSize-mPopulation.size()*/);
-    vector<future<map<int,string>>> resultFutureVec(4/*initPopSize-mPopulation.size()*/);
+    vector<future<shared_ptr<BuildList>>> buildListFutureVec(initPopSize-mPopulation.size());
+    vector<future<map<int,string>>> resultFutureVec(initPopSize-mPopulation.size());
     FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
     auto genBuildList = [=] () -> shared_ptr<BuildList> { return mBuildListGen.buildOneRandomList(mIndividualSize); };
     auto runSimulation = [=] (shared_ptr<BuildList> bl, TechnologyList techList) -> map<int,string> { return Simulation<RacePolicy>(bl, techList).run(timeLimit); };
@@ -222,7 +222,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(string target, in
     for(int i = 0; i < buildListFutureVec.size(); ++i)
     {
 
-        buildListFutureVec[i] = async(std::launch::deferred, genBuildList);
+        buildListFutureVec[i] = async(genBuildList);
     }
 
     vector<shared_ptr<BuildList>> bls(buildListFutureVec.size());
@@ -242,7 +242,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(string target, in
                 bls[i] = genBuildList();
         }
 
-        resultFutureVec[i] = async(std::launch::deferred, runSimulation, bls[i], mTechManager.getTechnologyList());
+        resultFutureVec[i] = async(runSimulation, bls[i], mTechManager.getTechnologyList());
     }
 
     for(int i = 0; i < resultFutureVec.size(); ++i)
