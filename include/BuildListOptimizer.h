@@ -13,6 +13,7 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <set>
+#include <future>
 
 #include "Simulation.cpp"
 #include "BuildList.h"
