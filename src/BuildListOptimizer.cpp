@@ -8,20 +8,17 @@ using std::async;
 
 inline void dummy()
 {
-    BuildListOptimizer<Terran, Rush> dummy1();
-    BuildListOptimizer<Protoss, Rush> dummy2();
-    BuildListOptimizer<Zerg, Rush> dummy3();
-    BuildListOptimizer<Terran, Push> dummy4();
-    BuildListOptimizer<Protoss, Push> dummy5();
-    BuildListOptimizer<Zerg, Push> dummy6();
-    BuildListOptimizer<Terran, Debug> dummy7();
-    BuildListOptimizer<Protoss, Debug> dummy8();
-    BuildListOptimizer<Zerg, Debug> dummy9();
+        BuildListOptimizer<Terran, Rush> dummy1();
+        BuildListOptimizer<Protoss, Rush> dummy2();
+        BuildListOptimizer<Zerg, Rush> dummy3();
+        BuildListOptimizer<Terran, Push> dummy4();
+        BuildListOptimizer<Protoss, Push> dummy5();
+        BuildListOptimizer<Zerg, Push> dummy6();
+        BuildListOptimizer<Terran, Debug> dummy7();
+        BuildListOptimizer<Protoss, Debug> dummy8();
+        BuildListOptimizer<Zerg, Debug> dummy9();
 }
 
-#ifdef DEBUG
-        static int failedAsyncCount = 0;
-#endif
 
 
 template <class RacePolicy, class FitnessPolicy>
@@ -212,6 +209,10 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(string target, in
     {
         throw std::invalid_argument("@BuildListOptimizer::initialize: The initial population size must be greater zero. The passed value is: "+std::to_string(initPopSize));
     }
+    #ifdef DEBUG
+        int failedThreadCount = 0;
+    #endif
+
 
     vector<future<shared_ptr<BuildList>>> buildListFutureVec(initPopSize-mPopulation.size());
     vector<future<map<int,string>>> resultFutureVec(initPopSize-mPopulation.size());
@@ -231,15 +232,15 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(string target, in
 
         try
         {
-                bls[i] = buildListFutureVec[i].get();
+            bls[i] = buildListFutureVec[i].get();
         }
         catch(std::system_error& e)
         {
-                PROGRESS("@BuildListOptimizer::initialize: system_error caught, unable to start new thread to generate BuildList");
-                #ifdef DEBUG
-                        ++failedAsyncCount;
-                #endif
-                bls[i] = genBuildList();
+            PROGRESS("@BuildListOptimizer::initialize: system_error caught, unable to start new thread to generate BuildList");
+            #ifdef DEBUG
+                ++failedThreadCount;
+            #endif
+            bls[i] = genBuildList();
         }
 
         resultFutureVec[i] = async(runSimulation, bls[i], mTechManager.getTechnologyList());
@@ -250,15 +251,15 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(string target, in
         map<int,string> simRes;
         try
         {
-                simRes = resultFutureVec[i].get();
+            simRes = resultFutureVec[i].get();
         }
         catch(std::system_error& e)
         {
-                PROGRESS("@BuildListOptimizer::initialize: system_error caught, unable to start new thread to run Simulation");
-                #ifdef DEBUG
-                        ++failedAsyncCount;
-                #endif
-                simRes = runSimulation(bls[i], mTechManager.getTechnologyList());
+            PROGRESS("@BuildListOptimizer::initialize: system_error caught, unable to start new thread to run Simulation");
+            #ifdef DEBUG
+                ++failedThreadCount;
+            #endif
+            simRes = runSimulation(bls[i], mTechManager.getTechnologyList());
         }
 
         mPopulation.push_back(Individual(fitnessPolicy.rateBuildListHard(simRes),
@@ -267,9 +268,9 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(string target, in
 
 
     std::sort(mPopulation.begin(), mPopulation.end());
-#ifdef DEBUG
-    std::cerr << "@BuildListOptimizer::initialize: Failed to start thread for " << std::to_string(failedAsyncCount) << " times.";
-#endif
+    #ifdef DEBUG
+        std::cerr << "@BuildListOptimizer::initialize: Failed to start thread for " << std::to_string(failedThreadCount) << " times." << std::endl;
+    #endif
 
 }
 
