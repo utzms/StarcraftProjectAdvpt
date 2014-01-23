@@ -191,7 +191,7 @@ public:
         return false;
     }
 
-    TechnologyList getTechnologyList()
+    const TechnologyList& getTechnologyList()
     {
         return _techList;
     }

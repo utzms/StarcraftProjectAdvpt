@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <set>
 #include <future>
+#include <functional>
 
 #include "Simulation.cpp"
 #include "BuildList.h"
@@ -26,8 +27,8 @@
 using std::string;
 using std::vector;
 using std::shared_ptr;
-using std::multimap;
 using std::set;
+using std::map;
 
 struct Individual
 {
@@ -67,6 +68,7 @@ struct Individual
     friend std::ostream& operator<<(std::ostream& out, const Individual& ind);
     friend std::ostream& operator<<(std::ostream& out, const vector<Individual>& inds);
 };
+
 std::ostream& operator<<(std::ostream& out, const Individual& ind)
 {
     for(string gene : ind.genes)
@@ -119,10 +121,11 @@ private:
         return res;
     }
 
+    inline void generateAndRate(const string target, FitnessPolicy& fitnessPolicy, const int nindividuals, std::function<shared_ptr<BuildList>(void)> genBuildList, const int timeLimit);
 
 public:
 
-    BuildListOptimizer(int accuracy, int individualSize);
+    BuildListOptimizer(const int accuracy, const int individualSize);
     BuildListOptimizer()// dummy Default-Constructor
     {
         mAccuracy=100;
@@ -132,17 +135,17 @@ public:
         mBuildListGen.initRandomGenerator();
     }
 
-    void setAccuracy(int accuracy)
+    void setAccuracy(const int accuracy)
     {
         mAccuracy = accuracy;
     }
 
-    int getAccuracy(int accuracy)
+    int getAccuracy()
     {
         return mAccuracy;
     }
 
-    void setIndividualSize(size_t newSize)
+    void setIndividualSize(const size_t newSize)
     {
         mIndividualSize = newSize;
     }
@@ -159,25 +162,25 @@ public:
 
 
     /*initializes the population with random individuals until the population size reaches initPopSize*/
-    void initialize(string target, int ntargets, int timeLimit, int initPopSize);
+    void initialize(const string target, const int ntargets, const int timeLimit, const int initPopSize);
 
     /* clears the whole population by terminating (sic!) all individuals */
     void clear(void);
 
     /* optimizes a buildList by mutating, crossing over and selecting the fittest individuals */
-    void optimize(string target, int ntargets, int timeLimit, int generations, int reproductionRate, int mutationRate, int selectionRate);
+    void optimize(const string target, const int ntargets, const int timeLimit, const int generations, const int reproductionRate, const int mutationRate, const int selectionRate);
 
     /* combined use of initialize and optimize */
-    void initializeAndOptimize(string target, int ntargets, int timeLimit, int initPopSize, int generations, int reproductionRate, int mutationRate, int selectionRate);
+    void initializeAndOptimize(const string target, const int ntargets, const int timeLimit, const int initPopSize, const int generations, const int reproductionRate, const int mutationRate, const int selectionRate);
 
     /* combined use of clear, initialize and optimize */
-    void clearInitializeAndOptimize(string target, int ntargets, int timeLimit, int initPopSize, int generations, int reproductionRate, int mutationRate, int selectionRate);
+    void clearInitializeAndOptimize(const string target, const int ntargets, const int timeLimit, const int initPopSize, const int generations, const int reproductionRate, const int mutationRate, const int selectionRate);
 
     /* adds a specific individual to the population */
-    void addIndividual(string target, int ntargets, int timeLimit, shared_ptr<BuildList> buildList);
+    void addIndividual(const string target, const int ntargets, const int timeLimit, shared_ptr<BuildList> buildList);
 
     /* get the group of size number of the fittest individuals, together with their corresponding fitness value */
-    vector<Individual> getFittestGroup(int groupSize);
+    vector<Individual> getFittestGroup(const int groupSize);
 
     /* get the overall fittest individual */
     Individual getFittestIndividual(void);
