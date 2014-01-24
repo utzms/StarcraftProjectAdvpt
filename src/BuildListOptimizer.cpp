@@ -38,7 +38,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 
     for(int i = 0; i < nindividuals; ++i)
     {
-        buildListFutureVec[i] = async(std::launch::async, genBuildList, mTechManager);
+        buildListFutureVec[i] = async(genBuildList, mTechManager);
     }
 
     for(int i = 0; i < nindividuals; ++i)
@@ -55,7 +55,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
             ++threadFailures;
             #endif
         }
-        resultFutureVec[i] = async(std::launch::async, runSimulation, bls[i]);
+        resultFutureVec[i] = async(runSimulation, bls[i]);
     }
 
     for(int i = 0; i < nindividuals; ++i)
@@ -90,75 +90,80 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
         throw std::invalid_argument("The reproduction Rate must be lower or equal the maximum value. The passed value is: "+std::to_string(reproductionRate));
     }
 
-    auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> shared_ptr<BuildList>
-    {
-
         std::minstd_rand0 generator1(std::chrono::system_clock::now().time_since_epoch().count());
         std::minstd_rand0 generator2(std::chrono::system_clock::now().time_since_epoch().count());
         std::uniform_int_distribution<size_t> distribution1(0,mPopulation.size()-1);
         std::uniform_int_distribution<int> distribution2(0,1);
+
+    auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> shared_ptr<BuildList>
+    {
+
         auto chooseIndividual = std::bind(distribution1, generator1);
         auto coin =  std::bind(distribution2, generator2);
 
         std::hash<string> hashGen;
-
         set<size_t> positions;
-        do
-        {
-            positions.insert(chooseIndividual());
-        } while(positions.size() < 4);
-
-        size_t maxDist = 0, currDist = 0, pos1 = 0, pos2 = 0;
-        for(size_t i : positions)
-        {
-            for(size_t j : positions)
+        vector<string> newGenes;
+        do {
+            do
             {
-                if(i != j)
+                positions.insert(chooseIndividual());
+            } while(positions.size() < 4);
+
+            size_t maxDist = 0, currDist = 0, pos1 = 0, pos2 = 0;
+            for(size_t i : positions)
+            {
+                for(size_t j : positions)
                 {
-                    const Individual& ind1 = mPopulation[i];
-                    const Individual& ind2 = mPopulation[j];
-
-                    size_t res;
-                    size_t len = ind1.genes.size() < ind2.genes.size() ? ind1.genes.size() : ind2.genes.size();
-                    for(size_t i = 0; i < len; ++i)
+                    if(i != j)
                     {
-                        res += (len-i) * std::abs(hashGen(ind1.genes[i])-hashGen(ind2.genes[i]));
-                    }
+                        const Individual& ind1 = mPopulation[i];
+                        const Individual& ind2 = mPopulation[j];
+
+                        size_t res;
+                        size_t len = ind1.genes.size() < ind2.genes.size() ? ind1.genes.size() : ind2.genes.size();
+                        for(size_t i = 0; i < len; ++i)
+                        {
+                            res += (len-i) * std::abs(hashGen(ind1.genes[i])-hashGen(ind2.genes[i]));
+                        }
 
 
-                    currDist = res;
-                    if(currDist > maxDist)
-                    {
-                        maxDist = currDist;
-                        pos1 = i;
-                        pos2 = j;
+                        currDist = res;
+                        if(currDist > maxDist)
+                        {
+                            maxDist = currDist;
+                            pos1 = i;
+                            pos2 = j;
+                        }
                     }
                 }
             }
-        }
-        const vector<string>& mumsGenes = mPopulation[pos1].genes;
-        const vector<string>& dadsGenes = mPopulation[pos2].genes;
+            const vector<string>& mumsGenes = mPopulation[pos1].genes;
+            const vector<string>& dadsGenes = mPopulation[pos2].genes;
 
-        vector<string> newGenes(std::max(mumsGenes.size(),dadsGenes.size()));
-        size_t i = 0;
-        for(;i < std::min(mumsGenes.size(),dadsGenes.size()); ++i)
-        {
-            int coinFlip = coin();
-            if(coinFlip == 1)
+            newGenes.clear();
+            newGenes.resize(std::max(mumsGenes.size(),dadsGenes.size()));
+            size_t i = 0;
+            for(;i < std::min(mumsGenes.size(),dadsGenes.size()); ++i)
             {
-                newGenes[i] = dadsGenes[i];
+                int coinFlip = coin();
+                if(coinFlip == 1)
+                {
+                    newGenes[i] = dadsGenes[i];
+                }
+                else
+                {
+                    newGenes[i] = mumsGenes[i];
+                }
             }
-            else
+            const vector<string>& rest = mumsGenes.size() < dadsGenes.size() ? dadsGenes : mumsGenes;
+            for(;i < rest.size(); ++i)
             {
-                newGenes[i] = mumsGenes[i];
+                newGenes[i] = rest[i];
             }
-        }
-        const vector<string>& rest = mumsGenes.size() < dadsGenes.size() ? dadsGenes : mumsGenes;
-        for(;i < rest.size(); ++i)
-        {
-            newGenes[i] = rest[i];
-        }
+            positions.clear();
 
+        } while(!(techManager.isBuildListPossible(newGenes)));
         return std::make_shared<BuildList>(newGenes);
     };
 
@@ -175,15 +180,17 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string t
     {
         throw std::invalid_argument("The mutation Rate must be lower or equal the maximum value. The passed value is: "+std::to_string(mutationRate));
     }
+    std::minstd_rand0 popGen(std::chrono::system_clock::now().time_since_epoch().count());
+    std::minstd_rand0 geneGen(std::chrono::system_clock::now().time_since_epoch().count());
+    std::uniform_int_distribution<size_t> popDist(0,mPopulation.size()-1);
+
 
     auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> shared_ptr<BuildList>
     {
-        std::minstd_rand0 popGen(std::chrono::system_clock::now().time_since_epoch().count());
-        std::minstd_rand0 geneGen(std::chrono::system_clock::now().time_since_epoch().count());
-        std::uniform_int_distribution<size_t> popDist(0,mPopulation.size()-1);
+
+        auto chooseIndividual = std::bind(popDist, popGen);
         BuildListGenerator<RacePolicy> buildListGen(techManager.getTechnologyList());
         buildListGen.initRandomGenerator();
-        auto chooseIndividual = std::bind(popDist, popGen);
 
         const Individual& oldInd = mPopulation[chooseIndividual()];
         vector<string> newGenes;
@@ -202,7 +209,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string t
                 string entry = buildListGen.getRandomTechnologyName();
                 newGenes.insert(newGenes.begin()+chooseGene(), entry);
             }
-        } while(techManager.isBuildListPossible(newGenes));
+        } while(!(techManager.isBuildListPossible(newGenes)));
 
         return std::make_shared<BuildList>(newGenes);
     };
@@ -274,13 +281,10 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(const string targ
         return;
     }
 
-
     auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> shared_ptr<BuildList>
     {
-
         BuildListGenerator<RacePolicy> buildListGen(techManager.getTechnologyList());
         buildListGen.initRandomGenerator();
-
         return buildListGen.buildOneRandomList(mIndividualSize);
     };
 
