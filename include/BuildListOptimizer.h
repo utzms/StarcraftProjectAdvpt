@@ -109,17 +109,6 @@ private:
     inline void mutate(string target, int ntargets, int timeLimit, int mutationRate);
     inline void select(int selectionRate);
 
-    inline size_t calculateDistance(const Individual& ind1, const Individual& ind2)
-    {
-        size_t res;
-        std::hash<string> hashGen;
-        size_t len = ind1.genes.size() < ind2.genes.size() ? ind1.genes.size() : ind2.genes.size();
-        for(size_t i = 0; i < len; ++i)
-        {
-            res += (len-i) * std::abs(hashGen(ind1.genes[i])-hashGen(ind2.genes[i]));
-        }
-        return res;
-    }
 
     inline void generateAndRate(const string target, FitnessPolicy& fitnessPolicy, const int nindividuals, std::function<shared_ptr<BuildList>(void)> genBuildList, const int timeLimit);
 

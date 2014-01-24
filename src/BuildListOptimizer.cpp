@@ -29,9 +29,13 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
     };
 
     vector<future<shared_ptr<BuildList>>> buildListFutureVec(nindividuals);
-    vector<future<map<int,string>>> resultFutureVec(nindividuals);
+    vector< future< map<int,string> > > resultFutureVec(nindividuals);
     vector<shared_ptr<BuildList>> bls(nindividuals);
+
+    #ifdef DEBUG
     int threadFailures = 0;
+    #endif
+
     for(int i = 0; i < nindividuals; ++i)
     {
         buildListFutureVec[i] = async(genBuildList);
@@ -85,19 +89,22 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
     {
         throw std::invalid_argument("The reproduction Rate must be lower or equal the maximum value. The passed value is: "+std::to_string(reproductionRate));
     }
-    std::minstd_rand0 generator1(std::chrono::system_clock::now().time_since_epoch().count());
-    std::minstd_rand0 generator2(std::chrono::system_clock::now().time_since_epoch().count());
-    std::uniform_int_distribution<size_t> distribution1(0,mPopulation.size()-1);
-    std::uniform_int_distribution<int> distribution2(0,1);
 
 
-    auto genBuildList = [=] () -> shared_ptr<BuildList>
+    auto genBuildList = [&] () -> shared_ptr<BuildList>
     {
+
+        std::minstd_rand0 generator1(std::chrono::system_clock::now().time_since_epoch().count());
+        std::minstd_rand0 generator2(std::chrono::system_clock::now().time_since_epoch().count());
+        std::uniform_int_distribution<size_t> distribution1(0,mPopulation.size()-1);
+        std::uniform_int_distribution<int> distribution2(0,1);
+
 
         auto chooseIndividual = std::bind(distribution1, generator1);
         auto coin =  std::bind(distribution2, generator2);
 
         set<size_t> positions;
+
         do
         {
             positions.insert(chooseIndividual());
@@ -110,7 +117,19 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
             {
                 if(i != j)
                 {
-                    currDist = calculateDistance(mPopulation[i], mPopulation[j]);
+                    const Individual& ind1 = mPopulation[i];
+                    const Individual& ind2 = mPopulation[j];
+
+                    size_t res;
+                    std::hash<string> hashGen;
+                    size_t len = ind1.genes.size() < ind2.genes.size() ? ind1.genes.size() : ind2.genes.size();
+                    for(size_t i = 0; i < len; ++i)
+                    {
+                        res += (len-i) * std::abs(hashGen(ind1.genes[i])-hashGen(ind2.genes[i]));
+                    }
+
+
+                    currDist = res;
                     if(currDist > maxDist)
                     {
                         maxDist = currDist;
@@ -120,7 +139,6 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
                 }
             }
         }
-
         const vector<string>& mumsGenes = mPopulation[pos1].genes;
         const vector<string>& dadsGenes = mPopulation[pos2].genes;
 
@@ -161,14 +179,15 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string t
         throw std::invalid_argument("The mutation Rate must be lower or equal the maximum value. The passed value is: "+std::to_string(mutationRate));
     }
 
-    std::minstd_rand0 popGen(std::chrono::system_clock::now().time_since_epoch().count());
+
+
+    auto genBuildList = [&] () -> shared_ptr<BuildList>
+    {
+                        std::minstd_rand0 popGen(std::chrono::system_clock::now().time_since_epoch().count());
     std::minstd_rand0 geneGen(std::chrono::system_clock::now().time_since_epoch().count());
 
     std::uniform_int_distribution<size_t> popDist(0,mPopulation.size()-1);
 
-
-    auto genBuildList = [=] () -> shared_ptr<BuildList>
-    {
         auto chooseIndividual = std::bind(popDist, popGen);
 
         const Individual& oldInd = mPopulation[chooseIndividual()];
@@ -263,7 +282,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(const string targ
     }
 
 
-    auto genBuildList = [=] () -> shared_ptr<BuildList>
+    auto genBuildList = [&] () -> shared_ptr<BuildList>
     {
         return mBuildListGen.buildOneRandomList(mIndividualSize);
     };
