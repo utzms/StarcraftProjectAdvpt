@@ -99,7 +99,6 @@ private:
     int mAccuracy;
     int mIndividualSize;
     TechnologyManager<RacePolicy> mTechManager;
-    BuildListGenerator<RacePolicy> mBuildListGen;
 
     inline void sortPopulation()
     {
@@ -120,8 +119,6 @@ public:
         mAccuracy=100;
         mIndividualSize=20;
         mTechManager = TechnologyManager<RacePolicy>();
-        mBuildListGen = BuildListGenerator<RacePolicy>(mTechManager.getTechnologyList());
-        mBuildListGen.initRandomGenerator();
     }
 
     void setAccuracy(const int accuracy)
