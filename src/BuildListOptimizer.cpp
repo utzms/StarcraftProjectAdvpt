@@ -31,7 +31,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
     vector<future<shared_ptr<BuildList>>> buildListFutureVec(nindividuals);
     vector<future<map<int,string>>> resultFutureVec(nindividuals);
     vector<shared_ptr<BuildList>> bls(nindividuals);
-
+    int threadFailures = 0;
     for(int i = 0; i < nindividuals; ++i)
     {
         buildListFutureVec[i] = async(genBuildList);
@@ -46,6 +46,10 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
         catch(std::system_error&)
         {
             bls[i] = genBuildList();
+            #ifdef DEBUG
+            std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
+            ++threadFailures;
+            #endif
         }
         resultFutureVec[i] = async(runSimulation, bls[i]);
     }
@@ -60,11 +64,18 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
         catch(std::system_error&)
         {
             simRes = runSimulation(bls[i]);
+            #ifdef DEBUG
+            std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
+            ++threadFailures;
+            #endif
         }
 
         Individual newOne(fitnessPolicy.rateBuildListHard(simRes), fitnessPolicy.rateBuildListSoft(simRes, RacePolicy::getWorker(), mTechManager.getEntityRequirements(target)), bls[i]->getAsVector());
         mPopulation.push_back(newOne);
     }
+    #ifdef DEBUG
+    std::cerr << "Failed to start thread for " << std::to_string(threadFailures) << " times." << std::endl;
+    #endif
 }
 
 template <class RacePolicy, class FitnessPolicy>
