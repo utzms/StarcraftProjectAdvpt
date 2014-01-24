@@ -15,6 +15,7 @@
 #include <set>
 #include <future>
 #include <functional>
+#include <iostream>
 
 #include "Simulation.cpp"
 #include "BuildList.h"
@@ -109,7 +110,7 @@ private:
     inline void select(int selectionRate);
 
 
-    inline void generateAndRate(const string target, FitnessPolicy& fitnessPolicy, const int nindividuals, std::function<shared_ptr<BuildList>(void)> genBuildList, const int timeLimit);
+    inline void generateAndRate(const string target, FitnessPolicy& fitnessPolicy, const int nindividuals, std::function<shared_ptr<BuildList>(TechnologyManager<RacePolicy>)> genBuildList, const int timeLimit);
 
 public:
 
