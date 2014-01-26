@@ -97,7 +97,6 @@ class TechnologyList
 				this->buildingPath = other.buildingPath;
 				this->unresolvedBuildingRequirements = other.unresolvedBuildingRequirements;        
                 this->techSet = other.techSet;
-                /*
                 for (auto &it : this->units)
 				{
 					it.second->setExistence(0);
@@ -106,7 +105,6 @@ class TechnologyList
 				{
 					it.second->setExistence(0);
                 }
-                */
 			}
 			return *this;
         }

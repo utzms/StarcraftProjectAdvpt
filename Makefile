@@ -3,7 +3,7 @@
 
 CC=g++
 OPT=-g -O2 -std=c++11 #-Wall -Wshadow -Wextra -pedantic
-LIBS=-fopenmp
+LIBS=-pthread
 INCPATH=./include/
 SRCPATH=./src/
 INC=-I$(INCPATH) -I$(SRCPATH)

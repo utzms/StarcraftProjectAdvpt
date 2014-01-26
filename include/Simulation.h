@@ -35,7 +35,7 @@ class Simulation
 
 private:
         //BuildList& _buildList;
-        std::unique_ptr <BuildList> _buildList;
+        std::shared_ptr <BuildList> _buildList;
 
         std::shared_ptr<GameState>       _gameState; /**< State of the whole game, containing all Entities and parameters */
         std::shared_ptr<ResourceManager> _resourceManager; /**< Object that is responsible for updating the all resources at the end of each timestep */

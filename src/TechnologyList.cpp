@@ -423,10 +423,10 @@ void TechnologyList::printAll()
 }
 
 
-std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
+std::shared_ptr<Technology> TechnologyList:: findBuilding(std::string key)
 {
-	static std::string lastKey="PlaceHolder";
-	static std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
+	std::string lastKey="PlaceHolder";
+	std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
 
 	int count = buildings.count(key);
 	if (count == 0)
@@ -450,7 +450,7 @@ std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 				std::cout << "No other building with key:\t" << key << " found" << std::endl;
 #endif
 				lastKey = "PlaceHolder";
-				return findBuilding(key);
+				return NULL;
 			}
 		} else
 		{
@@ -463,8 +463,8 @@ std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 
 std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 {
-	static std::string lastKey="PlaceHolder";
-	static std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
+	std::string lastKey="PlaceHolder";
+	std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
 
 	int count = units.count(key);
 	if (count == 0)
@@ -488,7 +488,7 @@ std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 				std::cout << "No other unit with key:\t" << key << " found\t" << count << std::endl;
 #endif
 				lastKey = "PlaceHolder";
-				return findUnit(key);
+				return NULL;
 			}
 		} else
 		{

@@ -174,7 +174,7 @@ template <class RacePolicy>
 Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 {
 
-	_buildList = std::unique_ptr<BuildList>(new BuildList(buildListFilename));
+	_buildList = std::shared_ptr<BuildList>(new BuildList(buildListFilename));
 
 
 	std::shared_ptr<GameState> gameState(new GameState());
@@ -238,6 +238,7 @@ template<class RacePolicy>
 Simulation<RacePolicy>::Simulation(std::shared_ptr<BuildList> buildList, const TechnologyList& techList)
 {
     // TODO
+	_buildList = buildList;
 }
 
 
@@ -609,7 +610,18 @@ template <class RacePolicy>
 std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 {
         // TODO
-        return std::map<int, std::string>();
+	int i = 0;
+	BuildList::State buildListState = BuildList::State::InProgress;
+	
+	std::map<int, std::string> ret;
+	_buildList->reset();
+	while (buildListState != BuildList::State::Finished)
+	{
+		std::string currentItem = _buildList->current();
+		ret.insert(std::pair<int,std::string>(i++,currentItem));
+		buildListState = _buildList->advance();
+	}
+    return ret;
 }
 
 template <class RacePolicy>
