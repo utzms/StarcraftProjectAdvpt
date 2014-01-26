@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
 			std::cerr << "Fehler\t" <<e.what();
 		}
         auto endTime =  std::chrono::system_clock::now().time_since_epoch().count();
-        std::cout << "Initialize required the following time to run: " << (endTime-startTime)*std::chrono::system_clock::period::num/std::chrono::system_clock::period::den << "s" << std::endl;
+        std::cout << "Required the following time to run: " << (endTime-startTime)*std::chrono::system_clock::period::num/std::chrono::system_clock::period::den << "s" << std::endl;
         std::cout << "Size of the population: " << opt.getPopulationSize() << std::endl;
         std::cout << opt.getFittestIndividual();
 	//testTechList();

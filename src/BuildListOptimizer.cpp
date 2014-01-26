@@ -41,7 +41,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 	vector<shared_ptr<BuildList>> bls(nindividuals/NUM_THREADS*(NUM_THREADS+1));
 	vector<future<Individual>> individualFutureVec(NUM_THREADS);
 
-	std::cout << buildListFutureVec.size() << std::endl;
+    PROGRESS("buildListFutureVec.size() << std::endl");
 
 #ifdef DEBUG
 	int threadFailures = 0;
@@ -57,9 +57,11 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 		{
 			try
 			{
-				bls[i+j] = buildListFutureVec[j].get();
+                bls[i+j] = buildListFutureVec[j].get();
+#ifdef DEBUG
 				if ((i+j)%1000==0)
-					std::cout << i+j <<"\t Random lists finished\n";
+                    std::cerr << i+j <<"\t Random lists finished\n";
+#endif
 			}
 			catch(std::system_error&)
 			{
@@ -91,10 +93,11 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 				std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
 				++threadFailures;
 #endif
-			}
+            }
+#ifdef DEBUG
 				if ((i+j)%1000==0)
 					std::cout << i+j <<"\t Simulations caught\n";
-
+#endif
 		//	Individual newOne(fitnessPolicy.rateBuildListHard(simRes), fitnessPolicy.rateBuildListSoft(simRes, RacePolicy::getWorker(), mTechManager.getEntityRequirements(target)), bls[i+j]->getAsVector());
 		//	mPopulation.push_back(newOne);
 		}
@@ -108,7 +111,9 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 			{
 				mPopulation.push_back(individualFutureVec[j].get());
 			} catch(std::system_error&)
-			{}
+            {
+
+            }
 		}
 	}
 
