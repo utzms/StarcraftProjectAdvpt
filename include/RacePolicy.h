@@ -60,7 +60,12 @@ class Protoss
 		static std::string getSupplyProvider()
 		{
 			return "Pylon";
-		}
+        }
+
+        static std::string getSpecialResource()
+        {
+            return "";
+        }
 };
 
 class Zerg
@@ -110,6 +115,10 @@ class Zerg
 			return "Overlord";
 		}
 		
+        static std::string getSpecialResource()
+        {
+            return "Larva";
+        }
 };
 
 class Terran
@@ -154,6 +163,11 @@ class Terran
 		{
 			return "SupplyDepot";
 		}
+
+        static std::string getSpecialResource()
+        {
+            return "";
+        }
 };
 
 #endif

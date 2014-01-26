@@ -45,7 +45,7 @@ template <class RacePolicy>
 void BuildListGenerator<RacePolicy>::initRandomGenerator(std::string SpecialOne, int weight)
 {
 	size_t tmp = std::chrono::system_clock::now().time_since_epoch().count();
-	std::cout << "For Debug Purpose: BuildListGenerator-Seed: " << tmp << std::endl;
+    //std::cout << "For Debug Purpose: BuildListGenerator-Seed: " << tmp << std::endl;
     copyFrom.initRandomGenerator(tmp,SpecialOne,weight);
 }
 
