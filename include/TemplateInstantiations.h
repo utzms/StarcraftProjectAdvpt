@@ -1,6 +1,6 @@
-#include "BuildListOptimizer.cpp"
-#include "Simulation.cpp"
-#include "BuildListGenerator.cpp"
+#include "../src/BuildListOptimizer.cpp"
+#include "../src/Simulation.cpp"
+#include "../src/BuildListGenerator.cpp"
 
 template class Simulation<Protoss>;
 template class Simulation<Zerg>;
