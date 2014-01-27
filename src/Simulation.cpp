@@ -35,6 +35,7 @@ void Simulation<RacePolicy>::buildBuilding(std::shared_ptr<Worker> workerForBuil
 	template <class RacePolicy>
 void Simulation<RacePolicy>::produceUnit(std::shared_ptr<Building> buildingForProduction, std::string unitName, int time,Building::ProductionType type)
 {
+    _energizer->handleBoost(buildingForProduction);
 	buildingForProduction->productionType = type;
 	buildingForProduction->productionUnitName = unitName;
 	buildingForProduction->timer = time;
@@ -132,6 +133,7 @@ void Simulation<RacePolicy>::timeStep()
 	}
 	_resourceManager->timeStep();
 	_gameStateUpdate->timeStep();
+    _energizer->update();
 }
 
 template <class RacePolicy> std::shared_ptr<Worker> Simulation<RacePolicy>::getAvailableWorker()
@@ -183,6 +185,8 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 	std::shared_ptr<TechnologyManager<RacePolicy>> techManager(new TechnologyManager<RacePolicy>(gameState));
 	std::shared_ptr<StartingConfiguration> startingConfiguration( new StartingConfiguration(std::string("./data/StartingConfiguration.txt")) );
 	std::shared_ptr<GameStateUpdate<RacePolicy>> gameStateUpdate(new GameStateUpdate<RacePolicy>(gameState,techManager));
+    std::shared_ptr<Energizer<RacePolicy>> energizer(new Energizer<RacePolicy>(gameState,techManager));
+
 
 	if(techManager->isBuildListPossible(_buildList->getAsVector()) == false)
 	{
@@ -194,6 +198,7 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 	_technologyManager = techManager;
 	_startingConfiguration = startingConfiguration;
 	_gameStateUpdate = gameStateUpdate;
+    _energizer = energizer;
 
 
 	std::vector< std::shared_ptr<Worker> >& workerList = gameState->workerList;
@@ -349,7 +354,10 @@ void Simulation<RacePolicy>::run()
 			++larvaTimer;
 		}
 
-		while (buildListState != BuildList::State::Finished)
+        //ENERGY handling!
+        _energizer->handleAbility();
+
+        while (buildListState != BuildList::State::Finished)
 		{
 			if (_buildList->allItemsOk())
 			{
@@ -551,7 +559,9 @@ void Simulation<RacePolicy>::run()
 
                         if(morphCounter != vanishingRequirements.size())
                         {
-                            throw std::runtime_error("Simulation::run: morphCount != vanishingRequirements");
+                            PROGRESS("Simulation::run: morphCount != vanishingRequirements");
+                            PROGRESS("morphCounter: " << morphCounter);
+                            //throw std::runtime_error("Simulation::run: morphCount != vanishingRequirements");
                         }
 					}
 					// if a building is ready, we produce a unit

@@ -106,6 +106,11 @@ class GameState
         {
 			_supplyCount -= value;
         }
+
+        void setEnergy(float value)
+        {
+            _energy = value;
+        }
 };
 
 #endif // _GAMESTATE_H_

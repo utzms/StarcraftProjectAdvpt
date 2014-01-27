@@ -2,6 +2,7 @@
 #define ENERGIZER_H
 
 #include "GameState.h"
+#include "TechnologyManager.h"
 
 template
 <
@@ -11,6 +12,7 @@ class Energizer
 {
     private:
         std::shared_ptr<GameState>  _gameState;
+        std::shared_ptr<TechnologyManager<RacePolicy>> _technologyManager;
         float                       _energy;
         int                         _timer;
         RaceType                    _race;
@@ -22,10 +24,11 @@ class Energizer
         int  _queenTimer;
 
         int _abilityCooldown;
-        std::vector< std::shared_ptr<Building> > boostedBuildingList;
+        std::vector<std::shared_ptr<Building>> boostedBuildingList;
     public:
-        Energizer(std::shared_ptr<GameState> gameState)
+        Energizer(std::shared_ptr<GameState> gameState, std::shared_ptr<TechnologyManager<RacePolicy>> technologyManager)
             :_gameState(gameState)
+            ,_technologyManager(technologyManager)
             ,_energy(0)
             ,_timer(0)
             ,_race(RacePolicy::getRace())
@@ -34,6 +37,7 @@ class Energizer
             ,_muleTimer(0)
             ,_abilityCooldown(0)
             ,_queenTimer(0)
+
         {
 
         }
@@ -89,6 +93,7 @@ class Energizer
                 if (_energy < _energyLimit)
                 {
                     _energy += 0.5625f;
+                    _gameState->setEnergy(_energy);
                 }
             }
 
@@ -102,6 +107,7 @@ class Energizer
                 {
                     if (_energy >= 50.f && _muleTimer == 0)
                     {
+                         PROGRESS("GSU Mule timer started");
                         _muleTimer = 90;
                         _energy -= 50.f;
                     }
@@ -119,6 +125,7 @@ class Energizer
                         // decrease energy
                         _energy -= 25.f;
                         _queenTimer = 40;
+                        PROGRESS("GSU Queen timer started");
                     }
 
                     if(_queenTimer > 0)
@@ -128,10 +135,15 @@ class Energizer
                         // spawn larva
                         if( _queenTimer == 0 )
                         {
+                            PROGRESS("GSU Larvas injected by Queen");
                             _gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
                             _gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
                             _gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
                             _gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
+                            _technologyManager->notifyCreation("Larva");
+                            _technologyManager->notifyCreation("Larva");
+                            _technologyManager->notifyCreation("Larva");
+                            _technologyManager->notifyCreation("Larva");
                          }
                     }
                 }
@@ -140,8 +152,9 @@ class Energizer
                      std::vector< std::shared_ptr<Building> > eraseBoostedList;
                     for(auto boostedBuildingIterator : boostedBuildingList)
                     {
-                        if(boostedBuildingIterator->timer == 0)
+                        if(boostedBuildingIterator->boostTimer == 0)
                         {
+                            PROGRESS("GSU boostTimer == 0");
                             boostedBuildingIterator->boostState = Building::BoostState::NotBoosted;
                             eraseBoostedList.push_back(boostedBuildingIterator);
                         }
@@ -160,14 +173,21 @@ class Energizer
             }
         }
 
-        void handleBoost(Building& building)
+        void handleBoost(std::shared_ptr<Building> building)
         {
             if (_race == RaceType::Protoss)
             {
-                 PROGRESS("GSU Building Boosted " << (building)->getName());
-                building.boostState = Building::BoostState::Boosted;
-                building.boostTimer = 20;
-                boostedBuildingList.push_back(std::shared_ptr(building));
+                if (_energy >= 25.f )
+                {
+                    if(building->boostState == Building::BoostState::NotBoosted)
+                    {
+                        PROGRESS("GSU Building Boosted " << (building)->getName());
+                        building->boostState = Building::BoostState::Boosted;
+                        building->boostTimer = 20;
+                        boostedBuildingList.push_back(building);
+                        _energy-=25.f;
+                    }
+                }
             }
         }
 
