@@ -28,51 +28,60 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
         return Simulation<RacePolicy>(buildList, techList).run(timeLimit);
     };
 
+    /*
     vector<future<shared_ptr<BuildList>>> buildListFutureVec(nindividuals);
     vector< future< map<int,string> > > resultFutureVec(nindividuals);
+    */
     vector<shared_ptr<BuildList>> bls(nindividuals);
 
     #ifdef DEBUG
     int threadFailures = 0;
     #endif
 
+    /*
     for(int i = 0; i < nindividuals; ++i)
     {
         buildListFutureVec[i] = async(genBuildList, mTechManager);
     }
+    */
 
     for(int i = 0; i < nindividuals; ++i)
     {
+        /*
         try
         {
             bls[i] = buildListFutureVec[i].get();
         }
         catch(std::system_error&)
         {
+        */
             bls[i] = genBuildList(mTechManager);
             #ifdef DEBUG
             std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
             ++threadFailures;
             #endif
-        }
-        resultFutureVec[i] = async(runSimulation, bls[i]);
+        //}
+
+        //resultFutureVec[i] = async(runSimulation, bls[i]);
     }
 
     for(int i = 0; i < nindividuals; ++i)
     {
         map<int,string> simRes;
+        /*
         try
         {
             simRes = resultFutureVec[i].get();
         }
         catch(std::system_error&)
         {
+        */
             simRes = runSimulation(bls[i]);
             #ifdef DEBUG
             std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
             ++threadFailures;
             #endif
-        }
+        //}
 
         Individual newOne(fitnessPolicy.rateBuildListHard(simRes), fitnessPolicy.rateBuildListSoft(simRes, RacePolicy::getWorker(), mTechManager.getEntityRequirements(target)), bls[i]->getAsVector());
         mPopulation.push_back(newOne);
@@ -331,6 +340,8 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(const string target
         mutate(target, ntargets, timeLimit, mutationRate);
         crossover(target, ntargets, timeLimit, reproductionRate);
         sortPopulation();
+
+        PROGRESS("Size of the population after " << std::to_string(i) << " generation(s): " << mPopulation.size() << std::endl);
     }
 
 }
