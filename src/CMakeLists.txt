@@ -1,15 +1,20 @@
 include_directories( . )
 
-set ( OWN_SOURCES  
+set ( OWN_SOURCES
 	DataReader.cpp 
 	Debug.cpp 
 	main.cpp 
 	ResourceManager.cpp 
 	Technology.cpp 
 	Simulation.cpp
-	TechnologyList.cpp )
+        TechnologyList.cpp
+        BuildListGenerator.cpp
+        BuildListOptimizer.cpp
 
-set ( OWN_HEADERS 
+
+)
+
+set ( OWN_HEADERS
   ../include/Building.h
   ../include/BuildList.h
   ../include/DataReader.h
@@ -26,7 +31,12 @@ set ( OWN_HEADERS
   ../include/Unit.h
   ../include/Worker.h
   ../include/Entity.h
-  ../include/RacePolicy.h )
+  ../include/RacePolicy.h
+  ../include/BuildListGenerator.h
+  ../include/FitnessPolicy.h
+  ../include/BuildListOptimizer.h
+  ../include/TemplateInstantiations.h
+ )
   
   
   add_executable( adpvt ${OWN_SOURCES} ${OWN_HEADERS} )

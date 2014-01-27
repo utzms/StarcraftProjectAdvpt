@@ -1,7 +1,7 @@
-
-#include "RacePolicy.h"
-#include "FitnessPolicy.h"
-#include "BuildListOptimizer.cpp"
+#include "../include/BuildListOptimizer.h"
+#include "../include/RacePolicy.h"
+#include "../include/FitnessPolicy.h"
+#include "../include/TemplateInstantiations.h"
 #include <chrono>
 
 #include <stdexcept>
@@ -59,10 +59,10 @@ int main(int argc, char *argv[])
 	size_t a=25;
         BuildListOptimizer<Protoss,Debug> opt(100,a);
         auto startTime = std::chrono::system_clock::now().time_since_epoch().count();
-        opt.initialize("Zealot",10,500000,10000);
+        opt.initialize("Zealot",10,500000,100);
         //std::cout << "Size of the population: " << opt.getPopulationSize() << std::endl;
         //std::cout << opt.getFittestIndividual();
-        opt.optimize("Zealot",10,1000000,1,10,10,10);
+        opt.optimize("Zealot",10,1000000,1,20,20,80);
         auto endTime =  std::chrono::system_clock::now().time_since_epoch().count();
         std::cout << "Initialize required the following time to run: " << endTime-startTime << std::endl;
         std::cout << "Size of the population: " << opt.getPopulationSize() << std::endl;

@@ -1,22 +1,12 @@
-#include "BuildListOptimizer.h"
+#include "../include/BuildListOptimizer.h"
 
 
 using std::pair;
 using std::future;
 using std::async;
 
-inline void dummy()
-{
-        BuildListOptimizer<Terran, Rush> dummy1();
-        BuildListOptimizer<Protoss, Rush> dummy2();
-        BuildListOptimizer<Zerg, Rush> dummy3();
-        BuildListOptimizer<Terran, Push> dummy4();
-        BuildListOptimizer<Protoss, Push> dummy5();
-        BuildListOptimizer<Zerg, Push> dummy6();
-        BuildListOptimizer<Terran, Debug> dummy7();
-        BuildListOptimizer<Protoss, Debug> dummy8();
-        BuildListOptimizer<Zerg, Debug> dummy9();
-}
+
+
 
 
 template<class RacePolicy, class FitnessPolicy>
@@ -370,7 +360,7 @@ template <class RacePolicy, class FitnessPolicy>
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::addIndividual(const string target, const int ntargets, const int timeLimit, shared_ptr<BuildList> buildList )
 {
     FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
-    map<int,const string> simRes = Simulation<RacePolicy>(buildList, mTechManager.getTechnologyList()).run(timeLimit);
+    map<int,string> simRes = Simulation<RacePolicy>(buildList, mTechManager.getTechnologyList()).run(timeLimit);
     mPopulation.push_back(Individual(fitnessPolicy.rateBuildListHard(simRes),
                                      fitnessPolicy.rateBuildListSoft(simRes, RacePolicy::getWorker(), mTechManager.getEntityRequirements(target)), buildList->getAsVector()));
 }

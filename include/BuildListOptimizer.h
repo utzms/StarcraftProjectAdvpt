@@ -17,9 +17,9 @@
 #include <functional>
 #include <iostream>
 
-#include "Simulation.cpp"
+#include "Simulation.h"
 #include "BuildList.h"
-#include "BuildListGenerator.cpp"
+#include "BuildListGenerator.h"
 #include "TechnologyManager.h"
 #include "RacePolicy.h"
 #include "FitnessPolicy.h"
@@ -66,11 +66,11 @@ struct Individual
         return ind.hardSkills == this->hardSkills && ind.softSkills == this->hardSkills;
     }
 
-    friend std::ostream& operator<<(std::ostream& out, const Individual& ind);
-    friend std::ostream& operator<<(std::ostream& out, const vector<Individual>& inds);
+    //friend std::ostream& operator<<(std::ostream& out, const Individual& ind);
+    //friend std::ostream& operator<<(std::ostream& out, const vector<Individual>& inds);
 };
 
-std::ostream& operator<<(std::ostream& out, const Individual& ind)
+inline std::ostream& operator<<(std::ostream& out, const Individual& ind)
 {
     for(string gene : ind.genes)
     {
@@ -79,7 +79,8 @@ std::ostream& operator<<(std::ostream& out, const Individual& ind)
     out << "Score: " << ind.hardSkills << "\t-\t" << ind.softSkills << std::endl;
     return out;
 }
-std::ostream& operator<<(std::ostream& out, const vector<Individual>& inds)
+
+inline std::ostream& operator<<(std::ostream& out, const vector<Individual>& inds)
 {
     for (auto i : inds)
         out << i;
