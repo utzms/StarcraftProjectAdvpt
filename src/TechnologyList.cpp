@@ -3,13 +3,15 @@
 TechnologyList::TechnologyList()
 {
 	initialized=false;
+
 }
 TechnologyList::TechnologyList(std::string unitPathIn, std::string buildPath)
 {
 	initialized=false;
 
 	initUnitList(unitPathIn);
-	initBuildingList(buildPath);
+    initBuildingList(buildPath);
+    initTechnologySet();
 }
 
 TechnologyList::~TechnologyList()
@@ -29,6 +31,9 @@ TechnologyList::TechnologyList(TechnologyList &other)
 		this->unitPath = other.unitPath;
 		this->buildingPath = other.buildingPath;
 		this->unresolvedBuildingRequirements = other.unresolvedBuildingRequirements;
+        this->techSet = other.techSet;
+
+        /* no longer required
 		for (auto &it : this->units)
 		{   
 			it.second->setExistence(0);
@@ -36,7 +41,8 @@ TechnologyList::TechnologyList(TechnologyList &other)
 		for (auto &it : this->buildings)
 		{   
 			it.second->setExistence(0);
-		}  
+        }
+        */
 	}
 }
 
@@ -50,7 +56,10 @@ TechnologyList::TechnologyList(const TechnologyList &other)
 		this->initialized = other.initialized;
 		this->unitPath = other.unitPath;
 		this->buildingPath = other.buildingPath;
-		this->unresolvedBuildingRequirements = other.unresolvedBuildingRequirements;
+        this->unresolvedBuildingRequirements = other.unresolvedBuildingRequirements;
+        this->techSet = other.techSet;
+
+        /* no longer required
 		for (auto &it : this->units)
 		{   
 			it.second->setExistence(0);
@@ -58,7 +67,8 @@ TechnologyList::TechnologyList(const TechnologyList &other)
 		for (auto &it : this->buildings)
 		{   
 			it.second->setExistence(0);
-		}  
+        }
+        */
 	}
 }
 
@@ -68,7 +78,7 @@ void TechnologyList::cleanAll()
 	if (!(units.size() == 0))
 		units.clear();
 	if (!(buildings.size() == 0))
-		buildings.clear();
+        buildings.clear();
 }
 
 void TechnologyList::cleanUnresolved()
@@ -333,9 +343,9 @@ void TechnologyList::initBuildingList(std::string buildList)
 	if (callRest)
 		initRest();
 }
-
 void TechnologyList::reset()
 {
+    /* no longer needed here
 	for (auto it : units)
 	{
 		(it).second->setExistence(false);
@@ -344,9 +354,31 @@ void TechnologyList::reset()
 	{
 		(it).second->setExistence(false);
 	}
+    */
 	techNames.clear();
 	findUnit("reset");
 	findBuilding("reset");
+}
+
+
+void TechnologyList::initTechnologySet()
+{
+    if(units.size() == 0)
+    {
+        throw std::invalid_argument("List of units not yet initialized!");
+    }
+    if(buildings.size() == 0)
+    {
+        throw std::invalid_argument("List of buildings not yet initialized!");
+    }
+    for(const auto& unit : units)
+    {
+        techSet.insert(unit.first);
+    }
+    for(const auto& building : buildings)
+    {
+        techSet.insert(building.first);
+    }
 }
 
 bool TechnologyList::isInitialized()
@@ -391,10 +423,10 @@ void TechnologyList::printAll()
 }
 
 
-std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
+std::shared_ptr<Technology> TechnologyList:: findBuilding(std::string key)
 {
-	static std::string lastKey="PlaceHolder";
-	static std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
+	std::string lastKey="PlaceHolder";
+	std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
 
 	int count = buildings.count(key);
 	if (count == 0)
@@ -418,7 +450,7 @@ std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 				std::cout << "No other building with key:\t" << key << " found" << std::endl;
 #endif
 				lastKey = "PlaceHolder";
-				return findBuilding(key);
+				return NULL;
 			}
 		} else
 		{
@@ -431,8 +463,8 @@ std::shared_ptr<Technology> TechnologyList::findBuilding(std::string key)
 
 std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 {
-	static std::string lastKey="PlaceHolder";
-	static std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
+	std::string lastKey="PlaceHolder";
+	std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
 
 	int count = units.count(key);
 	if (count == 0)
@@ -456,7 +488,7 @@ std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 				std::cout << "No other unit with key:\t" << key << " found\t" << count << std::endl;
 #endif
 				lastKey = "PlaceHolder";
-				return findUnit(key);
+				return NULL;
 			}
 		} else
 		{
@@ -471,39 +503,40 @@ void TechnologyList::initRandomGenerator(size_t seed, std::string SpecialOne, in
 {
 	PROGRESS("RandomGenerator INIT");
 
-	randomEngine = std::minstd_rand0(seed);
+    for(auto &it : units)
+    {
+        if (techNames.size()>0)
+            if (it.second->getName()==techNames.back())
+                continue;
+        if (it.second->getName()==SpecialOne)
+        {
+            for (int i = 0; i < weight; ++i)
+                techNames.push_back(it.second->getName());
+        } else
+        {
+            techNames.push_back(it.second->getName());
+        }
+    }
+    for(auto &it : buildings)
+    {
+        if (techNames.size()>0)
+            if (it.second->getName()==techNames.back())
+                continue;
+        if (it.second->getName()==SpecialOne)
+        {
+            for (int i = 0; i < weight; ++i)
+                techNames.push_back(it.second->getName());
+        } else
+        {
+            techNames.push_back(it.second->getName());
+        }
+    }
+
+    randomEngine = std::minstd_rand0(seed);
 	if (!(initialized))
 	{
 		std::cerr << "TechList not yet initialized, cant create RandomEngine" << std::endl;
 		return;
-	}
-	for(auto &it : units)
-	{
-		if (techNames.size()>0)
-			if (it.second->getName()==techNames.back())
-				continue;
-		if (it.second->getName()==SpecialOne)
-		{
-			for (int i = 0; i < weight; ++i)
-				techNames.push_back(it.second->getName());
-		} else
-		{
-			techNames.push_back(it.second->getName());
-		}
-	}
-	for(auto &it : buildings)
-	{
-		if (techNames.size()>0)
-			if (it.second->getName()==techNames.back())
-				continue;
-		if (it.second->getName()==SpecialOne)
-		{
-			for (int i = 0; i < weight; ++i)
-				techNames.push_back(it.second->getName());
-		} else
-		{
-			techNames.push_back(it.second->getName());
-		}
 	}
 	uniformDist = std::uniform_int_distribution<int>(0,techNames.size()-1);
 }
@@ -523,5 +556,16 @@ std::shared_ptr<Technology> TechnologyList::findTechnology(std::string key)
 	if ((tech=findBuilding(key))!=NULL)
 		return tech;
 	return NULL;
+}
+
+std::set<std::string> TechnologyList::getTechnologySet(void)
+{
+#ifdef DEBUG
+    for(auto it : techSet)
+    {
+        std::cerr << it << std::endl;
+    }
+#endif
+    return techSet;
 }
 
