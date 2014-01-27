@@ -22,7 +22,7 @@ class Energizer
         int  _queenTimer;
 
         int _abilityCooldown;
-
+        std::vector< std::shared_ptr<Building> > boostedBuildingList;
     public:
         Energizer(std::shared_ptr<GameState> gameState)
             :_gameState(gameState)
@@ -51,7 +51,7 @@ class Energizer
                         _energy += 0.5625f;
                     }
 
-                    energyEntityExists = true;
+                    _energyEntityExists = true;
                 }
                 else if (_race == RaceType::Terran)
                 {
@@ -64,7 +64,7 @@ class Energizer
                             {
                                 _energy += 0.5625f;
                             }
-                            energyEntityExists = true;
+                            _energyEntityExists = true;
                         }
                     }
                 }
@@ -79,7 +79,7 @@ class Energizer
                             {
                                 _energy += 0.5625f;
                             }
-                            energyEntityExists = true;
+                            _energyEntityExists = true;
                         }
                     }
                 }
@@ -135,12 +135,40 @@ class Energizer
                          }
                     }
                 }
+                else if (_race == RaceType::Protoss)
+                {
+                     std::vector< std::shared_ptr<Building> > eraseBoostedList;
+                    for(auto boostedBuildingIterator : boostedBuildingList)
+                    {
+                        if(boostedBuildingIterator->timer == 0)
+                        {
+                            boostedBuildingIterator->boostState = Building::BoostState::NotBoosted;
+                            eraseBoostedList.push_back(boostedBuildingIterator);
+                        }
+                    }
+                    for(auto eraseBoostedIterator : eraseBoostedList)
+                    {
+                        auto eraseIterator = std::find(boostedBuildingList.begin(), boostedBuildingList.end(), eraseBoostedIterator);
+                        if(eraseIterator != boostedBuildingList.end())
+                        {
+                            PROGRESS("GSU Building not Boosted anymore " << (*eraseIterator)->getName());
+                            boostedBuildingList.erase(eraseIterator);
+                        }
+                    }
+
+                }
             }
         }
 
         void handleBoost(Building& building)
         {
-
+            if (_race == RaceType::Protoss)
+            {
+                 PROGRESS("GSU Building Boosted " << (building)->getName());
+                building.boostState = Building::BoostState::Boosted;
+                building.boostTimer = 20;
+                boostedBuildingList.push_back(std::shared_ptr(building));
+            }
         }
 
 };
