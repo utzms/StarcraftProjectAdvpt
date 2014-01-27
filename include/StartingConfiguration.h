@@ -3,56 +3,56 @@
 
 class StartingConfiguration
 {
-	private:
+private:
 
-		int _initialWorkerCount;
-		int _initialMinerals;
-		int _initialVespeneGas;
+    int _initialWorkerCount;
+    float _initialMinerals;
+    float _initialVespeneGas;
 
-	public:
+public:
 
-		StartingConfiguration(std::string filename)
-		{
-			std::fstream configFile(filename, std::ios::in);
+    StartingConfiguration(std::string filename)
+    {
+        std::fstream configFile(filename, std::ios::in);
 
-			if(!configFile.good())
-			{
-				throw std::invalid_argument("file for StartingConfiguration is not valid");
-			}
+        if(!configFile.good())
+        {
+            throw std::invalid_argument("file for StartingConfiguration is not valid");
+        }
 
-			std::string currentString;
-			while(configFile >> currentString)
-			{
-				if(currentString.compare("Workers") == 0)
-				{
-					configFile >> _initialWorkerCount;
-				}
-				else if(currentString.compare("Minerals") == 0)
-				{
-					configFile >> _initialMinerals;
-				}
-				else if(currentString.compare("VespeneGas") == 0)
-				{
-					configFile >> _initialVespeneGas;
-				}
-			}
+        std::string currentString;
+        while(configFile >> currentString)
+        {
+            if(currentString.compare("Workers") == 0)
+            {
+                configFile >> _initialWorkerCount;
+            }
+            else if(currentString.compare("Minerals") == 0)
+            {
+                configFile >> _initialMinerals;
+            }
+            else if(currentString.compare("VespeneGas") == 0)
+            {
+                configFile >> _initialVespeneGas;
+            }
+        }
 
-		}
+    }
 
-		inline int getInitialWorkerCount()
-		{
-			return _initialWorkerCount;
-		}
+    inline int getInitialWorkerCount()
+    {
+        return _initialWorkerCount;
+    }
 
-		inline int getInitialMinerals()
-		{
-			return _initialMinerals;
-		}
+    inline int getInitialMinerals()
+    {
+        return _initialMinerals;
+    }
 
-		inline int getInitialVespeneGas()
-		{
-			return _initialVespeneGas;
-		}
+    inline int getInitialVespeneGas()
+    {
+        return _initialVespeneGas;
+    }
 
 };
 #endif // STARTINGCONFIGURATION_H

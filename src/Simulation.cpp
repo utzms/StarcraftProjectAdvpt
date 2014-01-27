@@ -11,12 +11,6 @@
  *
  */
 
-inline void temp()
-{
-	Simulation<Protoss> sim1("bla");
-	Simulation<Zerg> sim2("bli");
-	Simulation<Terran> sim3("bluuuuub");
-}
 
 	template <class RacePolicy>
 void Simulation<RacePolicy>::buildBuilding(std::shared_ptr<Worker> workerForBuilding, std::string name ,int time)
@@ -151,7 +145,6 @@ template <class RacePolicy> std::shared_ptr<Worker> Simulation<RacePolicy>::getA
 	}
 	// if we haven't found a ready worker, we 
 	// have to take a minerals or vespene guy
-	//TODO potentielle FEHLERQUELLE wegen vespene guy
 /*	if (ourWorker == nullptr)
 	{
 		for (auto workerIterator : _gameState->workerList)
@@ -177,7 +170,7 @@ template <class RacePolicy>
 Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 {
 
-	_buildList = new BuildList(buildListFilename);
+	_buildList = std::unique_ptr<BuildList>(new BuildList(buildListFilename));
 
 
 	std::shared_ptr<GameState> gameState(new GameState());
@@ -239,6 +232,13 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 
 
 }
+/* Constructor for use in BuildListOptimizer */
+template<class RacePolicy>
+Simulation<RacePolicy>::Simulation(std::shared_ptr<BuildList> buildList, const TechnologyList& techList)
+{
+    // TODO
+}
+
 
 template <class RacePolicy>
 void Simulation<RacePolicy>::run()
@@ -405,7 +405,6 @@ void Simulation<RacePolicy>::run()
 				// get the costs for game state manipulation and build time
 				Costs entityCosts = _technologyManager->getEntityCosts(currentItem);
 
-				//TODO hier muss dann noch mit Supplys geguckt werden..ich glaube, das wrid noch nicht gemacht, oder seh ich das nur nicht?
 				// otherwise, we find out if the item is a unit or a building
 				if (_technologyManager->checkIfNameIsBuilding(currentItem))
 				{
@@ -458,7 +457,7 @@ void Simulation<RacePolicy>::run()
 							_gameState->subMinerals(entityCosts.minerals);
 							_gameState->subGas(entityCosts.gas);
 
-							std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+							//std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 							// continue to the next item in the build list
 							continue;
@@ -481,7 +480,7 @@ void Simulation<RacePolicy>::run()
 						PROGRESS("Simulation::run() Ordering building " << currentItem);
 						buildBuilding(ourWorker, currentItem, entityCosts.buildTime);
 						_buildList->setCurrentItemOk();
-						std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+						//std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 						if (vanishingZergWorker)
 						{
@@ -499,8 +498,6 @@ void Simulation<RacePolicy>::run()
 						break;
 					}
 
-
-				//TODO hier auch mit den Supplys....bin mir nicht sicher, aber ich seh zumindest nicht, wo das gemacht wird.
 				// if we still haven't got a worker
 				// we need to try again at a later point		
 				}
@@ -529,7 +526,7 @@ void Simulation<RacePolicy>::run()
 					{
 						// we assume that units can have only other units as vanishing
 						// requirements (not workers)
-                        int morphCounter = 0;
+                        unsigned int morphCounter = 0;
 
                         for(auto vanishingRequirementsIterator : vanishingRequirements)
                         {
@@ -583,7 +580,7 @@ void Simulation<RacePolicy>::run()
 						}
 
 						_buildList->setCurrentItemOk();
-						std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+					//	std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 					}
 					else
 					{
@@ -609,6 +606,14 @@ void Simulation<RacePolicy>::run()
 		timeStep();
 	}
 
+}
+/* run() method for use in BuildListOptimizer */
+
+template <class RacePolicy>
+std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
+{
+        // TODO
+        return std::map<int, std::string>();
 }
 
 template <class RacePolicy>

@@ -13,12 +13,12 @@ class BuildList
 private:
     std::string              _filename;
     std::vector<std::string> _nameList;
-	std::vector<bool>		 _builtList;
+    std::vector<bool>		 _builtList;
 
-	
+
     std::vector<std::string>::iterator _currentItem;
-	std::vector<bool>::iterator		   _currentItemOk;
-		
+    std::vector<bool>::iterator		   _currentItemOk;
+
     void readBuildList(std::string filename)
     {
         std::ifstream file;
@@ -33,17 +33,17 @@ private:
         while (file.good())
         {
 
-			std::string currentLine;
-			std::getline(file, currentLine);
-			currentLine.erase(std::remove(currentLine.begin(), currentLine.end(), ' '), currentLine.end());
+            std::string currentLine;
+            std::getline(file, currentLine);
+            currentLine.erase(std::remove(currentLine.begin(), currentLine.end(), ' '), currentLine.end());
 
-			if (!currentLine.empty())
-			{
-				_nameList.push_back(currentLine);
-			}
+            if (!currentLine.empty())
+            {
+                _nameList.push_back(currentLine);
+            }
         }
 
-		_currentItem = _nameList.begin();
+        _currentItem = _nameList.begin();
         file.close();
     }
 
@@ -55,14 +55,28 @@ public:
     };
 
     BuildList(std::string filename)
-		:_filename(filename)
+        :_filename(filename)
         ,_currentItem(_nameList.begin())
     {
         readBuildList(filename);
-		_builtList.resize(_nameList.size(), false);
-		_currentItemOk = _builtList.begin();
+        // shouldn't builtList be initialized here with false completely?
+        _builtList.assign(_nameList.size(), false);
+        _currentItemOk = _builtList.begin();
     }
 
+    BuildList(std::vector<std::string> nameList)
+        :_nameList(nameList)
+        ,_currentItem(_nameList.begin())
+    {
+        _builtList.assign(_nameList.size(), false);
+        _currentItemOk = _builtList.begin();
+    }
+
+    ~BuildList()
+    {
+        _nameList.clear();
+        _builtList.clear();
+    }
     std::string current()
     {
         return *_currentItem;
@@ -73,7 +87,7 @@ public:
         State returnState = State::InProgress;
 
         _currentItem++;
-		_currentItemOk++;
+        _currentItemOk++;
 
         if (_currentItem == _nameList.end())
         {
@@ -83,41 +97,41 @@ public:
         return returnState;
     }
 
-	void reset()
-	{
-		_currentItem = _nameList.begin();
-		_currentItemOk = _builtList.begin();
-	}
+    void reset()
+    {
+        _currentItem = _nameList.begin();
+        _currentItemOk = _builtList.begin();
+    }
 
-	std::vector<std::string> getAsVector()
-	{
-		return _nameList;
-	}
+    std::vector<std::string> getAsVector()
+    {
+        return _nameList;
+    }
 
-	bool isCurrentItemOk()
-	{
-		return *_currentItemOk;
-	}
+    bool isCurrentItemOk()
+    {
+        return *_currentItemOk;
+    }
 
-	void setCurrentItemOk()
-	{
-		*_currentItemOk = true;
-	}
+    void setCurrentItemOk()
+    {
+        *_currentItemOk = true;
+    }
 
-	bool allItemsOk()
-	{
-		bool result = true;
+    bool allItemsOk()
+    {
+        bool result = true;
 
-		for (auto item : _builtList)
-		{
-			if (item == false)
-			{
-				result = false;
-			}
-		}
+        for (auto item : _builtList)
+        {
+            if (item == false)
+            {
+                result = false;
+            }
+        }
 
-		return result;
-	}
+        return result;
+    }
 };
 
 #endif
