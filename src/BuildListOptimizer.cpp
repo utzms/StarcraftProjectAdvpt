@@ -7,25 +7,26 @@ using std::async;
 
 
 template<class RacePolicy, class FitnessPolicy>
-inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const string target, FitnessPolicy& fitnessPolicy, const int nindividuals, std::function<shared_ptr<BuildList>(TechnologyManager<RacePolicy>)> genBuildList, const int timeLimit)
+inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const string target, FitnessPolicy& fitnessPolicy, const int nindividuals, std::function<vector<string>(TechnologyManager<RacePolicy>)> genBuildList, const int timeLimit)
 {
 	const TechnologyList& techList = mTechManager.getTechnologyList();
-	auto runSimulation = [=] (shared_ptr<BuildList> buildList) -> map<int, string>
+    auto runSimulation = [=] (vector<string> dna) -> map<int, string>
 	{
+        shared_ptr<BuildList> buildList = std::make_shared<BuildList>(dna);
 		Simulation<RacePolicy> a(buildList, techList);
 		return a.run(timeLimit);
 	};
 
-	auto runIndividual = [&] (map<int,string> res, shared_ptr<BuildList> bl) -> Individual
+    auto runIndividual = [=] (map<int,string> res, vector<string> dnaVec, FitnessPolicy fitnessPolicy) -> Individual
 	{
 		auto a = mTechManager.getEntityRequirements(target);
-		Individual newOne(fitnessPolicy.rateBuildListHard(res), fitnessPolicy.rateBuildListSoft(res,RacePolicy::getWorker(), a),bl->getAsVector());
+        Individual newOne(fitnessPolicy.rateBuildListHard(res), fitnessPolicy.rateBuildListSoft(res,RacePolicy::getWorker(), a),dnaVec);
 		return newOne;
 	};
     const unsigned NUM_THREADS = std::thread::hardware_concurrency();
-	vector<future<shared_ptr<BuildList>>> buildListFutureVec(NUM_THREADS);
+    vector<future<vector<string>>> dnaFutureVec(NUM_THREADS);
 	vector<future<map<int,string>>> resultFutureVec(NUM_THREADS);
-	vector<shared_ptr<BuildList>> bls(nindividuals/NUM_THREADS*(NUM_THREADS+1));
+    vector<vector<string>> dnaVec(nindividuals/NUM_THREADS*(NUM_THREADS+1));
 	vector<future<Individual>> individualFutureVec(NUM_THREADS);
 
     PROGRESS("buildListFutureVec.size() << std::endl");
@@ -38,13 +39,13 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 	{
 		for (int j = 0; j < NUM_THREADS; ++j)
 		{
-			buildListFutureVec[j] = async(std::launch::async,genBuildList, mTechManager);
+            dnaFutureVec[j] = async(std::launch::async,genBuildList, mTechManager);
 		}
 		for (int j = 0; j < NUM_THREADS; ++j)
 		{
 			try
 			{
-                bls[i+j] = buildListFutureVec[j].get();
+                dnaVec.at(i+j) = dnaFutureVec[j].get(); // Here we got the segfault, now a exception is thrown
 #ifdef DEBUG
 				if ((i+j)%1000==0)
                     std::cerr << i+j <<"\t Random lists finished\n";
@@ -52,7 +53,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 			}
 			catch(std::system_error&)
 			{
-				bls[i+j] = genBuildList(mTechManager);
+                dnaVec[i+j] = genBuildList(mTechManager);
 #ifdef DEBUG
 				std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
 				++threadFailures;
@@ -64,9 +65,9 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 	{
 		for (int j = 0; j < NUM_THREADS; ++j)
 		{
-			resultFutureVec[j] = async(std::launch::async,runSimulation, bls[i+j]);
+            resultFutureVec[j] = async(std::launch::async,runSimulation, dnaVec[i+j]);
 		}
-		map<int,string> simRes[NUM_THREADS];
+        vector<map<int,string>> simRes(NUM_THREADS);
 		for (int j = 0; j < NUM_THREADS; ++j)
 		{
 			try
@@ -75,7 +76,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 			}
 			catch(std::system_error&)
 			{
-				simRes[j] = runSimulation(bls[i+j]);
+                simRes[j] = runSimulation(dnaVec[i+j]);
 #ifdef DEBUG
 				std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
 				++threadFailures;
@@ -85,12 +86,13 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 				if ((i+j)%1000==0)
 					std::cout << i+j <<"\t Simulations caught\n";
 #endif
-		//	Individual newOne(fitnessPolicy.rateBuildListHard(simRes), fitnessPolicy.rateBuildListSoft(simRes, RacePolicy::getWorker(), mTechManager.getEntityRequirements(target)), bls[i+j]->getAsVector());
-		//	mPopulation.push_back(newOne);
+        //	Individual newOne(fitnessPolicy.rateBuildListHard(simRes), fitnessPolicy.rateBuildListSoft(simRes, RacePolicy::getWorker(), mTechManager.getEntityRequirements(target)), bls[i+j]->getAsVector());
+        //	mPopulation.push_back(newOne);
 		}
+
 		for (int j = 0; j < NUM_THREADS; ++j)
 		{
-			individualFutureVec[j] = async(std::launch::async,runIndividual,simRes[j],bls[i+j]);
+            individualFutureVec[j] = async(std::launch::async,runIndividual,simRes[j],dnaVec[i+j], fitnessPolicy);
 		}
 		for (int j = 0; j < NUM_THREADS; ++j)
 		{
@@ -122,7 +124,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
 	std::uniform_int_distribution<size_t> distribution1(0,mPopulation.size()-1);
 	std::uniform_int_distribution<int> distribution2(0,1);
 
-	auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> shared_ptr<BuildList>
+    auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> vector<string>
 	{
 
 		auto chooseIndividual = std::bind(distribution1, generator1);
@@ -191,7 +193,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
 			positions.clear();
 
 		} while(!(techManager.isBuildListPossible(newGenes)));
-		return std::make_shared<BuildList>(newGenes);
+        return newGenes;
 	};
 
 	FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
@@ -212,7 +214,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string t
 	std::uniform_int_distribution<size_t> popDist(0,mPopulation.size()-1);
 
 
-	auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> shared_ptr<BuildList>
+    auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> vector<string>
 	{
 
 		auto chooseIndividual = std::bind(popDist, popGen);
@@ -238,7 +240,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string t
 			}
 		} while(!(techManager.isBuildListPossible(newGenes)));
 
-		return std::make_shared<BuildList>(newGenes);
+        return newGenes;
 	};
 
 
@@ -282,7 +284,7 @@ BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(const int accu
 
 
 /*initializes the population with random individuals until the population size reaches initPopSize*/
-	template <class RacePolicy, class FitnessPolicy>
+template <class RacePolicy, class FitnessPolicy>
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(const string target, const int ntargets, const int timeLimit, const int initPopSize)
 {
 
@@ -308,11 +310,11 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(const string targ
 		return;
 	}
 
-	auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> shared_ptr<BuildList>
+    auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> vector<string>
 	{
 		BuildListGenerator<RacePolicy> buildListGen(techManager.getTechnologyList());
 		buildListGen.initRandomGenerator();
-		return buildListGen.buildOneRandomList(mIndividualSize);
+        return buildListGen.buildOneRandomList(mIndividualSize)->getAsVector();
 	};
 
 	const int nindividuals = initPopSize-mPopulation.size();
@@ -325,14 +327,14 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(const string targ
 
 
 /* clears the whole population by terminating (sic!) all individuals */
-	template <class RacePolicy, class FitnessPolicy>
+template <class RacePolicy, class FitnessPolicy>
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::clear(void)
 {
 	mPopulation.clear();
 }
 
 /* optimizes a buildList by mutating, crossing over and selecting the fittest individuals */
-	template <class RacePolicy, class FitnessPolicy>
+template <class RacePolicy, class FitnessPolicy>
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(const string target, const int ntargets, const int timeLimit, const int generations, const int reproductionRate, const int mutationRate, const int selectionRate)
 {
 	if(!mTechManager.technologyExists(target))

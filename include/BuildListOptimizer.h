@@ -108,7 +108,7 @@ private:
     inline void select(int selectionRate);
 
 
-    inline void generateAndRate(const string target, FitnessPolicy& fitnessPolicy, const int nindividuals, std::function<shared_ptr<BuildList>(TechnologyManager<RacePolicy>)> genBuildList, const int timeLimit);
+    inline void generateAndRate(const string target, FitnessPolicy& fitnessPolicy, const int nindividuals, std::function<vector<string>(TechnologyManager<RacePolicy>)> genBuildList, const int timeLimit);
 
 public:
 
