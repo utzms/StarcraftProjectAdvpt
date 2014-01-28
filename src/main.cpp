@@ -59,14 +59,14 @@ int main(int argc, char *argv[])
 	size_t a=25;
         BuildListOptimizer<Protoss,Debug> opt(100,a);
         auto startTime = std::chrono::system_clock::now().time_since_epoch().count();
-        opt.initialize("Zealot",10,500000,100);
+        opt.initialize("Zealot",10,500000,1000);
         //std::cout << "Size of the population: " << opt.getPopulationSize() << std::endl;
         //std::cout << opt.getFittestIndividual();
-        opt.optimize("Zealot",10,1000000,1,20,20,80);
+        opt.optimize("Zealot",10,1000000,5,20,20,75);
         auto endTime =  std::chrono::system_clock::now().time_since_epoch().count();
         std::cout << "Initialize required the following time to run: " << endTime-startTime << std::endl;
         std::cout << "Size of the population: " << opt.getPopulationSize() << std::endl;
-        std::cout << opt.getFittestIndividual();
+        std::cout << opt.getFittestGroup(5);
 	return  0;
 }
 
