@@ -547,6 +547,7 @@ std::string TechnologyList::getRandomTechnology()
 {
 	//unsigned int num = randomEngine()%techNames.size();
 	//return techNames[num];
+    randomEngine = std::minstd_rand0(std::chrono::system_clock::now().time_since_epoch().count());
     const int end = uniformDist(randomEngine);
     auto it = techSet.begin();
     for(int i = 0; i < end; ++i)

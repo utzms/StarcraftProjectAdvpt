@@ -14,6 +14,7 @@
 #include <cstdlib>
 #include <set>
 #include <future>
+#include <thread>
 #include <functional>
 #include <iostream>
 
@@ -70,10 +71,12 @@ struct Individual
 
 inline std::ostream& operator<<(std::ostream& out, const Individual& ind)
 {
+    int count = -1;
     for(string gene : ind.genes)
     {
-        out << gene << std::endl;
+        out << std::to_string(++count) << ":" << gene << "\t\t";
     }
+    out << std::endl;
     out << "Score: " << ind.hardSkills << "\t-\t" << ind.softSkills << std::endl;
     return out;
 }
