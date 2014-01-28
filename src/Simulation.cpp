@@ -11,12 +11,6 @@
  *
  */
 
-inline void temp()
-{
-	Simulation<Protoss> sim1("bla");
-	Simulation<Zerg> sim2("bli");
-	Simulation<Terran> sim3("bluuuuub");
-}
 
 	template <class RacePolicy>
 void Simulation<RacePolicy>::buildBuilding(std::shared_ptr<Worker> workerForBuilding, std::string name ,int time)

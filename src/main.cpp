@@ -1,9 +1,8 @@
 
-#define NUM_THREADS 5
-
-#include "RacePolicy.h"
-#include "FitnessPolicy.h"
-#include "BuildListOptimizer.cpp"
+#include "../include/RacePolicy.h"
+#include "../include/FitnessPolicy.h"
+#include "../include/BuildListOptimizer.h"
+#include "../include/TemplateInstantiations.h"
 #include <chrono>
 
 #include <stdexcept>

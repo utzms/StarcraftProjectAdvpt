@@ -1,13 +1,7 @@
-#include "BuildListGenerator.h"
+#include "../include/BuildListGenerator.h"
 
 //do never ever ever call this function, its only for the compiler
 //This way we force the compiler to evaluate Templates!
-inline void funny()
-{
-	BuildListGenerator<Protoss> bla();
-	BuildListGenerator<Terran> blab();
-	BuildListGenerator<Zerg> blabla();
-}
 
 template <class RacePolicy>
 BuildListGenerator<RacePolicy>::BuildListGenerator()
