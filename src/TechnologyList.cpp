@@ -502,7 +502,7 @@ std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 void TechnologyList::initRandomGenerator(size_t seed, std::string SpecialOne, int weight)
 {
 	PROGRESS("RandomGenerator INIT");
-    /*
+
     for(auto &it : units)
     {
         if (techNames.size()>0)
@@ -531,7 +531,7 @@ void TechnologyList::initRandomGenerator(size_t seed, std::string SpecialOne, in
             techNames.push_back(it.second->getName());
         }
     }
-    */
+
 
     randomEngine = std::minstd_rand0(seed);
 	if (!(initialized))
@@ -539,14 +539,13 @@ void TechnologyList::initRandomGenerator(size_t seed, std::string SpecialOne, in
 		std::cerr << "TechList not yet initialized, cant create RandomEngine" << std::endl;
 		return;
 	}
-    //uniformDist = std::uniform_int_distribution<int>(0,techNames.size()-1);
-    uniformDist = std::uniform_int_distribution<int>(0,techSet.size()-1);
+    uniformDist = std::uniform_int_distribution<int>(0,techNames.size()-1);
+    //uniformDist = std::uniform_int_distribution<int>(0,techSet.size()-1);
 }
 
 std::string TechnologyList::getRandomTechnology()
 {
-	//unsigned int num = randomEngine()%techNames.size();
-	//return techNames[num];
+    /*
     randomEngine = std::minstd_rand0(std::chrono::system_clock::now().time_since_epoch().count());
     const int end = uniformDist(randomEngine);
     auto it = techSet.begin();
@@ -555,6 +554,8 @@ std::string TechnologyList::getRandomTechnology()
         ++it;
     }
     return *it;
+    */
+    return techNames[uniformDist(randomEngine)];
 }
 
 std::shared_ptr<Technology> TechnologyList::findTechnology(std::string key)

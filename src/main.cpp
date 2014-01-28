@@ -73,10 +73,10 @@ int main(int argc, char *argv[])
 {
     //oldCall(argc, argv);
         const int individualSize = 30;
-        const int selectionRate = 65;
-        const int mutationRate = 10;
-        const int reproductionRate = 20;
-        const int initPopSize = 100000;
+        const int selectionRate = 60;
+        const int mutationRate = 15;
+        const int reproductionRate = 25;
+        const int initPopSize = 10000;
         const int generations = 50;
         const int accuracy = 100;
         std::cout << "The optimization is done with the following rates:" << std::endl;
