@@ -75,10 +75,10 @@ int main(int argc, char *argv[])
         BuildListOptimizer<Protoss,Push> opt(100,a);
         auto startTime = std::chrono::system_clock::now().time_since_epoch().count();
 		try{
-        opt.initialize("Zealot",30,500000,77777);
+        opt.initialize("Zealot",10,1000000,100);
         //std::cout << "Size of the population: " << opt.getPopulationSize() << std::endl;
         //std::cout << opt.getFittestIndividual();
-        opt.optimize("Zealot",10,1000000,1,10,10,10);
+        opt.optimize("Zealot",10,1000000,2,10,10,10);
 		} catch(std::exception &e)
 		{
 			std::cerr << "Fehler\t" <<e.what();

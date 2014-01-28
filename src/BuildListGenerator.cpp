@@ -3,6 +3,7 @@
 //do never ever ever call this function, its only for the compiler
 //This way we force the compiler to evaluate Templates!
 
+
 template <class RacePolicy>
 BuildListGenerator<RacePolicy>::BuildListGenerator()
 {
@@ -38,8 +39,10 @@ bool BuildListGenerator<RacePolicy>::checkBuildListPossibility(std::vector<std::
 template <class RacePolicy>
 void BuildListGenerator<RacePolicy>::initRandomGenerator(std::string SpecialOne, int weight)
 {
-	size_t tmp = std::chrono::system_clock::now().time_since_epoch().count();
-    //std::cout << "For Debug Purpose: BuildListGenerator-Seed: " << tmp << std::endl;
+    size_t tmp = std::chrono::system_clock::now().time_since_epoch().count();
+#ifdef DEBUG
+    std::cerr << "For Debug Purpose: BuildListGenerator-Seed: " << tmp << std::endl;
+#endif
     copyFrom.initRandomGenerator(tmp,SpecialOne,weight);
 }
 

@@ -34,12 +34,11 @@ class InitTechTree : private TechTree
 #endif
 					tech->initBuildingList(TechTree::buildingPath2());
                     tech->initUnitList(TechTree::unitPath2());
-                    tech->initTechnologySet();
                 }
                 else
 				{
 					tech->initUnitList(TechTree::unitPath1()); 
-                    tech->initTechnologySet();
+
                 }
 				if (!(tech->isInitialized()))
 					return false;

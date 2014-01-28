@@ -28,45 +28,69 @@ class TechnologyManager : private RacePolicy
 {
 
 private:
-    std::shared_ptr<GameState> _gameState;
-    TechnologyList _techList;
-    std::map<std::string,int> existenceMap;
+    std::shared_ptr<GameState> mGameState;
+    TechnologyList mTechList;
+    std::map<std::string,int> mExistenceMap;
 
-    inline void initializeExistence(void)
+    inline void addExistenceEntries(void)
     {
-        const auto& initBuildings = _techList.findBuildingVec(RacePolicy::getMainBuilding());
-        const auto& initUnits = _techList.findUnitVec(RacePolicy::getWorker());
-        const auto& specialResources = _techList.findUnitVec(RacePolicy::getSpecialResource());
-        for (const auto res : specialResources)
+        const auto& techSet = mTechList.getTechnologySet();
+        if(techSet.size() <= 0)
         {
-            existenceMap.find(res->getName())->second = INT_MAX;
+            throw std::logic_error("@TechnologyManager::addExistenceEntries: There are currently no entries to add!");
         }
-        for (const auto building : initBuildings)
+        for(std::string name : techSet)
         {
-            existenceMap[building->getName()] = 1;
-        }
-        for (const auto unit : initUnits)
-        {
-            existenceMap[unit->getName()] = 6;
+            mExistenceMap.emplace(name,0);
         }
     }
 
+    inline void initializeExistence(void)
+    {
+        if(mExistenceMap.size() <= 0)
+        {
+            throw std::logic_error("@TechnologyManager::initializeExistence: Empty existenceMap, nothing to initialize");
+        }
+        const auto& initBuildings = mTechList.findBuildingVec(RacePolicy::getMainBuilding());
+        const auto& initUnits = mTechList.findUnitVec(RacePolicy::getWorker());
+        const auto& initSpecials = mTechList.findUnitVec(RacePolicy::getSpecialResource());
+        for (const auto special : initSpecials)
+        {
+            mExistenceMap[special->getName()] = INT_MAX;
+        }
+        for (const auto building : initBuildings)
+        {
+            mExistenceMap[building->getName()] = 1;
+        }
+        for (const auto unit : initUnits)
+        {
+            mExistenceMap[unit->getName()] = 6;
+        }
+    }
+
+    inline void constructExistenceMap()
+    {
+        addExistenceEntries();
+        initializeExistence();
+    }
+
+
     inline void resetExistence(void)
     {
-        for(auto it = existenceMap.begin(); it != existenceMap.end(); ++it)
+        for(auto it = mExistenceMap.begin(); it != mExistenceMap.end(); ++it)
         {
-            it->second;
+            it->second = 0;
         }
     }
 
     inline bool checkTechnologyCosts(std::shared_ptr<Technology> technology)
     {
-        if(technology->getMineralsCost() > _gameState->getMinerals() ||
-                technology->getGasCost() > _gameState->getGas() )
+        if(technology->getMineralsCost() > mGameState->getMinerals() ||
+                technology->getGasCost() > mGameState->getGas() )
         {
             return false;
         }
-        else if(!checkIfNameIsBuilding(technology->getName()) && technology->getSupplyCost() > _gameState->getAvailableSupply())
+        else if(!checkIfNameIsBuilding(technology->getName()) && technology->getSupplyCost() > mGameState->getAvailableSupply())
         {
             return false;
         }
@@ -82,48 +106,41 @@ private:
         return false;
     }
 
+    inline void initTechnologyList(void)
+    {
+        if(!InitTechTree<RacePolicy>(&mTechList).initTechTree())
+        {
+            throw std::runtime_error("@TechnologyManager::initTechnologyListTechnologyList: initTechTree failed, something went terribly wrong!");
+        }
+        mTechList.initTechnologySet();
+    }
+
 public:
 
 
     TechnologyManager(std::shared_ptr<GameState> initialGameState)
-        :_gameState(initialGameState)
+        :mGameState(initialGameState)
     {
         //PROGRESS("TM Constructor");
-        if(!_gameState)
+        if(!mGameState)
         {
             throw std::invalid_argument("Can not pass nullptr as initial argument");
         }
-        if(!InitTechTree<RacePolicy>(&_techList).initTechTree())
-        {
-            throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
-        }
-        auto techNames = _techList.getTechnologySet();
-        for(auto name : techNames)
-        {
-            existenceMap.insert(std::pair<std::string,int>(name,0));
-
-        }
-        initializeExistence();
+        initTechnologyList();
+        constructExistenceMap();
 
         PROGRESS("TechnologyManager: Constructor with GameState as argument");
     }
 
     TechnologyManager(std::shared_ptr<GameState> initialGameState, const TechnologyList& techList)
-        :_gameState(initialGameState)
+        :mGameState(initialGameState)
     {
-        if(!_gameState)
+        if(!mGameState)
         {
             throw std::invalid_argument("Can not pass nullptr as initial argument");
         }
-        _techList = techList;
-        auto techNames = _techList.getTechnologySet();
-        for(std::string name : techNames)
-        {
-
-            std::cout << name << std::endl;
-            existenceMap.insert(std::pair<std::string,int>(name,0));
-        }
-        initializeExistence();
+        mTechList = techList;
+        constructExistenceMap();
 
         PROGRESS("TechnologyManager: Constructor with TechnologyList and GameState as argument");
 
@@ -132,14 +149,9 @@ public:
     //only for BuildListGenerator designed
     TechnologyManager(TechnologyList &techList)
     {
-        _techList = techList;
-        _gameState = std::make_shared<GameState>();
-        auto techNames = _techList.getTechnologySet();
-        for(std::string name : techNames)
-        {
-            existenceMap.insert(std::pair<std::string,int>(name,0));
-        }
-        initializeExistence();
+        mTechList = techList;
+        mGameState = std::make_shared<GameState>();
+        constructExistenceMap();
 
         PROGRESS("TechnologyManager: Constructor with Technology List as argument");
     }
@@ -147,14 +159,9 @@ public:
     //only for BuildListGenerator designed
     TechnologyManager(const TechnologyList &techList)
     {
-        _techList = techList;
-        _gameState = std::make_shared<GameState>();
-        auto techNames = _techList.getTechnologySet();
-        for(std::string name : techNames)
-        {
-            existenceMap.insert(std::pair<std::string,int>(name,0));
-        }
-        initializeExistence();
+        mTechList = techList;
+        mGameState = std::make_shared<GameState>();
+        constructExistenceMap();
 
         PROGRESS("TechnologyManager: Constructor with Technology List as argument");
     }
@@ -165,9 +172,9 @@ public:
 
     TechnologyManager(TechnologyManager<RacePolicy>& techManager)
     {
-        _techList = techManager._techList;
-        _gameState = techManager._gameState;
-        existenceMap = techManager.existenceMap;
+        mTechList = techManager.mTechList;
+        mGameState = techManager.mGameState;
+        mExistenceMap = techManager.mExistenceMap;
         resetExistence();
         initializeExistence();
 
@@ -176,9 +183,10 @@ public:
 
     TechnologyManager(const TechnologyManager<RacePolicy>& techManager)
     {
-        _techList = techManager._techList;
-        _gameState = techManager._gameState;
-        existenceMap = techManager.existenceMap;
+        mTechList = techManager.mTechList;
+        mGameState = techManager.mGameState;
+        mExistenceMap = techManager.mExistenceMap;
+        mExistenceMap = techManager.mExistenceMap;
         resetExistence();
         initializeExistence();
 
@@ -189,17 +197,11 @@ public:
     //Standard Constructor
     TechnologyManager()
     {
-        if(!InitTechTree<RacePolicy>(&_techList).initTechTree())
-        {
-            throw std::runtime_error("TechnologyList initialization failed. Something went terribly wrong!");
-        }
-        _gameState = std::make_shared<GameState>();
-        auto techNames = _techList.getTechnologySet();
-        for(std::string name : techNames)
-        {
-            existenceMap[name] = 0;
-        }
-        initializeExistence();
+        initTechnologyList();
+        mGameState = std::make_shared<GameState>();
+
+        constructExistenceMap();
+
         PROGRESS("TechnologyManager: Standard Constructor");
     }
 
@@ -228,20 +230,20 @@ public:
     }
     inline std::vector< std::shared_ptr<Technology> > findTechnology(std::string entityName)
     {
-        const auto& technology = _techList.findBuilding(entityName);
+        const auto& technology = mTechList.findBuilding(entityName);
         if(technology == nullptr)
         {
-            return _techList.findUnitVec(entityName);
+            return mTechList.findUnitVec(entityName);
         }
         else
         {
-            return _techList.findBuildingVec(entityName);
+            return mTechList.findBuildingVec(entityName);
         }
     }
 
     bool technologyExists(std::string name)
     {    
-        return existenceMap.count(name) > 0 ? true : false;
+        return mExistenceMap.count(name) > 0 ? true : false;
     }
 
     inline bool isZerg()
@@ -253,7 +255,7 @@ public:
 
     const TechnologyList& getTechnologyList()
     {
-        return _techList;
+        return mTechList;
     }
 
 
@@ -336,8 +338,9 @@ public:
 
     void printAll()
     {
-        _techList.printAll();
+        mTechList.printAll();
     }
+
     bool isBuildListPossible(std::vector<std::string> buildList)
     {
         resetExistence();
@@ -397,12 +400,12 @@ public:
      */
     void notifyCreation(std::string entityName)
     {
-        if(existenceMap.count(entityName) == 0)
+        if(mExistenceMap.count(entityName) == 0)
         {
             throw std::invalid_argument("@TechnologyManager::notifiyCreation: "+entityName+" is not part of the tech tree.");
         }
 
-        auto it = existenceMap.find(entityName);
+        auto it = mExistenceMap.find(entityName);
         if(it->second < 0)
         {
             throw std::range_error("@TechnologyManager::notifyCreation: The internal existence count for "+entityName+" reached a negative value. Something went terribly wrong");
@@ -413,12 +416,12 @@ public:
 
     void notifyDestruction(std::string entityName)
     {
-        if(existenceMap.count(entityName) == 0)
+        if(mExistenceMap.count(entityName) == 0)
         {
             throw std::invalid_argument("@TechnologyManager::notifiyCreation: "+entityName+" is not part of the tech tree.");
         }
 
-        auto it = existenceMap.find(entityName);
+        auto it = mExistenceMap.find(entityName);
         if(it->second <= 0)
         {
             throw std::range_error("@TechnologyManager::notifyDestruction: The internal existence count for "+entityName+" reached a negative value. Something went terribly wrong");
@@ -433,7 +436,7 @@ public:
     {
         bool result = false;
 
-        auto technology = _techList.findBuilding(entityName);
+        auto technology = mTechList.findBuilding(entityName);
         if(technology != nullptr)
         {
             result = true;
@@ -446,7 +449,7 @@ public:
     {
         bool result = false;
 
-        auto technology = _techList.findUnit(entityName);
+        auto technology = mTechList.findUnit(entityName);
         if(technology != nullptr)
         {
             result = true;
@@ -461,11 +464,11 @@ public:
 
         if (checkIfNameIsBuilding(entityName))
         {
-            technology = _techList.findBuilding(entityName);
+            technology = mTechList.findBuilding(entityName);
         }
         else if (checkIfNameIsUnit(entityName))
         {
-            technology = _techList.findUnit(entityName);
+            technology = mTechList.findUnit(entityName);
         }
         else
         {
@@ -481,7 +484,7 @@ public:
 
         if (checkIfNameIsUnit(unitName))
         {
-            technology = _techList.findUnit(unitName);
+            technology = mTechList.findUnit(unitName);
         }
         else
         {
@@ -508,12 +511,12 @@ public:
     bool entityExists(std::string name)
     {
 
-        if(existenceMap.count(name) == 0)
+        if(mExistenceMap.count(name) == 0)
         {
             throw std::invalid_argument("@TechnologyManager::entityExists: "+name+" is not part of the tech tree.");
         }
 
-        auto it = existenceMap.find(name);
+        auto it = mExistenceMap.find(name);
         if(it->second < 0)
         {
             throw std::range_error("@TechnologyManager::entityExists: The internal existence count for "+name+" reached a negative value. Something went terribly wrong");
@@ -529,12 +532,12 @@ public:
 
     std::string getRandomTechnologyName()
     {
-            return _techList.getRandomTechnology();
+            return mTechList.getRandomTechnology();
     }
 
-    std::map<std::string,int> getExistenceMap()
+    std::map<std::string,int> getmExistenceMap()
     {
-        return existenceMap;
+        return mExistenceMap;
     }
 
 
