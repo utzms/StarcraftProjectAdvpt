@@ -3,7 +3,6 @@
 #include "../include/FitnessPolicy.h"
 #include "../include/TemplateInstantiations.h"
 #include <chrono>
-#include <chrono>
 
 #include <stdexcept>
 
@@ -52,39 +51,22 @@ int oldCall(int argc, char **argv)
 	return 1;
 }
 
-void testTechList()
-{
-	TechnologyList a;
-	InitTechTree<Protoss>(&a).initTechTree();
-	TechnologyList b = a;
-
-	a.printAll();
-	b.printAll();
-
-	auto t = a.findUnit("Probe");
-	t->setExistence(1);
-	a.printAll();
-	b.printAll();
-}
 
 
 int main(int argc, char *argv[])
 {
     //oldCall(argc, argv);
-	size_t a=50;
+	size_t a=25;
         BuildListOptimizer<Protoss,Debug> opt(100,a);
         auto startTime = std::chrono::system_clock::now().time_since_epoch().count();
-        opt.initialize("Zealot",10,500000,100);
+        opt.initialize("Zealot",10,1000000,200);
         //std::cout << "Size of the population: " << opt.getPopulationSize() << std::endl;
         //std::cout << opt.getFittestIndividual();
-        opt.optimize("Zealot",10,1000000,1,20,20,80);
+        opt.optimize("Zealot",10,1000000,5,20,20,75);
         auto endTime =  std::chrono::system_clock::now().time_since_epoch().count();
-
-        std::cout << "Required the following time to run: " << (endTime-startTime)*std::chrono::system_clock::period::num/std::chrono::system_clock::period::den << "s" << std::endl;
+        std::cout << "Initialize required the following time to run: " << endTime-startTime << std::endl;
         std::cout << "Size of the population: " << opt.getPopulationSize() << std::endl;
-        std::cout << opt.getFittestIndividual();
-	//testTechList();
-
+        std::cout << opt.getFittestGroup(5);
 	return  0;
 }
 

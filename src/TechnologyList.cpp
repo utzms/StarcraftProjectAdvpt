@@ -365,19 +365,19 @@ void TechnologyList::initTechnologySet()
 {
     if(units.size() == 0)
     {
-        throw std::invalid_argument("List of units not yet initialized!");
+        throw std::invalid_argument("@TechnologyList::initTechSet: List of units not yet initialized");
     }
     if(buildings.size() == 0)
     {
-        throw std::invalid_argument("List of buildings not yet initialized!");
+        throw std::invalid_argument("@TechnologyList::initTechSet: List of buildings not yet initialized!");
     }
-    for(const auto& unit : units)
+    for(const std::pair<std::string, std::shared_ptr<Technology>>& unit : units)
     {
-        techSet.insert(unit.first);
+        techSet.emplace(unit.first);
     }
-    for(const auto& building : buildings)
+    for(const std::pair<std::string, std::shared_ptr<Technology>>& building : buildings)
     {
-        techSet.insert(building.first);
+        techSet.emplace(building.first);
     }
 }
 
@@ -538,14 +538,15 @@ void TechnologyList::initRandomGenerator(size_t seed, std::string SpecialOne, in
 		std::cerr << "TechList not yet initialized, cant create RandomEngine" << std::endl;
 		return;
 	}
-	uniformDist = std::uniform_int_distribution<int>(0,techNames.size()-1);
+    uniformDist = std::uniform_int_distribution<int>(0,techNames.size()-1);
 }
 
 std::string TechnologyList::getRandomTechnology()
 {
 	//unsigned int num = randomEngine()%techNames.size();
 	//return techNames[num];
-	return techNames[uniformDist(randomEngine)];
+
+    return techNames[uniformDist(randomEngine)];
 }
 
 std::shared_ptr<Technology> TechnologyList::findTechnology(std::string key)

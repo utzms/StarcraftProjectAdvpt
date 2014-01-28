@@ -24,10 +24,6 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
     */
     vector<shared_ptr<BuildList>> bls(nindividuals);
 
-    #ifdef DEBUG
-    int threadFailures = 0;
-    #endif
-
     /*
     for(int i = 0; i < nindividuals; ++i)
     {
@@ -46,10 +42,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
         {
         */
             bls[i] = genBuildList(mTechManager);
-            #ifdef DEBUG
-            std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
-            ++threadFailures;
-            #endif
+
         //}
 
         //resultFutureVec[i] = async(runSimulation, bls[i]);
@@ -67,18 +60,13 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
         {
         */
             simRes = runSimulation(bls[i]);
-            #ifdef DEBUG
-            std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
-            ++threadFailures;
-            #endif
+
         //}
 
         Individual newOne(fitnessPolicy.rateBuildListHard(simRes), fitnessPolicy.rateBuildListSoft(simRes, RacePolicy::getWorker(), mTechManager.getEntityRequirements(target)), bls[i]->getAsVector());
         mPopulation.push_back(newOne);
     }
-    #ifdef DEBUG
-    std::cerr << "Failed to start thread for " << std::to_string(threadFailures) << " times." << std::endl;
-    #endif
+
 }
 
 template <class RacePolicy, class FitnessPolicy>
@@ -331,7 +319,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(const string target
         crossover(target, ntargets, timeLimit, reproductionRate);
         sortPopulation();
 
-        PROGRESS("Size of the population after " << std::to_string(i) << " generation(s): " << mPopulation.size() << std::endl);
+        std::cerr << "Size of the population after " << std::to_string(i+1) << " generation(s): " << mPopulation.size() << std::endl;
     }
 
 }
