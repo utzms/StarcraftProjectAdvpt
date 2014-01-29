@@ -72,9 +72,10 @@ struct Individual
 
 inline std::ostream& operator<<(std::ostream& out, const Individual& ind)
 {
+    int count = 0;
     for(string gene : ind.genes)
     {
-        out << gene << std::endl;
+        out << ++count << ":" << gene << std::endl;
     }
     out << "Score: " << ind.hardSkills << "\t-\t" << ind.softSkills << std::endl;
     return out;

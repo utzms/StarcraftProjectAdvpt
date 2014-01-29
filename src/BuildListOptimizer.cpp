@@ -103,7 +103,14 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
         std::hash<string> hashGen;
         set<size_t> positions;
         vector<string> newGenes;
+        int count = 0;
+
         do {
+            if(++count > 1000)
+            {
+                return std::make_shared<BuildList>(mPopulation[chooseIndividual()].genes);
+            }
+
             do
             {
                 positions.insert(chooseIndividual());
@@ -193,8 +200,13 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string t
 
         const Individual& oldInd = mPopulation[chooseIndividual()];
         vector<string> newGenes;
+        int count = 0;
         do
         {
+            if(++count > 1000)
+            {
+                return std::make_shared<BuildList>(mPopulation[chooseIndividual()].genes);
+            }
             newGenes = oldInd.genes;
             std::uniform_int_distribution<size_t> geneDist(0,newGenes.size()-1);
             auto chooseGene = std::bind(geneDist, geneGen);
@@ -330,8 +342,8 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(const string target
         mutate(target, ntargets, timeLimit, mutationRate);
         crossover(target, ntargets, timeLimit, reproductionRate);
         sortPopulation();
-
-        PROGRESS("Size of the population after " << std::to_string(i) << " generation(s): " << mPopulation.size() << std::endl);
+        std::cout << "Size of the population after " << std::to_string(i+1) << " generation(s): " << std::to_string(mPopulation.size()) << std::endl;
+        PROGRESS("Size of the population after " << std::to_string(i+1) << " generation(s): " << mPopulation.size() << std::endl);
     }
 
 }
