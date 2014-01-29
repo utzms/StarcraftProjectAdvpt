@@ -19,7 +19,8 @@ class Building
         {
             UnderConstruction,
             Ready,
-            Producing
+            Producing,
+			ProducingDouble
         };
 
 		enum class UpgradeState

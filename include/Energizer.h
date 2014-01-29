@@ -63,6 +63,9 @@ class Energizer
                     {
                         if ((buildingIterator->getName().compare("OrbitalCommand") == 0))
                         {
+							// Orbital Command starts out with 50 energy
+							_energy += 50.f;
+
                             _energyLimit = 200.f;
                             if (_energy < _energyLimit)
                             {
@@ -78,6 +81,9 @@ class Energizer
                     {
                         if ((unitIterator->getName().compare("Queen") == 0))
                         {
+							// Queen starts out with 50 energy
+							_energy += 50.f;
+
                             _energyLimit = 200.f;
                             if (_energy < _energyLimit)
                             {
@@ -114,7 +120,8 @@ class Energizer
 
                     if (_muleTimer > 0)
                     {
-                        _gameState->addMinerals(2.67f);
+						// Project1-Description: "roughly 4 times the yield of a SCV"
+                        _gameState->addMinerals(2.8f);
                         _muleTimer--;
                     }
                 }
@@ -122,10 +129,23 @@ class Energizer
                 {
                     if (_energy >= 25.f && _queenTimer == 0)
                     {
-                        // decrease energy
-                        _energy -= 25.f;
-                        _queenTimer = 40;
-                        PROGRESS("GSU Queen timer started");
+						int larvaCount = 0;
+						for (auto unitIterator : _gameState->unitList)
+						{
+							if ((unitIterator->getName().compare("Larva") == 0))
+							{
+								larvaCount++;
+							}
+						}
+
+						if (larvaCount < 19)
+						{
+							// start the larva injection process
+							// decrease energy
+							_energy -= 25.f;
+							_queenTimer = 40;
+							PROGRESS("GSU Queen timer started");
+						}
                     }
 
                     if(_queenTimer > 0)
@@ -133,17 +153,28 @@ class Energizer
                         // decrease queenTimer
                         _queenTimer--;
                         // spawn larva
-                        if( _queenTimer == 0 )
+                        if(_queenTimer == 0)
                         {
                             PROGRESS("GSU Larvas injected by Queen");
-                            _gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
-                            _gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
-                            _gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
-                            _gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
-                            _technologyManager->notifyCreation("Larva");
-                            _technologyManager->notifyCreation("Larva");
-                            _technologyManager->notifyCreation("Larva");
-                            _technologyManager->notifyCreation("Larva");
+
+							// now we have to ensure the 19 larvae limit
+							// first count larvae
+							int larvaCount = 0;
+							for (auto unitIterator : _gameState->unitList)
+							{
+								if ((unitIterator->getName().compare("Larva") == 0))
+								{
+									larvaCount++;
+								}
+							}
+
+							int injectionCount = 0;
+							while (larvaCount < 19 && injectionCount < 4)
+							{
+								_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
+								_technologyManager->notifyCreation("Larva");
+								injectionCount++;
+							}
                          }
                     }
                 }

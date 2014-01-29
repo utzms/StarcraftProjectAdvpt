@@ -51,7 +51,7 @@ private:
 
         void buildBuilding(std::shared_ptr<Worker> workerForBuilding, std::string name ,int time);
 
-        void produceUnit(std::shared_ptr<Building> buildingForProduction, std::string unitName, int time,Building::ProductionType type);
+        void produceUnit(std::shared_ptr<Building> buildingForProduction, std::string unitName, int time,Building::ProductionType type, bool doubleProduction = false);
 
         void removeUnit(std::shared_ptr<Unit> unitForRemoval, std::string unitName);
         void removeWorker(std::shared_ptr<Worker> unitForRemoval, std::string unitName);

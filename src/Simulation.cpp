@@ -27,13 +27,21 @@ void Simulation<RacePolicy>::buildBuilding(std::shared_ptr<Worker> workerForBuil
 }
 
 	template <class RacePolicy>
-void Simulation<RacePolicy>::produceUnit(std::shared_ptr<Building> buildingForProduction, std::string unitName, int time,Building::ProductionType type)
+void Simulation<RacePolicy>::produceUnit(std::shared_ptr<Building> buildingForProduction, std::string unitName, int time,Building::ProductionType type, bool doubleProduction)
 {
     _energizer->handleBoost(buildingForProduction);
 	buildingForProduction->productionType = type;
 	buildingForProduction->productionUnitName = unitName;
 	buildingForProduction->timer = time;
-	buildingForProduction->state = Building::State::Producing;
+
+	if (!doubleProduction)
+	{
+		buildingForProduction->state = Building::State::Producing;
+	}
+	else
+	{
+		buildingForProduction->state = Building::State::ProducingDouble;
+	}
 }
 
 template <class RacePolicy>
@@ -563,8 +571,6 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 				}
 				else if (_technologyManager->checkIfNameIsUnit(currentItem))
 				{
-					// it is a unit, so we need to decide if it is a 
-					// worker or another unit
 					PROGRESS("Simulation::run() Trying unit " << currentItem);
 
 					// get the buildings this unit can be built from
@@ -627,21 +633,75 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 					// if a building is ready, we produce a unit
 					else if (buildingReady)
 					{
+						bool doubleProduction = false;
+						bool doubleProductionRequirements = false;
+
+						// here comes the special case for producing two units simultaneously in a reactor-building for the terrans
+						if (RacePolicy::getRace() == RaceType::Terran)
+						{
+							// we are terrans
+
+							// first see if it is a reactor building
+							// if not we dont need to bother
+							if (currentItem.find("Reactor") != std::string::npos)
+							{
+								// check next item in buildList
+								// for this we need to extract the whole list and find the current item
+								std::vector<std::string> currentList = _buildList->getAsVector();
+								std::vector<std::string>::const_iterator currentItemIterator = std::find(currentList.begin(), currentList.end(), currentItem);
+
+								if (currentItemIterator != currentList.end())
+								{
+									currentItemIterator++;
+
+									if (currentItemIterator != currentList.end())
+									{
+										if (currentItem.compare(*currentItemIterator) == 0)
+										{
+											// we now know that there are 2 identical units after each other in the build list
+											// and we have a reactor building
+											// so we can produce both
+											doubleProduction = true;
+										}
+									}
+								}
+							}
+						}
+
 						// reduce minerals and gas by costs
 						_gameState->subMinerals(entityCosts.minerals);
 						_gameState->subGas(entityCosts.gas);
+						
+						if (doubleProduction)
+						{
+							Costs nextCosts = _technologyManager->getEntityCosts(currentItem);
 
-						// this way is temporary, maybe we find a nice
-						// design to do this better
+							if (_gameState->getGas() >= nextCosts.gas &&
+								_gameState->getMinerals() >= nextCosts.minerals &&
+								_gameState->getAvailableSupply() >= nextCosts.supply * 2)
+							{
+								std::cout << "Double Production!" << std::endl;
+								// we can produce the second unit
+								doubleProductionRequirements = true;
+
+								_gameState->subMinerals(entityCosts.minerals);
+								_gameState->subGas(entityCosts.gas);
+
+								_buildList->setCurrentItemOk();
+								_buildList->advance();
+								resultMap[time+1] = currentItem;
+							}
+						}
+
 						if ((currentItem.compare(RacePolicy::getWorker()) == 0))
 						{
-							produceUnit(buildingForProduction, currentItem, entityCosts.buildTime, Building::ProductionType::WorkerOrder);
+							produceUnit(buildingForProduction, currentItem, entityCosts.buildTime, Building::ProductionType::WorkerOrder, doubleProduction && doubleProductionRequirements);
 						}
 						else
 						{
-							produceUnit(buildingForProduction, currentItem, entityCosts.buildTime, Building::ProductionType::UnitOrder);
+							produceUnit(buildingForProduction, currentItem, entityCosts.buildTime, Building::ProductionType::UnitOrder, doubleProduction && doubleProductionRequirements);
 						}
-
+						
 						_buildList->setCurrentItemOk();
 						//std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
