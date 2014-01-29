@@ -373,11 +373,17 @@ void TechnologyList::initTechnologySet()
     }
     for(const std::pair<std::string, std::shared_ptr<Technology>>& unit : units)
     {
+        /* currently not supported in the g++ version installed at Huber-CIP
         techSet.emplace(unit.first);
+        */
+        techSet.insert(unit.first);
     }
     for(const std::pair<std::string, std::shared_ptr<Technology>>& building : buildings)
     {
+        /* currently not supported in the g++ version installed at Huber-CIP
         techSet.emplace(building.first);
+        */
+        techSet.insert(building.first);
     }
 }
 
@@ -428,7 +434,7 @@ std::shared_ptr<Technology> TechnologyList:: findBuilding(std::string key)
 	std::string lastKey="PlaceHolder";
 	std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
 
-	int count = buildings.count(key);
+    size_t count = buildings.count(key);
 	if (count == 0)
 	{
 		lastKey="PlaceHolder";
@@ -466,7 +472,7 @@ std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 	std::string lastKey="PlaceHolder";
 	std::multimap<std::string,std::shared_ptr<Technology>>::iterator it;
 
-	int count = units.count(key);
+    size_t count = units.count(key);
 	if (count == 0)
 	{
 		lastKey="PlaceHolder";
@@ -540,7 +546,7 @@ void TechnologyList::initRandomGenerator(size_t seed, std::string SpecialOne, in
 		return;
 	}
     uniformDist = std::uniform_int_distribution<int>(0,techNames.size()-1);
-    //uniformDist = std::uniform_int_distribution<int>(0,techSet.size()-1);
+
 }
 
 std::string TechnologyList::getRandomTechnology()

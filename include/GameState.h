@@ -13,11 +13,11 @@
 class GameState
 {
 	private:	
-		float _minerals;
-		float _gas;
+        float mMinerals;
+        float mGas;
 		float _energy;
-		float _supplyCount;
-		float _supplyMax;
+        int mSupplyCount;
+        int mSupplyMax;
 
 	public:
 		std::vector< std::shared_ptr<Worker> >      workerList;
@@ -26,21 +26,21 @@ class GameState
 
 		GameState()
 		{
-			_minerals	=	0.0f;
-			_gas		=	0.0f;
+            mMinerals	=	0.0f;
+            mGas		=	0.0f;
 			_energy		=	0.0f;
-			_supplyCount=	0.0f;
-			_supplyMax  =	0.0f;
+            mSupplyCount=	0.;
+            mSupplyMax  =	0;
 		}
 
         float getMinerals()
         {
-			return _minerals;
+            return mMinerals;
         }
 
         float getGas()
         {
-			return _gas;
+            return mGas;
         }
 
         float getEnergy()
@@ -48,38 +48,38 @@ class GameState
 			return _energy;
         }
 		
-        float getMaxSupply()
+        int getMaxSupply()
         {
-			return _supplyMax;
+            return mSupplyMax;
         }
 
-        float getSupply()
+        int getSupply()
         {
-			return _supplyCount;
+            return mSupplyCount;
         }
-		float getAvailableSupply()
+        int getAvailableSupply()
 		{
-			return (_supplyMax-_supplyCount);
+            return (mSupplyMax-mSupplyCount);
 		}
 
         void addMinerals(float value)
         {
-			_minerals += value;
+            mMinerals += value;
         }
 
         void subMinerals(float value)
         {
-			_minerals -= value;
+            mMinerals -= value;
         }
 
         void addGas(float value)
         {
-			_gas += value;
+            mGas += value;
         }
 
         void subGas(float value)
         {
-			_gas -= value;
+            mGas -= value;
         }
 
         void addEnergy(float value)
@@ -92,19 +92,19 @@ class GameState
 			_energy -= value;
         }
 
-		void addSupplyMax(float value)
+        void addSupplyMax(int value)
 		{
-			_supplyMax += value;
+            mSupplyMax += value;
 		}
 
-        void addSupply(float value)
+        void addSupply(int value)
         {
-			_supplyCount += value;
+            mSupplyCount += value;
         }
 
-        void subSupply(float value)
+        void subSupply(int value)
         {
-			_supplyCount -= value;
+            mSupplyCount -= value;
         }
 };
 

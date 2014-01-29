@@ -201,7 +201,7 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 	_gameState->buildingList.push_back(std::shared_ptr<Building>(new Building(RacePolicy::getMainBuilding(), 0)));
 	_gameState->buildingList.back()->state = Building::State::Ready;
 
-	int supplyToAdd = _technologyManager->getEntityCosts(RacePolicy::getMainBuilding()).supply;	
+    int supplyToAdd = _technologyManager->getEntityCosts(RacePolicy::getMainBuilding()).supply;
 	_technologyManager->notifyCreation(RacePolicy::getMainBuilding());
 
 	// again special zerg handling

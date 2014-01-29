@@ -30,7 +30,7 @@ struct Costs
 {
 	float minerals;
 	float gas;
-	float supply;
+    int   supply;
 	int   buildTime;
 };
 
@@ -46,7 +46,7 @@ class Technology
 		Costs TechCosts;
 		Technology();
 		Technology(std::string name);
-		Technology(std::string name, float min, float gas, float supply, int buildTime);
+        Technology(std::string name, float min, float gas, int supply, int buildTime);
 
 		void setZero();
 
@@ -56,7 +56,7 @@ class Technology
 		void setName(std::string name);
 		void setMineral(float minerals);
 		void setGas(float gas);
-		void setSupply(float supply);
+        void setSupply(int supply);
 		void setBuildTime(int time);
 		void setExistence(int state);
 		void incExistence(void);
@@ -68,7 +68,7 @@ class Technology
 		float getMineralsCost(void);
 		float getGasCost(void);
 		//getSupplyCost returns providing supply in case of buildings
-		float getSupplyCost(void);
+        int getSupplyCost(void);
 		int getBuildTime(void);
 		bool exists();
 

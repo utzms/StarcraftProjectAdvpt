@@ -7,7 +7,7 @@ using std::async;
 
 
 template<class RacePolicy, class FitnessPolicy>
-inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const string target, FitnessPolicy& fitnessPolicy, const int nindividuals, std::function<vector<string>(TechnologyManager<RacePolicy>)> genBuildList, const int timeLimit)
+inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const string target, FitnessPolicy& fitnessPolicy, const size_t nindividuals, std::function<vector<string>(TechnologyManager<RacePolicy>)> genBuildList, const int timeLimit)
 {
     const TechnologyList& techList = mTechManager.getTechnologyList();
     auto runSimulation = [=] (vector<string> dna) -> map<int, string>
@@ -17,10 +17,10 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
         return a.run(timeLimit);
     };
 
-    auto rateIndividual = [=] (map<int,string> res, vector<string> dnaVec, FitnessPolicy fitnessPolicy) -> Individual
+    auto rateIndividual = [=] (map<int,string> res, vector<string> dnaVec, FitnessPolicy fp) -> Individual
     {
         auto a = mTechManager.getEntityRequirements(target);
-        Individual newOne(fitnessPolicy.rateBuildListHard(res), fitnessPolicy.rateBuildListSoft(res,RacePolicy::getWorker(), a),dnaVec);
+        Individual newOne(fp.rateBuildListHard(res), fp.rateBuildListSoft(res,RacePolicy::getWorker(), a),dnaVec);
         return newOne;
     };
 
@@ -190,7 +190,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 }
 
 	template <class RacePolicy, class FitnessPolicy>
-inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const string target, const int ntargets, const int timeLimit, const int reproductionRate)
+inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const string target, const size_t ntargets, const int timeLimit, const size_t reproductionRate)
 {
 	if(reproductionRate > mAccuracy)
 	{
@@ -213,7 +213,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
 		std::hash<string> hashGen;
 		set<size_t> positions;
 		vector<string> newGenes;
-        int count = 0;
+        size_t count = 0;
 		do {
             if(++count > 1000)
             {
@@ -236,11 +236,11 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
 						const Individual& ind1 = mPopulation[i];
 						const Individual& ind2 = mPopulation[j];
 
-						size_t res;
-						size_t len = ind1.genes.size() < ind2.genes.size() ? ind1.genes.size() : ind2.genes.size();
-						for(size_t i = 0; i < len; ++i)
+                        size_t res;
+                        size_t len = ind1.genes.size() < ind2.genes.size() ? ind1.genes.size() : ind2.genes.size();
+                        for(size_t k = 0; k < len; ++k)
 						{
-							res += (len-i) * std::abs(hashGen(ind1.genes[i])-hashGen(ind2.genes[i]));
+                            res += (len-k) * std::abs(hashGen(ind1.genes[k])-hashGen(ind2.genes[k]));
 						}
 
 
@@ -284,13 +284,13 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
 	};
 
 	FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
-	const int ncrossovers = mPopulation.size()*reproductionRate / mAccuracy;
+    const size_t ncrossovers = mPopulation.size()*reproductionRate / mAccuracy;
 	generateAndRate(target, fitnessPolicy, ncrossovers, genBuildList, timeLimit);
 
 }
 
 	template <class RacePolicy, class FitnessPolicy>
-inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string target, const int ntargets, const int timeLimit, const int mutationRate)
+inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string target, const size_t ntargets, const int timeLimit, const size_t mutationRate)
 {
 	if(mutationRate > mAccuracy)
 	{
@@ -310,7 +310,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string t
 		buildListGen.initRandomGenerator();
 
         vector<string> newGenes;
-        int count = 0;
+        size_t count = 0;
 		do
 		{
             PROGRESS("Try to create valid mutant");
@@ -322,7 +322,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string t
             newGenes = oldInd.genes;
 			std::uniform_int_distribution<size_t> geneDist(0,newGenes.size()-1);
 			auto chooseGene = std::bind(geneDist, geneGen);
-			for(int i = 0; i < (mutationRate * newGenes.size())/mAccuracy; ++i)
+            for(size_t i = 0; i < (mutationRate * newGenes.size())/mAccuracy; ++i)
 			{
 
 				geneDist = std::uniform_int_distribution<size_t>(0,newGenes.size()-1);
@@ -338,19 +338,19 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string t
 	};
 
 
-	const int nmutants = mPopulation.size() / 5;
+    const size_t nmutants = mPopulation.size() / 5;
 	FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
 	generateAndRate(target, fitnessPolicy, nmutants, genBuildList, timeLimit);
 }
 
 	template <class RacePolicy, class FitnessPolicy>
-inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::select(const int selectionRate)
+inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::select(const size_t selectionRate)
 {
 	if(selectionRate > mAccuracy)
 	{
 		throw std::invalid_argument("@BuildListOptimizer::select: The selection Rate must be lower or equal the maximum value. The passed value is: "+std::to_string(selectionRate));
 	}
-	int threshold = (mPopulation.size()*selectionRate)/mAccuracy;
+    size_t threshold = (mPopulation.size()*selectionRate)/mAccuracy;
 	if (threshold <= 0)
 	{
 		return;
@@ -359,15 +359,15 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::select(const int sele
 }
 
 	template <class RacePolicy, class FitnessPolicy>
-BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(const int accuracy, const int individualSize)
+BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(const size_t accuracy, const size_t individualSize)
 {
 	if(accuracy <= 0)
 	{
-		throw std::invalid_argument("@BuildListOptimizer::BuildListOptimizer(int accuracy, size_t individualSize): The accuracy must be greater than zero. The value passed is: "+std::to_string(accuracy));
+        throw std::invalid_argument("@BuildListOptimizer::BuildListOptimizer(size_t accuracy, size_t individualSize): The accuracy must be greater than zero. The value passed is: "+std::to_string(accuracy));
 	}
 	if(individualSize <= 0)
 	{
-		throw std::invalid_argument("@BuildListOptimizer::BuildListOptimizer(int accuracy, size_t individualSize): The size of the individuals must be greater than zero. The value passed is: "+std::to_string(accuracy));
+        throw std::invalid_argument("@BuildListOptimizer::BuildListOptimizer(size_t accuracy, size_t individualSize): The size of the individuals must be greater than zero. The value passed is: "+std::to_string(accuracy));
 	}
 
 	mAccuracy = accuracy;
@@ -379,7 +379,7 @@ BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(const int accu
 
 /*initializes the population with random individuals until the population size reaches initPopSize*/
 template <class RacePolicy, class FitnessPolicy>
-void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(const string target, const int ntargets, const int timeLimit, const int initPopSize)
+void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(const string target, const size_t ntargets, const int timeLimit, const size_t initPopSize)
 {
 
 	if(!mTechManager.technologyExists(target))
@@ -411,7 +411,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(const string targ
         return buildListGen.buildOneRandomList(mIndividualSize)->getAsVector();
 	};
 
-	const int nindividuals = initPopSize-mPopulation.size();
+    const size_t nindividuals = initPopSize-mPopulation.size();
 
 	FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
 	generateAndRate(target, fitnessPolicy, nindividuals, genBuildList, timeLimit);
@@ -429,7 +429,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::clear(void)
 
 /* optimizes a buildList by mutating, crossing over and selecting the fittest individuals */
 template <class RacePolicy, class FitnessPolicy>
-void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(const string target, const int ntargets, const int timeLimit, const int generations, const int reproductionRate, const int mutationRate, const int selectionRate)
+void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(const string target, const size_t ntargets, const int timeLimit, const size_t generations, const size_t reproductionRate, const size_t mutationRate, const size_t selectionRate)
 {
 
 	if(!mTechManager.technologyExists(target))
@@ -449,7 +449,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(const string target
 		throw std::invalid_argument("@BuildListOptimizer::optimize: The number of generations must be greater than zero. The passed value is: "+std::to_string(generations));
 	}
 
-	for(int i = 0; i < generations; ++i)
+    for(size_t i = 0; i < generations; ++i)
 	{
 		select(selectionRate);
         mutate(target, ntargets, timeLimit, mutationRate);
@@ -463,7 +463,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(const string target
 
 /* combined use of initialize and optimize */
 	template <class RacePolicy, class FitnessPolicy>
-void BuildListOptimizer<RacePolicy, FitnessPolicy>::clearInitializeAndOptimize(const string target, const int ntargets, const int timeLimit, const int initPopSize, const int generations, const int reproductionRate, const int mutationRate, const int selectionRate)
+void BuildListOptimizer<RacePolicy, FitnessPolicy>::clearInitializeAndOptimize(const string target, const size_t ntargets, const int timeLimit, const size_t initPopSize, const size_t generations, const size_t reproductionRate, const size_t mutationRate, const size_t selectionRate)
 {
 	clear();
 	initialize(target, ntargets, timeLimit, initPopSize);
@@ -473,7 +473,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::clearInitializeAndOptimize(c
 
 /* combined use of initialize and optimize */
 	template <class RacePolicy, class FitnessPolicy>
-void BuildListOptimizer<RacePolicy, FitnessPolicy>::initializeAndOptimize(const string target, const int ntargets, const int timeLimit, const int initPopSize, const int generations, const int reproductionRate, const int mutationRate, const int selectionRate)
+void BuildListOptimizer<RacePolicy, FitnessPolicy>::initializeAndOptimize(const string target, const size_t ntargets, const int timeLimit, const size_t initPopSize, const size_t generations, const size_t reproductionRate, const size_t mutationRate, const size_t selectionRate)
 {
 	initialize(target, ntargets, timeLimit, initPopSize);
 	optimize(target, ntargets, timeLimit, generations, reproductionRate, mutationRate, selectionRate);
@@ -481,7 +481,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initializeAndOptimize(const 
 
 /* adds a specific individual to the population */
 	template <class RacePolicy, class FitnessPolicy>
-void BuildListOptimizer<RacePolicy, FitnessPolicy>::addIndividual(const string target, const int ntargets, const int timeLimit, shared_ptr<BuildList> buildList )
+void BuildListOptimizer<RacePolicy, FitnessPolicy>::addIndividual(const string target, const size_t ntargets, const int timeLimit, shared_ptr<BuildList> buildList )
 {
 	FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
     map<int,string> simRes = Simulation<RacePolicy>(buildList, mTechManager.getTechnologyList()).run(timeLimit);
@@ -491,7 +491,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::addIndividual(const string t
 
 /* get the group of size number of the fittest individuals, together with their corresponding fitness value */
 	template <class RacePolicy, class FitnessPolicy>
-vector<Individual> BuildListOptimizer<RacePolicy, FitnessPolicy>::getFittestGroup(const int groupSize)
+vector<Individual> BuildListOptimizer<RacePolicy, FitnessPolicy>::getFittestGroup(const size_t groupSize)
 {
 
 	if (mPopulation.size() < groupSize)
@@ -501,7 +501,7 @@ vector<Individual> BuildListOptimizer<RacePolicy, FitnessPolicy>::getFittestGrou
 
 	sortPopulation();
 	vector<Individual> res;
-	for (int i = mPopulation.size()-1; i >= mPopulation.size()-groupSize; --i)
+    for (size_t i = mPopulation.size()-1; i >= mPopulation.size()-groupSize; --i)
 	{
 		res.push_back(mPopulation.at(i));
 	}

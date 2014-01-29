@@ -16,12 +16,12 @@ void Technology::setZero()
 {   
 	TechCosts.minerals=0.0f;
 	TechCosts.gas=0.0f;
-	TechCosts.supply=0.0f;
+    TechCosts.supply=0;
 	TechCosts.buildTime=0;
 }   
 
 
-Technology::Technology(std::string nameIn, float min, float gas, float supply, int buildTime)
+Technology::Technology(std::string nameIn, float min, float gas, int supply, int buildTime)
 {
 #ifdef DEBUG
 	std::cerr << "CONSTRUCTOR - Technology(name,float,float....)" << std::endl;
@@ -69,7 +69,7 @@ void Technology::setGas(float gas)
 {
 	TechCosts.gas=gas;
 }   
-void Technology::setSupply(float supply)
+void Technology::setSupply(int supply)
 {
 	TechCosts.supply=supply;
 }   
@@ -110,7 +110,7 @@ float Technology::getGasCost(void)
 {
 	return TechCosts.gas;
 }
-float Technology::getSupplyCost(void)
+int Technology::getSupplyCost(void)
 {
 	return TechCosts.supply;
 }

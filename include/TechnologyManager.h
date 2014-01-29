@@ -41,7 +41,10 @@ private:
         }
         for(std::string name : techSet)
         {
+            /* currently not supported in the g++ version installed in the Huber-CIP
             mExistenceMap.emplace(name,0);
+            */
+            mExistenceMap.insert(std::pair<std::string,int>(name,0));
         }
     }
 
