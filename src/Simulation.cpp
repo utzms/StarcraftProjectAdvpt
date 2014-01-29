@@ -170,7 +170,7 @@ template <class RacePolicy>
 Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 {
 
-	_buildList = std::unique_ptr<BuildList>(new BuildList(buildListFilename));
+	_buildList = std::shared_ptr<BuildList>(new BuildList(buildListFilename));
 
 
 	std::shared_ptr<GameState> gameState(new GameState());
@@ -236,14 +236,68 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 template<class RacePolicy>
 Simulation<RacePolicy>::Simulation(std::shared_ptr<BuildList> buildList, const TechnologyList& techList)
 {
-    // TODO
+	_buildList = buildList;
+
+	std::shared_ptr<GameState> gameState(new GameState());
+	std::shared_ptr<ResourceManager> resourceManager(new ResourceManager(gameState, 0.35f, 0.7f));
+	std::shared_ptr<TechnologyManager<RacePolicy>> techManager(new TechnologyManager<RacePolicy>(gameState, techList));
+	std::shared_ptr<StartingConfiguration> startingConfiguration( new StartingConfiguration(std::string("./data/StartingConfiguration.txt")) );
+	std::shared_ptr<GameStateUpdate<RacePolicy>> gameStateUpdate(new GameStateUpdate<RacePolicy>(gameState,techManager));
+    std::shared_ptr<Energizer<RacePolicy>> energizer(new Energizer<RacePolicy>(gameState,techManager));
+
+	_gameState = gameState;
+	_resourceManager = resourceManager;
+	_technologyManager = techManager;
+	_startingConfiguration = startingConfiguration;
+	_gameStateUpdate = gameStateUpdate;
+    _energizer = energizer;
+
+	std::vector< std::shared_ptr<Worker> >& workerList = gameState->workerList;
+
+	for(int currentWorker = 0; currentWorker < _startingConfiguration->getInitialWorkerCount(); ++currentWorker)
+	{
+		workerList.push_back(std::shared_ptr<Worker>(new Worker(RacePolicy::getWorker())));
+		workerList[currentWorker]->state = Worker::State::CollectingMinerals;
+		_technologyManager->notifyCreation(RacePolicy::getWorker());
+	}   
+
+	_gameState->buildingList.push_back(std::shared_ptr<Building>(new Building(RacePolicy::getMainBuilding(), 0)));
+	_gameState->buildingList.back()->state = Building::State::Ready;
+
+	int supplyToAdd = _technologyManager->getEntityCosts(RacePolicy::getMainBuilding()).supply;	
+	_technologyManager->notifyCreation(RacePolicy::getMainBuilding());
+
+	// again special zerg handling
+	if (RacePolicy::getMainBuilding().compare("Hatchery") == 0)
+	{
+		supplyToAdd += 8;
+
+		_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Overlord")));
+		_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
+		_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
+		_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit("Larva")));
+
+		_technologyManager->notifyCreation("Overlord");
+		_technologyManager->notifyCreation("Larva");
+		_technologyManager->notifyCreation("Larva");
+		_technologyManager->notifyCreation("Larva");
+	}
+
+	_gameState->addMinerals(_startingConfiguration->getInitialMinerals());
+	_gameState->addGas(_startingConfiguration->getInitialVespeneGas());
+	_gameState->addSupplyMax(supplyToAdd);
+	_gameState->addSupply(_startingConfiguration->getInitialWorkerCount());
 }
 
 
+/* run() method for use in BuildListOptimizer */
+
 template <class RacePolicy>
-void Simulation<RacePolicy>::run()
+std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 {
 	PROGRESS("Simulation::run() starts ");
+
+	std::map<int, string> resultMap;
 
 	std::vector< std::shared_ptr<Worker> >& workerList = _gameState->workerList;
 
@@ -251,7 +305,7 @@ void Simulation<RacePolicy>::run()
 	int time = 0;
 
 	PROGRESS("Simulation::run() Starting main loop");
-	while (!_buildList->allItemsOk()/*&& missing: check if no items are under construction and no building is producing anymore */)
+	while (!_buildList->allItemsOk() && time < timeLimit/*&& missing: check if no items are under construction and no building is producing anymore */)
 	{
 		_buildList->reset();
 		buildListState = BuildList::State::InProgress;
@@ -459,6 +513,9 @@ void Simulation<RacePolicy>::run()
 
 							//std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
+							// write current item to result map
+							resultMap[time] = currentItem;
+
 							// continue to the next item in the build list
 							continue;
 						}
@@ -481,6 +538,9 @@ void Simulation<RacePolicy>::run()
 						buildBuilding(ourWorker, currentItem, entityCosts.buildTime);
 						_buildList->setCurrentItemOk();
 						//std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+
+						// write current item to result map
+						resultMap[time] = currentItem;
 
 						if (vanishingZergWorker)
 						{
@@ -545,11 +605,14 @@ void Simulation<RacePolicy>::run()
                                         _gameState->subGas(entityCosts.gas);
 
                                         _buildList->setCurrentItemOk();
-                                        std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+                                        //std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+
+										// write current item to result map
+										resultMap[time] = currentItem;
+
                                         PROGRESS("morphCounter reached vanishingSize:" << vanishingRequirements.size() );
                                         break;
                                     }
-
                                 }
                             }
                         }
@@ -580,7 +643,10 @@ void Simulation<RacePolicy>::run()
 						}
 
 						_buildList->setCurrentItemOk();
-					//	std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+						//std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+
+						// write current item to result map
+						resultMap[time] = currentItem;
 					}
 					else
 					{
@@ -606,14 +672,7 @@ void Simulation<RacePolicy>::run()
 		timeStep();
 	}
 
-}
-/* run() method for use in BuildListOptimizer */
-
-template <class RacePolicy>
-std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
-{
-        // TODO
-        return std::map<int, std::string>();
+	return resultMap;
 }
 
 template <class RacePolicy>
