@@ -2,7 +2,7 @@
 .PHONY: pathmaker clean
 
 CC=g++
-OPT=-g -O2 -std=c++11 #-Wall -Wshadow -Wextra -pedantic
+OPT= -g -O2 -std=c++11 #-Wall -Wshadow -Wextra -pedantic
 LIBS=-fopenmp
 INCPATH=./include/
 SRCPATH=./src/
