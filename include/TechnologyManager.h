@@ -59,7 +59,7 @@ private:
         const auto& initSpecials = mTechList.findUnitVec(RacePolicy::getSpecialResource());
         for (const auto special : initSpecials)
         {
-            mExistenceMap[special->getName()] = INT_MAX;
+            mExistenceMap[special->getName()] = 10000000; //With INT_MAX we risc integer overflows! 
         }
         for (const auto building : initBuildings)
         {
@@ -251,7 +251,7 @@ public:
 
     inline bool isZerg()
     {
-        if (RacePolicy::getSpecialResource == "Zerg")
+        if (RacePolicy::getSpecialResource == "Larva")
             return true;
         return false;
     }

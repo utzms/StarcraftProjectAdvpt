@@ -232,6 +232,7 @@ template<class RacePolicy>
 Simulation<RacePolicy>::Simulation(std::shared_ptr<BuildList> buildList, const TechnologyList& techList)
 {
     // TODO
+	auto a = techList;
 	_buildList = buildList;
 }
 
@@ -604,7 +605,7 @@ template <class RacePolicy>
 std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 {
         // TODO
-	int i = 0;
+	int i = timeLimit;
 	BuildList::State buildListState = BuildList::State::InProgress;
 	
 	std::map<int, std::string> ret;

@@ -38,6 +38,7 @@ class Debug
 		//returns the rating of the buildlist counting hard constraints
         int rateBuildListHard(std::map<int, std::string> &resultList)
 		{
+			auto a = resultList;
 			static int rating = 0;
 
 			return ++rating;
@@ -48,6 +49,9 @@ class Debug
 		{
 			//number of workers, number of production buildings...
 			static int rating = 50000000;
+			auto a = resultList;
+			auto b = worker;
+			auto c = requirements;
 			return rating--;
 		}
 };

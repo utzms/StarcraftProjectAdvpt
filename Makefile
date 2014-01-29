@@ -2,15 +2,13 @@
 .PHONY: pathmaker clean
 
 CC=g++
-OPT=-g -O2 -std=c++11 #-Wall -Wshadow -Wextra -pedantic
+OPT=-g -O2 -std=c++11 -Wall -Wshadow -Wextra -pedantic
 LIBS=-pthread
 INCPATH=./include/
 SRCPATH=./src/
 INC=-I$(INCPATH) -I$(SRCPATH)
 BINPATH=./bin/
 OBJPATH=./obj/
-
-#OPT += -O2
 
 objects=$(SRCPATH)main.cpp\
 		$(OBJPATH)debug.o\

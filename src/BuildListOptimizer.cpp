@@ -236,7 +236,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
 						const Individual& ind1 = mPopulation[i];
 						const Individual& ind2 = mPopulation[j];
 
-                        size_t res;
+                        size_t res=0;
                         size_t len = ind1.genes.size() < ind2.genes.size() ? ind1.genes.size() : ind2.genes.size();
                         for(size_t k = 0; k < len; ++k)
 						{
