@@ -10,66 +10,6 @@
 
 #include <stdexcept>
 
-int oldCall(int argc, char **argv)
-{
-	if(argc < 2)
-	{
-		std::cerr << "Too few arguments" << std::endl;
-	}
-	std::string argument(argv[1]);
-	
-	try
-	{
-		Simulation<Protoss> simulation(argument);
-		simulation.run();
-		return 0;
-	}
-	catch (std::exception &e)
-	{
-		std::cerr << "Protoss Error Message: " << e.what() << std::endl;
-	}
-
-	try
-	{
-		Simulation<Terran> simulation(argument);
-		simulation.run();
-		return 0;
-	}
-	catch (std::exception &e)
-	{
-		std::cerr << "Terran Error Message: " << e.what() << std::endl;
-	}
-
-	try
-	{
-		Simulation<Zerg> simulation(argument);
-		simulation.run();
-		return 0;
-	}
-	catch (std::exception &e)
-	{
-		std::cerr << "Zerg Error Message: " << e.what() << std::endl;
-	}
-
-	std::cerr << "BuildList invalid. Cannot be built by any race." << std::endl;
-	return 1;
-}
-
-void testTechList()
-{
-	TechnologyList a;
-	InitTechTree<Protoss>(&a).initTechTree();
-	TechnologyList b = a;
-
-	a.printAll();
-	b.printAll();
-
-	auto t = a.findUnit("Probe");
-	t->setExistence(1);
-	a.printAll();
-	b.printAll();
-}
-
 template <typename T>
 T pushOrRush(std::string in)
 {
@@ -86,12 +26,12 @@ T pushOrRush(std::string in)
 
 void startBuildListOptimizer(std::string race, std::string strategy, std::string unit)
 {
-	const int individualSize = 30;
+	const int individualSize = 10;
 	const int selectionRate = 60;
 	const int mutationRate = 15;
 	const int reproductionRate = 25;
-	const int initPopSize = 10000;
-	const int generations = 50;
+	const int initPopSize = 1000;
+	const int generations = 10;
 	const int accuracy = 100;
 	std::cout << "The optimization is done with the following rates:" << std::endl;
 	std::cout << "Selection Rate: " << std::to_string(selectionRate) << std::endl;
@@ -245,12 +185,13 @@ int main(int argc, char *argv[])
 	race = getRace(unit);
 	std::cout << unit << "\t" << strategy << "\t" << race << std::endl;
 	
-
 	auto startTime = std::chrono::system_clock::now().time_since_epoch().count();
 	startBuildListOptimizer(race, strategy, unit);
 	auto endTime =  std::chrono::system_clock::now().time_since_epoch().count();
+/*
 	std::cout << "Required the following time to run: " << (endTime-startTime)*std::chrono::system_clock::period::num/std::chrono::system_clock::period::den << "s" << std::endl;
 	std::cout << "Number of threads used: " << std::to_string(std::thread::hardware_concurrency()+1) << std::endl;
+	*/
 	//testTechList();
 
 	return  0;

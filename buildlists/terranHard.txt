@@ -38,6 +38,8 @@ TechLabStarport
 ReactorBarracks
 ReactorFactory
 ReactorStarport
+Marine
+Marine
 FusionCore
 Viking
 Medivac

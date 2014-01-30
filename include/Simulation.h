@@ -12,6 +12,7 @@
 #include "TechnologyManager.h"
 #include "StartingConfiguration.h"
 #include "Entity.h"
+#include "Energizer.h"
 #include "GameStateUpdate.h"
 #include "Debug.h"
 /** Main class designed for managing and controlling the Simulation.
@@ -42,6 +43,7 @@ private:
         std::shared_ptr<TechnologyManager<RacePolicy>> _technologyManager; /**< Object that is responsible for updating the all technologies at the end of each timestep */
         std::shared_ptr<StartingConfiguration> _startingConfiguration;
         std::shared_ptr<GameStateUpdate<RacePolicy>> _gameStateUpdate;
+        std::shared_ptr<Energizer<RacePolicy>> _energizer;
         /**< Calling this function proceeds to the next timestep */
         TechnologyManager<Zerg> _techManagerZerg;
         TechnologyManager<Protoss> _techManagerProtoss;
@@ -49,7 +51,7 @@ private:
 
         void buildBuilding(std::shared_ptr<Worker> workerForBuilding, std::string name ,int time);
 
-        void produceUnit(std::shared_ptr<Building> buildingForProduction, std::string unitName, int time,Building::ProductionType type);
+        void produceUnit(std::shared_ptr<Building> buildingForProduction, std::string unitName, int time,Building::ProductionType type, bool doubleProduction = false);
 
         void removeUnit(std::shared_ptr<Unit> unitForRemoval, std::string unitName);
         void removeWorker(std::shared_ptr<Worker> unitForRemoval, std::string unitName);
