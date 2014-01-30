@@ -9,6 +9,7 @@ using std::async;
 template<class RacePolicy, class FitnessPolicy>
 inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const string target, FitnessPolicy& fitnessPolicy, const size_t nindividuals, std::function<vector<string>(TechnologyManager<RacePolicy>)> genBuildList, const int timeLimit)
 {
+	std::cout << nindividuals << std::endl;
     const TechnologyList& techList = mTechManager.getTechnologyList();
     auto runSimulation = [=] (vector<string> dna) -> map<int, string>
     {
@@ -24,169 +25,300 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
         return newOne;
     };
 
-    const unsigned int NUM_THREADS = std::thread::hardware_concurrency()+1;
-    vector<future<vector<string>>> dnaFutureVec(nindividuals);
-    vector<future<map<int,string>>> resultFutureVec(nindividuals);
-    vector<future<Individual>> individualFutureVec(nindividuals);
+    const unsigned int NUM_THREADS = std::min(std::thread::hardware_concurrency()+1,nindividuals);
+    vector<future<vector<string>>> dnaFutureVec(NUM_THREADS);
+    vector<future<map<int,string>>> resultFutureVec(NUM_THREADS);
+    vector<future<Individual>> individualFutureVec(NUM_THREADS);
     vector<vector<string>> dnaVec(nindividuals);
-
-    PROGRESS("buildListFutureVec.size() << std::endl");
+    vector<map<int,string>> simRes(nindividuals);
 
     #ifdef DEBUG
     int threadFailures = 0;
     #endif
 
-    size_t pos = 0;
-    for (size_t i = 0; i < nindividuals / NUM_THREADS; ++i)
-    {
-        for (size_t j = 0; j < NUM_THREADS; ++j)
-        {
-            pos = i*NUM_THREADS+j;
-            dnaFutureVec[pos] = async(std::launch::async,genBuildList, mTechManager);
-        }
-        for (size_t j = 0; j < NUM_THREADS; ++j)
-        {
-            pos = i*NUM_THREADS+j;
-            try
-            {
-                dnaVec.at(pos) = dnaFutureVec[pos].get(); // Here we had the segfault
-            }
-            catch(std::system_error&)
-            {
-                dnaVec.at(pos) = genBuildList(mTechManager);
-                #ifdef DEBUG
-                std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
-                ++threadFailures;
-                #endif
-            }
-        }
-    }
+	size_t started=0;
+	size_t finished=0;
+	std::future_status status;
 
-    for(size_t i = pos+1; i < nindividuals; ++i )
-    {
-        dnaFutureVec[i] = async(std::launch::async,genBuildList, mTechManager);
-    }
-    for(size_t i = pos+1; i < nindividuals; ++i)
-    {
-        try
-        {
-            dnaVec.at(i) = dnaFutureVec[i].get();
-        }
+	for (int i = 0; i < NUM_THREADS; ++i)
+	{
+		dnaFutureVec[i] = async(std::launch::async,genBuildList, mTechManager);
+		++started;
+	}
+	while (finished < nindividuals)
+	{
+		for (int i = 0; i < NUM_THREADS; ++i)
+		{
+			try
+			{
+				//watch status
+				try
+				{
+					status = dnaFutureVec[i].wait_for(std::chrono::milliseconds(200));
+				} catch (std::future_error &e)
+				{
+					//only happens if no thread associated with future-object
+					continue;
+				}
+				if (status == std::future_status::ready) {
+					dnaVec.at(finished) = dnaFutureVec[i].get(); 
+					++finished;
+					if (started < nindividuals)
+					{
+						++started;
+						dnaFutureVec[i] = async(std::launch::async,genBuildList, mTechManager);
+					}
+				} else
+				{
+					std::cout << "Buildlist-Thread not yet ready " << finished+i << std::endl;
+				}
+			} catch(std::system_error&)
+			{
+				dnaVec.at(finished++) = genBuildList(mTechManager);
+			}
+		}
+	}
+	std::cout << "New buildlists finished" << std::endl;
 
-        catch(std::system_error&)
-        {
-            dnaVec.at(i) = genBuildList(mTechManager);
-            #ifdef DEBUG
-            std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
-            ++threadFailures;
-            #endif
-        }
-    }
+	finished = started = 0;
+	for (int i = 0; i < NUM_THREADS; ++i)
+	{
+		resultFutureVec[i] = async(std::launch::async,runSimulation,dnaVec.at(started));
+		++started;
+	}
 
+	while (finished < nindividuals)
+	{
+		for (int i = 0; i < NUM_THREADS; ++i)
+		{
+			try
+			{
+				//watch status
+				try
+				{
+					status = resultFutureVec[i].wait_for(std::chrono::milliseconds(500));
+				} catch (std::future_error &e)
+				{
+					//only happens if no thread associated with future-object
+					continue;
+				}
+				if (status == std::future_status::ready) {
+					simRes[finished] = resultFutureVec[i].get();
+					++finished;
+					if (started < nindividuals)
+					{
+						resultFutureVec[i] = async(std::launch::async,runSimulation,dnaVec.at(started++));
+					}
+				} else
+				{
+					std::cout << "Simulation not yet ready " << finished+i << std::endl;
+				}
+			} catch(std::system_error &e)
+			{
+				simRes[finished++] = runSimulation(dnaVec.at(started++));
+				std::cerr << "Thread didnt start properly " << e.what() << std::endl;
+			}
+		}
+	}
+	std::cout << "Simulations done" << std::endl;
 
-    vector<map<int,string>> simRes(nindividuals);
-    pos = 0;
-
-    for (size_t i = 0; i < nindividuals / NUM_THREADS; ++i)
-    {
-        for (size_t j = 0; j < NUM_THREADS; ++j)
-        {
-            pos = i*NUM_THREADS+j;
-            resultFutureVec[pos] = async(std::launch::async,runSimulation, dnaVec.at(pos));
-        }
-
-        for (size_t j = 0; j < NUM_THREADS; ++j)
-        {
-            pos = i*NUM_THREADS+j;
-            try
-            {
-                simRes[pos] = resultFutureVec[pos].get();
-            }
-            catch(std::system_error&)
-            {
-                simRes[pos] = runSimulation(dnaVec[pos]);
+	finished = started = 0;
+	for (int i = 0; i < NUM_THREADS; ++i)
+	{
+		individualFutureVec[i] = async(std::launch::async,rateIndividual,simRes[started],dnaVec.at(started), fitnessPolicy);
+		++started;
+	}
+	while (finished < nindividuals)
+	{
+		for (int i = 0; i < NUM_THREADS; ++i)
+		{
+			try
+			{
+				//watch status
+				try
+				{
+					status = individualFutureVec[i].wait_for(std::chrono::milliseconds(500));
+				} catch (std::future_error &e)
+				{
+					//only happens if no thread associated with future-object
+					continue;
+				}
+				if (status == std::future_status::ready) {
+					++finished;
+					mPopulation.push_back(individualFutureVec[i].get());
+					if (started < nindividuals)
+					{
+						individualFutureVec[i] = async(std::launch::async,rateIndividual,simRes[started],dnaVec.at(started), fitnessPolicy);
+						++started;
+					}
+				} else
+				{
+					std::cout << "Individual-Creation not yet ready " << finished+i << std::endl;
+				}
+			} catch(std::system_error &e)
+			{
+				mPopulation.push_back(rateIndividual(simRes[i],dnaVec[i], fitnessPolicy));
+				++finished;
+				std::cerr << "Thread didnt start properly " << e.what() << std::endl;
+			}
+		}
+	}
+	std::cout << "Individuals created" << std::endl;
+	/*
+	   size_t pos = 0;
+	   for (size_t i = 0; i < nindividuals / NUM_THREADS; ++i)
+	   {
+	   for (size_t j = 0; j < NUM_THREADS; ++j)
+	   {
+	   pos = i*NUM_THREADS+j;
+	   dnaFutureVec[j] = async(std::launch::async,genBuildList, mTechManager);
+	   }
+	   for (size_t j = 0; j < NUM_THREADS; ++j)
+	   {
+	   pos = i*NUM_THREADS+j;
+	   try
+	   {
+	   dnaVec.at(pos) = dnaFutureVec[j].get(); // Here we had the segfault
+	   }
+	   catch(std::system_error&)
+	   {
+	   dnaVec.at(pos) = genBuildList(mTechManager);
 #ifdef DEBUG
-                std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
-                ++threadFailures;
+std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
+++threadFailures;
 #endif
-            }
-        }
-    }
+}
+}
+}
 
-    for(size_t i = pos+1; i < nindividuals; ++i )
-    {
-        resultFutureVec[i] = async(std::launch::async,runSimulation, dnaVec.at(i));
-    }
-    for(size_t i = pos+1; i < nindividuals; ++i)
-    {
-        try
-        {
-            simRes[i] = resultFutureVec[i].get();
-        }
-        catch(std::system_error&)
-        {
-            simRes[i] = runSimulation(dnaVec[i]);
+for(size_t i = pos+1; i < nindividuals; ++i )
+{
+dnaFutureVec[i-pos] = async(std::launch::async,genBuildList, mTechManager);
+}
+for(size_t i = pos+1; i < nindividuals; ++i)
+{
+try
+{
+dnaVec.at(i) = dnaFutureVec[i-pos].get();
+}
+
+catch(std::system_error&)
+{
+dnaVec.at(i) = genBuildList(mTechManager);
 #ifdef DEBUG
-            std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
-            ++threadFailures;
+std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
+++threadFailures;
 #endif
-        }
-    }
+}
+}
 
-    pos = 0;
-    for (size_t i = 0; i < nindividuals / NUM_THREADS; ++i)
-    {
-        for (size_t j = 0; j < NUM_THREADS; ++j)
-        {
-            pos = i*NUM_THREADS+j;
-            individualFutureVec[pos] = async(std::launch::async,rateIndividual,simRes[pos],dnaVec.at(pos), fitnessPolicy);
-        }
+std::cout << "New Buildlists finished" << std::endl;
 
+pos = 0;
 
-        for (size_t j = 0; j < NUM_THREADS; ++j)
-        {
-            pos = i*NUM_THREADS+j;
-            try
-            {
-                mPopulation.push_back(individualFutureVec[pos].get());
-            }
-            catch(std::system_error&)
-            {
-                mPopulation.push_back(rateIndividual(simRes[pos],dnaVec[pos],fitnessPolicy));
+for (size_t i = 0; i < nindividuals / NUM_THREADS; ++i)
+{
+for (size_t j = 0; j < NUM_THREADS; ++j)
+{
+pos = i*NUM_THREADS+j;
+resultFutureVec[j] = async(std::launch::async,runSimulation, dnaVec.at(pos));
+}
+
+for (size_t j = 0; j < NUM_THREADS; ++j)
+{
+pos = i*NUM_THREADS+j;
+try
+{
+simRes[pos] = resultFutureVec[j].get();
+}
+catch(std::system_error&)
+{
+simRes[pos] = runSimulation(dnaVec.at(pos));
 #ifdef DEBUG
-                std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
-                ++threadFailures;
+	std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
+	++threadFailures;
 #endif
-            }
-        }
-    }
+}
+}
+std::cout << "caught Simulation: " << pos << std::endl;
+}
 
-    for(size_t i = pos+1; i < nindividuals; ++i )
-    {
-        individualFutureVec[i] = async(std::launch::async,rateIndividual,simRes[i],dnaVec.at(i), fitnessPolicy);
-    }
-
-    for(size_t i = pos+1; i < nindividuals; ++i)
-    {
-        try
-        {
-            mPopulation.push_back(individualFutureVec[i].get());
-        }
-        catch(std::system_error&)
-        {
-            mPopulation.push_back(rateIndividual(simRes[i],dnaVec[i], fitnessPolicy));
+for(size_t i = pos+1; i < nindividuals; ++i )
+{
+	resultFutureVec[i-pos] = async(std::launch::async,runSimulation, dnaVec.at(i));
+}
+for(size_t i = pos+1; i < nindividuals; ++i)
+{
+	try
+	{
+		simRes[i] = resultFutureVec[i-pos].get();
+	}
+	catch(std::system_error&)
+	{
+		simRes[i] = runSimulation(dnaVec[i]);
 #ifdef DEBUG
-            std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
-            ++threadFailures;
+		std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
+		++threadFailures;
 #endif
-        }
-    }
+	}
+}
+std::cout << "Simulations ran" << std::endl;
+
+pos = 0;
+for (size_t i = 0; i < nindividuals / NUM_THREADS; ++i)
+{
+	for (size_t j = 0; j < NUM_THREADS; ++j)
+	{
+		pos = i*NUM_THREADS+j;
+		individualFutureVec[pos] = async(std::launch::async,rateIndividual,simRes[pos],dnaVec.at(pos), fitnessPolicy);
+	}
+
+
+	for (size_t j = 0; j < NUM_THREADS; ++j)
+	{
+		pos = i*NUM_THREADS+j;
+		try
+		{
+			mPopulation.push_back(individualFutureVec[pos].get());
+		}
+		catch(std::system_error&)
+		{
+			mPopulation.push_back(rateIndividual(simRes[pos],dnaVec[pos],fitnessPolicy));
+#ifdef DEBUG
+			std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
+			++threadFailures;
+#endif
+		}
+	}
+}
+
+for(size_t i = pos+1; i < nindividuals; ++i )
+{
+	individualFutureVec[i] = async(std::launch::async,rateIndividual,simRes[i],dnaVec.at(i), fitnessPolicy);
+}
+
+for(size_t i = pos+1; i < nindividuals; ++i)
+{
+	try
+	{
+		mPopulation.push_back(individualFutureVec[i].get());
+	}
+	catch(std::system_error&)
+	{
+		mPopulation.push_back(rateIndividual(simRes[i],dnaVec[i], fitnessPolicy));
+#ifdef DEBUG
+		std::cerr << "Was unable to start thread, std::system_error caught" << std::endl;
+		++threadFailures;
+#endif
+	}
+}
+std::cout << "Individuals created" << std::endl;
 
 
 #ifdef DEBUG
-    std::cerr << "Failed to start thread for " << std::to_string(threadFailures) << " times." << std::endl;
+std::cerr << "Failed to start thread for " << std::to_string(threadFailures) << " times." << std::endl;
 #endif
-
+*/
 }
 
 	template <class RacePolicy, class FitnessPolicy>
@@ -196,15 +328,15 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
 	{
 		throw std::invalid_argument("The reproduction Rate must be lower or equal the maximum value. The passed value is: "+std::to_string(reproductionRate));
 	}
-    std::minstd_rand0 generator1(std::chrono::system_clock::now().time_since_epoch().count());
-    std::minstd_rand0 generator2(std::chrono::system_clock::now().time_since_epoch().count());
+	std::minstd_rand0 generator1(std::chrono::system_clock::now().time_since_epoch().count());
+	std::minstd_rand0 generator2(std::chrono::system_clock::now().time_since_epoch().count());
 
 
-    auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> vector<string>
+	auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> vector<string>
 	{
 
-        std::uniform_int_distribution<size_t> distribution1(0,mPopulation.size()-1);
-        std::uniform_int_distribution<int> distribution2(0,1);
+		std::uniform_int_distribution<size_t> distribution1(0,mPopulation.size()-1);
+		std::uniform_int_distribution<int> distribution2(0,1);
 
 
 		auto chooseIndividual = std::bind(distribution1, generator1);
@@ -213,14 +345,14 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
 		std::hash<string> hashGen;
 		set<size_t> positions;
 		vector<string> newGenes;
-        size_t count = 0;
+		size_t count = 0;
 		do {
-            if(++count > 1000)
-            {
-                return mPopulation[chooseIndividual()].genes;
-            }
+			if(++count > 1000)
+			{
+				return mPopulation[chooseIndividual()].genes;
+			}
 
-            PROGRESS("Try to create valid child");
+			PROGRESS("Try to create valid child");
 			do
 			{
 				positions.insert(chooseIndividual());
@@ -236,11 +368,11 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
 						const Individual& ind1 = mPopulation[i];
 						const Individual& ind2 = mPopulation[j];
 
-                        size_t res=0;
-                        size_t len = ind1.genes.size() < ind2.genes.size() ? ind1.genes.size() : ind2.genes.size();
-                        for(size_t k = 0; k < len; ++k)
+						size_t res=0;
+						size_t len = ind1.genes.size() < ind2.genes.size() ? ind1.genes.size() : ind2.genes.size();
+						for(size_t k = 0; k < len; ++k)
 						{
-                            res += (len-k) * std::abs(hashGen(ind1.genes[k])-hashGen(ind2.genes[k]));
+							res += (len-k) * std::abs(hashGen(ind1.genes[k])-hashGen(ind2.genes[k]));
 						}
 
 
@@ -280,11 +412,11 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
 			positions.clear();
 
 		} while(!(techManager.isBuildListPossible(newGenes)));
-        return newGenes;
+		return newGenes;
 	};
 
 	FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
-    const size_t ncrossovers = mPopulation.size()*reproductionRate / mAccuracy;
+	const size_t ncrossovers = mPopulation.size()*reproductionRate / mAccuracy;
 	generateAndRate(target, fitnessPolicy, ncrossovers, genBuildList, timeLimit);
 
 }
@@ -297,32 +429,32 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string t
 		throw std::invalid_argument("The mutation Rate must be lower or equal the maximum value. The passed value is: "+std::to_string(mutationRate));
 	}
 
-    std::minstd_rand0 popGen(std::chrono::system_clock::now().time_since_epoch().count());
-    std::minstd_rand0 geneGen(std::chrono::system_clock::now().time_since_epoch().count());
+	std::minstd_rand0 popGen(std::chrono::system_clock::now().time_since_epoch().count());
+	std::minstd_rand0 geneGen(std::chrono::system_clock::now().time_since_epoch().count());
 
-    auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> vector<string>
+	auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> vector<string>
 	{
 
-        std::uniform_int_distribution<size_t> popDist(0,mPopulation.size()-1);
+		std::uniform_int_distribution<size_t> popDist(0,mPopulation.size()-1);
 
 		auto chooseIndividual = std::bind(popDist, popGen);
 		BuildListGenerator<RacePolicy> buildListGen(techManager.getTechnologyList());
 		buildListGen.initRandomGenerator();
 
-        vector<string> newGenes;
-        size_t count = 0;
+		vector<string> newGenes;
+		size_t count = 0;
 		do
 		{
-            PROGRESS("Try to create valid mutant");
-            const Individual& oldInd = mPopulation[chooseIndividual()];
-            if(++count > 1000)
-            {
-                return mPopulation[chooseIndividual()].genes;
-            }
-            newGenes = oldInd.genes;
+			PROGRESS("Try to create valid mutant");
+			const Individual& oldInd = mPopulation[chooseIndividual()];
+			if(++count > 1000)
+			{
+				return mPopulation[chooseIndividual()].genes;
+			}
+			newGenes = oldInd.genes;
 			std::uniform_int_distribution<size_t> geneDist(0,newGenes.size()-1);
 			auto chooseGene = std::bind(geneDist, geneGen);
-            for(size_t i = 0; i < (mutationRate * newGenes.size())/mAccuracy; ++i)
+			for(size_t i = 0; i < (mutationRate * newGenes.size())/mAccuracy; ++i)
 			{
 
 				geneDist = std::uniform_int_distribution<size_t>(0,newGenes.size()-1);
@@ -332,13 +464,13 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string t
 				string entry = buildListGen.getRandomTechnologyName();
 				newGenes.insert(newGenes.begin()+chooseGene(), entry);
 			}
-        } while(!(techManager.isBuildListPossible(newGenes)));
+		} while(!(techManager.isBuildListPossible(newGenes)));
 
-        return newGenes;
+		return newGenes;
 	};
 
 
-    const size_t nmutants = mPopulation.size() / 5;
+	const size_t nmutants = mPopulation.size() / 5;
 	FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
 	generateAndRate(target, fitnessPolicy, nmutants, genBuildList, timeLimit);
 }
@@ -350,7 +482,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::select(const size_t s
 	{
 		throw std::invalid_argument("@BuildListOptimizer::select: The selection Rate must be lower or equal the maximum value. The passed value is: "+std::to_string(selectionRate));
 	}
-    size_t threshold = (mPopulation.size()*selectionRate)/mAccuracy;
+	size_t threshold = (mPopulation.size()*selectionRate)/mAccuracy;
 	if (threshold <= 0)
 	{
 		return;
@@ -363,11 +495,11 @@ BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(const size_t a
 {
 	if(accuracy <= 0)
 	{
-        throw std::invalid_argument("@BuildListOptimizer::BuildListOptimizer(size_t accuracy, size_t individualSize): The accuracy must be greater than zero. The value passed is: "+std::to_string(accuracy));
+		throw std::invalid_argument("@BuildListOptimizer::BuildListOptimizer(size_t accuracy, size_t individualSize): The accuracy must be greater than zero. The value passed is: "+std::to_string(accuracy));
 	}
 	if(individualSize <= 0)
 	{
-        throw std::invalid_argument("@BuildListOptimizer::BuildListOptimizer(size_t accuracy, size_t individualSize): The size of the individuals must be greater than zero. The value passed is: "+std::to_string(accuracy));
+		throw std::invalid_argument("@BuildListOptimizer::BuildListOptimizer(size_t accuracy, size_t individualSize): The size of the individuals must be greater than zero. The value passed is: "+std::to_string(accuracy));
 	}
 
 	mAccuracy = accuracy;
@@ -378,7 +510,7 @@ BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(const size_t a
 
 
 /*initializes the population with random individuals until the population size reaches initPopSize*/
-template <class RacePolicy, class FitnessPolicy>
+	template <class RacePolicy, class FitnessPolicy>
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(const string target, const size_t ntargets, const int timeLimit, const size_t initPopSize)
 {
 
@@ -404,14 +536,14 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(const string targ
 		return;
 	}
 
-    auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> vector<string>
+	auto genBuildList = [=] (TechnologyManager<RacePolicy> techManager) -> vector<string>
 	{
 		BuildListGenerator<RacePolicy> buildListGen(techManager.getTechnologyList());
 		buildListGen.initRandomGenerator();
-        return buildListGen.buildOneRandomList(mIndividualSize)->getAsVector();
+		return buildListGen.buildOneRandomList(mIndividualSize)->getAsVector();
 	};
 
-    const size_t nindividuals = initPopSize-mPopulation.size();
+	const size_t nindividuals = initPopSize-mPopulation.size();
 
 	FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
 	generateAndRate(target, fitnessPolicy, nindividuals, genBuildList, timeLimit);
@@ -421,14 +553,14 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(const string targ
 
 
 /* clears the whole population by terminating (sic!) all individuals */
-template <class RacePolicy, class FitnessPolicy>
+	template <class RacePolicy, class FitnessPolicy>
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::clear(void)
 {
 	mPopulation.clear();
 }
 
 /* optimizes a buildList by mutating, crossing over and selecting the fittest individuals */
-template <class RacePolicy, class FitnessPolicy>
+	template <class RacePolicy, class FitnessPolicy>
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(const string target, const size_t ntargets, const int timeLimit, const size_t generations, const size_t reproductionRate, const size_t mutationRate, const size_t selectionRate)
 {
 
@@ -449,13 +581,13 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(const string target
 		throw std::invalid_argument("@BuildListOptimizer::optimize: The number of generations must be greater than zero. The passed value is: "+std::to_string(generations));
 	}
 
-    for(size_t i = 0; i < generations; ++i)
+	for(size_t i = 0; i < generations; ++i)
 	{
 		select(selectionRate);
-        mutate(target, ntargets, timeLimit, mutationRate);
+		mutate(target, ntargets, timeLimit, mutationRate);
 		crossover(target, ntargets, timeLimit, reproductionRate);
 		sortPopulation();
-        std::cout << "Size of the population after " << std::to_string(i+1) << " generation(s): " << std::to_string(mPopulation.size()) << std::endl;
+		std::cout << "Size of the population after " << std::to_string(i+1) << " generation(s): " << std::to_string(mPopulation.size()) << std::endl;
 	}
 
 }
@@ -484,7 +616,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initializeAndOptimize(const 
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::addIndividual(const string target, const size_t ntargets, const int timeLimit, shared_ptr<BuildList> buildList )
 {
 	FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
-    map<int,string> simRes = Simulation<RacePolicy>(buildList, mTechManager.getTechnologyList()).run(timeLimit);
+	map<int,string> simRes = Simulation<RacePolicy>(buildList, mTechManager.getTechnologyList()).run(timeLimit);
 	mPopulation.push_back(Individual(fitnessPolicy.rateBuildListHard(simRes),
 				fitnessPolicy.rateBuildListSoft(simRes, RacePolicy::getWorker(), mTechManager.getEntityRequirements(target)), buildList->getAsVector()));
 }
@@ -501,7 +633,7 @@ vector<Individual> BuildListOptimizer<RacePolicy, FitnessPolicy>::getFittestGrou
 
 	sortPopulation();
 	vector<Individual> res;
-    for (size_t i = mPopulation.size()-1; i >= mPopulation.size()-groupSize; --i)
+	for (size_t i = mPopulation.size()-1; i >= mPopulation.size()-groupSize; --i)
 	{
 		res.push_back(mPopulation.at(i));
 	}

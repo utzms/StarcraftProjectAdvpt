@@ -127,9 +127,10 @@ class GameStateUpdate
 				if(buildingIterator->timer == 0)
 				{
 
-					if (buildingIterator->state == Building::State::Producing)
+					if (buildingIterator->state == Building::State::Producing || buildingIterator->state == Building::State::ProducingDouble)
 					{						
 						PROGRESS("GSU: Building " << buildingIterator->getName() << " has produced");
+						bool doubleProduction = (buildingIterator->state == Building::State::ProducingDouble);
 
 						Costs unitCosts = _technologyManager->getEntityCosts(buildingIterator->productionUnitName);
 
@@ -139,6 +140,14 @@ class GameStateUpdate
 							_gameState->workerList.push_back(std::shared_ptr<Worker>(new Worker(buildingIterator->productionUnitName)));
 							_technologyManager->notifyCreation(_gameState->workerList.back()->getName());							
 							_gameState->addSupply(unitCosts.supply);
+
+							if (doubleProduction)
+							{
+								PROGRESS("a worker");
+								_gameState->workerList.push_back(std::shared_ptr<Worker>(new Worker(buildingIterator->productionUnitName)));
+								_technologyManager->notifyCreation(_gameState->workerList.back()->getName());							
+								_gameState->addSupply(unitCosts.supply);
+							}
 						}
                         else if (buildingIterator->productionType == Building::ProductionType::UnitOrder)
 						{
@@ -153,6 +162,22 @@ class GameStateUpdate
 							else
 							{
 								_gameState->addSupply(unitCosts.supply);
+							}
+
+							if (doubleProduction)
+							{
+								PROGRESS("a unit");
+								_gameState->unitList.push_back(std::shared_ptr<Unit>(new Unit(buildingIterator->productionUnitName)));
+								_technologyManager->notifyCreation(_gameState->unitList.back()->getName());
+
+								if (buildingIterator->productionUnitName.compare("Overlord") == 0)
+								{
+									_gameState->addSupplyMax(8);
+								}
+								else
+								{
+									_gameState->addSupply(unitCosts.supply);
+								}
 							}
 						}
 					}

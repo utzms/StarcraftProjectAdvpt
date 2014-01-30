@@ -36,6 +36,7 @@ set ( OWN_HEADERS
   ../include/FitnessPolicy.h
   ../include/BuildListOptimizer.h
   ../include/TemplateInstantiations.h
+  ../include/Energizer.h
  )
   
   
