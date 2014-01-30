@@ -25,7 +25,8 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
         return newOne;
     };
 
-    const unsigned int NUM_THREADS = std::min(std::thread::hardware_concurrency()+1,nindividuals);
+	size_t availableThreads = std::thread::hardware_concurrency();
+    const unsigned int NUM_THREADS = std::min(availableThreads,nindividuals);
     vector<future<vector<string>>> dnaFutureVec(NUM_THREADS);
     vector<future<map<int,string>>> resultFutureVec(NUM_THREADS);
     vector<future<Individual>> individualFutureVec(NUM_THREADS);
@@ -96,7 +97,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 				//watch status
 				try
 				{
-					status = resultFutureVec[i].wait_for(std::chrono::milliseconds(500));
+					status = resultFutureVec[i].wait_for(std::chrono::milliseconds(200));
 				} catch (std::future_error &e)
 				{
 					//only happens if no thread associated with future-object
