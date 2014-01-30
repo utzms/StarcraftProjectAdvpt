@@ -15,46 +15,6 @@ enum class FitnessType
 	Rush
 };
 
-
-class Debug
-{
-	public:
-		std::string m_Target;
-		int m_Time; //its the time limit
-		int m_Number;
-
-		Debug(std::string target, int time, int number)
-		{
-			m_Target = target;
-			m_Time = time;
-			m_Number = number;
-		}
-
-		FitnessType getFitnessType()
-		{
-			return FitnessType::Debug;
-		}
-
-		//returns the rating of the buildlist counting hard constraints
-        int rateBuildListHard(std::map<int, std::string> &resultList)
-		{
-			auto a = resultList;
-			static int rating = 0;
-
-			return ++rating;
-		}
-
-		//returns the rating of the buildlist counting soft contraints
-        int rateBuildListSoft(std::map<int, std::string> &resultList, std::string worker, std::vector<std::string> requirements)
-		{
-			//number of workers, number of production buildings...
-			static int rating = 50000000;
-			auto a = resultList;
-			auto b = worker;
-			auto c = requirements;
-			return rating--;
-		}
-};
 //how many targets can be built in a given time
 class Push
 {
@@ -86,7 +46,8 @@ class Push
 				if(m_Target.compare(i.second) == 0)
 				{
 					PROGRESS("Found target in the list");
-					++rating;
+					rating = 10000/i.first;
+					break;
 				}
 				//TODO maybe the rest of the list should be deleted
 			}
@@ -145,16 +106,24 @@ class Rush
 		{
 			int rating = 0;
 			int count = 0;
+			int lastTime = 1;
 			m_SecondConstraint=400;
 			for(auto i : resultList)
 			{
 				//TODO if simulation doesn't quit after the number constraint, this should be checked here
 				//TODO the time aspekt should be added to the rating
+				if (i.second.compare("Time")==0)
+				{
+					//calculate a score, how long for how many targets it needed
+					rating = rating*10000/lastTime;
+					break;
+				}
 				if(m_Target.compare(i.second) == 0)
 				{
 					PROGRESS("Found target in the list");
 					++count;
-					rating += 10; //testwert
+					rating = rating+1; //testwert
+					lastTime = i.first;
 				}
 				if(count >= m_SecondConstraint)
 				{

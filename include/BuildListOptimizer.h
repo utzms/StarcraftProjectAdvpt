@@ -172,6 +172,8 @@ public:
     /* get the overall fittest individual */
     Individual getFittestIndividual(void);
 
+	void printBest(void);
+
 };
 
 

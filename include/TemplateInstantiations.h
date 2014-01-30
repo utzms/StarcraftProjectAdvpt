@@ -16,6 +16,3 @@ template class BuildListOptimizer<Zerg, Rush>;
 template class BuildListOptimizer<Terran, Push>;
 template class BuildListOptimizer<Protoss, Push>;
 template class BuildListOptimizer<Zerg, Push>;
-template class BuildListOptimizer<Terran, Debug>;
-template class BuildListOptimizer<Protoss, Debug>;
-template class BuildListOptimizer<Zerg, Debug>;

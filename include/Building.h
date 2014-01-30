@@ -51,10 +51,10 @@ class Building
 		Building(std::string name, int buildTime)
 			:_name(name)
 			,state(State::UnderConstruction)
-			,timer(buildTime)
 			,upgradeState(UpgradeState::Ready)
-			,upgradeTimer(0)
             ,boostState(BoostState::NotBoosted)
+			,timer(buildTime)
+			,upgradeTimer(0)
             ,boostTimer(0)
 		{
 		}

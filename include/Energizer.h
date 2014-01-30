@@ -35,8 +35,8 @@ class Energizer
             ,_energyEntityExists(false)
             ,_energyLimit(0)
             ,_muleTimer(0)
-            ,_abilityCooldown(0)
             ,_queenTimer(0)
+            ,_abilityCooldown(0)
 
         {
 

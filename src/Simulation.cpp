@@ -539,7 +539,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 					// it is a building, so we need a worker
 					std::shared_ptr<Worker> ourWorker = getAvailableWorker();
 
-								// we have a worker, let's build something!
+					// we have a worker, let's build something!
 					if (ourWorker)
 					{
 						PROGRESS("Simulation::run() Ordering building " << currentItem);
@@ -732,6 +732,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 		timeStep();
 	}
 
+	resultMap[time] = "Time";
 	return resultMap;
 }
 

@@ -59,7 +59,7 @@ private:
         const auto& initSpecials = mTechList.findUnitVec(RacePolicy::getSpecialResource());
         for (const auto special : initSpecials)
         {
-            mExistenceMap[special->getName()] = 10000000; //With INT_MAX we risc integer overflows! 
+            mExistenceMap[special->getName()] = 100000; //With INT_MAX we risc integer overflows! 
         }
         for (const auto building : initBuildings)
         {
@@ -411,7 +411,7 @@ public:
         auto it = mExistenceMap.find(entityName);
         if(it->second < 0)
         {
-            throw std::range_error("@TechnologyManager::notifyCreation: The internal existence count for "+entityName+" reached a negative value. Something went terribly wrong");
+            throw std::range_error("@TechnologyManager::notifyCreation: The internal existence count for "+entityName+" reached a negative value. Something went terribly wrong " + std::to_string(it->second));
         }
 
         ++(it->second);
@@ -421,13 +421,13 @@ public:
     {
         if(mExistenceMap.count(entityName) == 0)
         {
-            throw std::invalid_argument("@TechnologyManager::notifiyCreation: "+entityName+" is not part of the tech tree.");
+            throw std::invalid_argument("@TechnologyManager::notifiyDestruction: "+entityName+" is not part of the tech tree.");
         }
 
         auto it = mExistenceMap.find(entityName);
         if(it->second <= 0)
         {
-            throw std::range_error("@TechnologyManager::notifyDestruction: The internal existence count for "+entityName+" reached a negative value. Something went terribly wrong");
+            throw std::range_error("@TechnologyManager::notifyDestruction: The internal existence count for "+entityName+" reached a negative value. Something went terribly wrong " + std::to_string(it->second));
         }
         --(it->second);
 

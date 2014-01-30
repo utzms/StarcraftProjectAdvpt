@@ -4,7 +4,6 @@
 #include <random>
 #include <vector>
 #include <stdexcept>
-//#include <omp.h>
 #include <chrono>
 
 #include "Debug.h"
