@@ -33,11 +33,13 @@ class InitTechTree : private TechTree
 					std::cerr << "Will try another Path" << std::endl;
 #endif
 					tech->initBuildingList(TechTree::buildingPath2());
-					tech->initUnitList(TechTree::unitPath2());
-				} else
+                    tech->initUnitList(TechTree::unitPath2());
+                }
+                else
 				{
-					tech->initUnitList(TechTree::unitPath1());
-				}
+					tech->initUnitList(TechTree::unitPath1()); 
+
+                }
 				if (!(tech->isInitialized()))
 					return false;
 				return true;

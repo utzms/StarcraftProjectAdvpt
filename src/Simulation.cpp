@@ -168,7 +168,7 @@ template <class RacePolicy>
 Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 {
 
-	_buildList = std::unique_ptr<BuildList>(new BuildList(buildListFilename));
+	_buildList = std::shared_ptr<BuildList>(new BuildList(buildListFilename));
 
 
 	std::shared_ptr<GameState> gameState(new GameState());
@@ -201,7 +201,7 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 	_gameState->buildingList.push_back(std::shared_ptr<Building>(new Building(RacePolicy::getMainBuilding(), 0)));
 	_gameState->buildingList.back()->state = Building::State::Ready;
 
-	int supplyToAdd = _technologyManager->getEntityCosts(RacePolicy::getMainBuilding()).supply;	
+    int supplyToAdd = _technologyManager->getEntityCosts(RacePolicy::getMainBuilding()).supply;
 	_technologyManager->notifyCreation(RacePolicy::getMainBuilding());
 
 	// again special zerg handling
@@ -232,6 +232,8 @@ template<class RacePolicy>
 Simulation<RacePolicy>::Simulation(std::shared_ptr<BuildList> buildList, const TechnologyList& techList)
 {
     // TODO
+	auto a = techList;
+	_buildList = buildList;
 }
 
 
@@ -603,7 +605,18 @@ template <class RacePolicy>
 std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 {
         // TODO
-        return std::map<int, std::string>();
+	int i = timeLimit;
+	BuildList::State buildListState = BuildList::State::InProgress;
+	
+	std::map<int, std::string> ret;
+	_buildList->reset();
+	while (buildListState != BuildList::State::Finished)
+	{
+		std::string currentItem = _buildList->current();
+		ret.insert(std::pair<int,std::string>(i++,currentItem));
+		buildListState = _buildList->advance();
+	}
+    return ret;
 }
 
 template <class RacePolicy>

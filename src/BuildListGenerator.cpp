@@ -55,6 +55,7 @@ std::string BuildListGenerator<RacePolicy>::getRandomTechnologyName()
 template <class RacePolicy>
 std::shared_ptr<BuildList> BuildListGenerator<RacePolicy>::buildOneRandomList(int length)
 {
+    PROGRESS("BuildListGenerator::buildOneRandomList()");
 	std::vector<std::string> stringList;
 	std::shared_ptr<BuildList> list;
 	do

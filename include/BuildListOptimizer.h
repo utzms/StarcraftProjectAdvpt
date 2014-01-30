@@ -14,12 +14,12 @@
 #include <cstdlib>
 #include <set>
 #include <future>
+#include <thread>
 #include <functional>
 #include <iostream>
 
-#include "Simulation.h"
-#include "BuildList.h"
 #include "BuildListGenerator.h"
+#include "BuildList.h"
 #include "TechnologyManager.h"
 #include "RacePolicy.h"
 #include "FitnessPolicy.h"
@@ -66,21 +66,19 @@ struct Individual
         return ind.hardSkills == this->hardSkills && ind.softSkills == this->hardSkills;
     }
 
-    //friend std::ostream& operator<<(std::ostream& out, const Individual& ind);
-    //friend std::ostream& operator<<(std::ostream& out, const vector<Individual>& inds);
+
 };
 
 inline std::ostream& operator<<(std::ostream& out, const Individual& ind)
 {
-    int count = 0;
+    size_t count = 0;
     for(string gene : ind.genes)
     {
-        out << ++count << ":" << gene << std::endl;
+        out << std::to_string(++count) << ":" << gene << std::endl;
     }
     out << "Score: " << ind.hardSkills << "\t-\t" << ind.softSkills << std::endl;
     return out;
 }
-
 inline std::ostream& operator<<(std::ostream& out, const vector<Individual>& inds)
 {
     for (auto i : inds)
@@ -99,24 +97,24 @@ private:
           ...
         */
     vector<Individual> mPopulation;
-    int mAccuracy;
-    int mIndividualSize;
+    size_t mAccuracy;
+    size_t mIndividualSize;
     TechnologyManager<RacePolicy> mTechManager;
 
     inline void sortPopulation()
     {
         std::sort(mPopulation.begin(), mPopulation.end());
     }
-    inline void crossover(string target, int ntargets, int timeLimit, int reproductionRate);
-    inline void mutate(string target, int ntargets, int timeLimit, int mutationRate);
-    inline void select(int selectionRate);
+    inline void crossover(string target, size_t ntargets, int timeLimit, size_t reproductionRate);
+    inline void mutate(string target, size_t ntargets, int timeLimit, size_t mutationRate);
+    inline void select(size_t selectionRate);
 
 
-    inline void generateAndRate(const string target, FitnessPolicy& fitnessPolicy, const int nindividuals, std::function<shared_ptr<BuildList>(TechnologyManager<RacePolicy>)> genBuildList, const int timeLimit);
+    inline void generateAndRate(const string target, FitnessPolicy& fitnessPolicy, const size_t nindividuals, std::function<vector<string>(TechnologyManager<RacePolicy>)> genBuildList, const int timeLimit);
 
 public:
 
-    BuildListOptimizer(const int accuracy, const int individualSize);
+    BuildListOptimizer(const size_t accuracy, const size_t individualSize);
     BuildListOptimizer()// dummy Default-Constructor
     {
         mAccuracy=100;
@@ -124,12 +122,12 @@ public:
         mTechManager = TechnologyManager<RacePolicy>();
     }
 
-    void setAccuracy(const int accuracy)
+    void setAccuracy(const size_t accuracy)
     {
         mAccuracy = accuracy;
     }
 
-    int getAccuracy()
+    size_t getAccuracy()
     {
         return mAccuracy;
     }
@@ -151,25 +149,25 @@ public:
 
 
     /*initializes the population with random individuals until the population size reaches initPopSize*/
-    void initialize(const string target, const int ntargets, const int timeLimit, const int initPopSize);
+    void initialize(const string target, const size_t ntargets, const int timeLimit, const size_t initPopSize);
 
     /* clears the whole population by terminating (sic!) all individuals */
     void clear(void);
 
     /* optimizes a buildList by mutating, crossing over and selecting the fittest individuals */
-    void optimize(const string target, const int ntargets, const int timeLimit, const int generations, const int reproductionRate, const int mutationRate, const int selectionRate);
+    void optimize(const string target, const size_t ntargets, const int timeLimit, const size_t generations, const size_t reproductionRate, const size_t mutationRate, const size_t selectionRate);
 
     /* combined use of initialize and optimize */
-    void initializeAndOptimize(const string target, const int ntargets, const int timeLimit, const int initPopSize, const int generations, const int reproductionRate, const int mutationRate, const int selectionRate);
+    void initializeAndOptimize(const string target, const size_t ntargets, const int timeLimit, const size_t initPopSize, const size_t generations, const size_t reproductionRate, const size_t mutationRate, const size_t selectionRate);
 
     /* combined use of clear, initialize and optimize */
-    void clearInitializeAndOptimize(const string target, const int ntargets, const int timeLimit, const int initPopSize, const int generations, const int reproductionRate, const int mutationRate, const int selectionRate);
+    void clearInitializeAndOptimize(const string target, const size_t ntargets, const int timeLimit, const size_t initPopSize, const size_t generations, const size_t reproductionRate, const size_t mutationRate, const size_t selectionRate);
 
     /* adds a specific individual to the population */
-    void addIndividual(const string target, const int ntargets, const int timeLimit, shared_ptr<BuildList> buildList);
+    void addIndividual(const string target, const size_t ntargets, const int timeLimit, shared_ptr<BuildList> buildList);
 
     /* get the group of size number of the fittest individuals, together with their corresponding fitness value */
-    vector<Individual> getFittestGroup(const int groupSize);
+    vector<Individual> getFittestGroup(const size_t groupSize);
 
     /* get the overall fittest individual */
     Individual getFittestIndividual(void);

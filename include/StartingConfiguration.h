@@ -5,9 +5,9 @@ class StartingConfiguration
 {
 private:
 
-    int _initialWorkerCount;
-    float _initialMinerals;
-    float _initialVespeneGas;
+    int mInitialWorkerCount;
+    float mInitialMinerals;
+    float mInitialVespeneGas;
 
 public:
 
@@ -25,15 +25,15 @@ public:
         {
             if(currentString.compare("Workers") == 0)
             {
-                configFile >> _initialWorkerCount;
+                configFile >> mInitialWorkerCount;
             }
             else if(currentString.compare("Minerals") == 0)
             {
-                configFile >> _initialMinerals;
+                configFile >> mInitialMinerals;
             }
             else if(currentString.compare("VespeneGas") == 0)
             {
-                configFile >> _initialVespeneGas;
+                configFile >> mInitialVespeneGas;
             }
         }
 
@@ -41,17 +41,17 @@ public:
 
     inline int getInitialWorkerCount()
     {
-        return _initialWorkerCount;
+        return mInitialWorkerCount;
     }
 
-    inline int getInitialMinerals()
+    inline float getInitialMinerals()
     {
-        return _initialMinerals;
+        return mInitialMinerals;
     }
 
-    inline int getInitialVespeneGas()
+    inline float getInitialVespeneGas()
     {
-        return _initialVespeneGas;
+        return mInitialVespeneGas;
     }
 
 };
