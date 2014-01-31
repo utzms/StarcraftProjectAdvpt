@@ -319,7 +319,6 @@ std::cout << "Individuals created" << std::endl;
 std::cerr << "Failed to start thread for " << std::to_string(threadFailures) << " times." << std::endl;
 #endif
 */
-
 }
 
 	template <class RacePolicy, class FitnessPolicy>
@@ -473,7 +472,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string t
 	};
 
 
-	const size_t nmutants = mPopulation.size() / 5;
+    const size_t nmutants = mPopulation.size() / 4;
 	FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
 	generateAndRate(target, fitnessPolicy, nmutants, genBuildList, timeLimit);
 }
