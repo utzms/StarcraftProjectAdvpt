@@ -24,8 +24,8 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
         Individual newOne(fp.rateBuildListHard(res), fp.rateBuildListSoft(res,RacePolicy::getWorker(), a),dnaVec);
         return newOne;
     };
-
-    const unsigned int NUM_THREADS = std::min(std::thread::hardware_concurrency()+1,nindividuals);
+    const size_t concurrency = std::thread::hardware_concurrency()+1;
+    const size_t NUM_THREADS = std::min(concurrency,nindividuals);
     vector<future<vector<string>>> dnaFutureVec(NUM_THREADS);
     vector<future<map<int,string>>> resultFutureVec(NUM_THREADS);
     vector<future<Individual>> individualFutureVec(NUM_THREADS);
@@ -47,7 +47,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 	}
 	while (finished < nindividuals)
 	{
-		for (int i = 0; i < NUM_THREADS; ++i)
+        for (size_t i = 0; i < NUM_THREADS; ++i)
 		{
 			try
 			{
@@ -81,7 +81,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 	std::cout << "New buildlists finished" << std::endl;
 
 	finished = started = 0;
-	for (int i = 0; i < NUM_THREADS; ++i)
+    for (size_t i = 0; i < NUM_THREADS; ++i)
 	{
 		resultFutureVec[i] = async(std::launch::async,runSimulation,dnaVec.at(started));
 		++started;
@@ -89,7 +89,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 
 	while (finished < nindividuals)
 	{
-		for (int i = 0; i < NUM_THREADS; ++i)
+        for (size_t i = 0; i < NUM_THREADS; ++i)
 		{
 			try
 			{
@@ -123,14 +123,14 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 	std::cout << "Simulations done" << std::endl;
 
 	finished = started = 0;
-	for (int i = 0; i < NUM_THREADS; ++i)
+    for (size_t i = 0; i < NUM_THREADS; ++i)
 	{
 		individualFutureVec[i] = async(std::launch::async,rateIndividual,simRes[started],dnaVec.at(started), fitnessPolicy);
 		++started;
 	}
 	while (finished < nindividuals)
 	{
-		for (int i = 0; i < NUM_THREADS; ++i)
+        for (size_t i = 0; i < NUM_THREADS; ++i)
 		{
 			try
 			{
@@ -349,7 +349,9 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
 		do {
 			if(++count > 1000)
 			{
-				return mPopulation[chooseIndividual()].genes;
+                BuildListGenerator<RacePolicy> buildListGen(techManager.getTechnologyList());
+                buildListGen.initRandomGenerator();
+                return buildListGen.buildOneRandomList(mIndividualSize)->getAsVector();
 			}
 
 			PROGRESS("Try to create valid child");
@@ -449,7 +451,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string t
 			const Individual& oldInd = mPopulation[chooseIndividual()];
 			if(++count > 1000)
 			{
-				return mPopulation[chooseIndividual()].genes;
+                return buildListGen.buildOneRandomList(mIndividualSize)->getAsVector();
 			}
 			newGenes = oldInd.genes;
 			std::uniform_int_distribution<size_t> geneDist(0,newGenes.size()-1);
