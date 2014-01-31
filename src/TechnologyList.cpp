@@ -531,7 +531,7 @@ void TechnologyList::initRandomGenerator(size_t seed, std::string SpecialOne, in
 
 	//put all requirements with higher weight in list
 	std::map<std::string,int>::iterator findMe;
-	int maxRuns=100;
+	int maxRuns=50;
 	while (depth > 1)
 	{
 		if (maxRuns--<= 0)

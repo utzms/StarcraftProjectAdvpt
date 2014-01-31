@@ -543,7 +543,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::printBest(int timeLimit, std
 
 		if (target.compare(it.second) == 0)
 			++targetCount;
-		if (target.compare(it.second)==0 && FitnessPolicy::getFitnessType() == FitnessType::Push)
+		if ((target.compare(it.second) == 0) && (FitnessPolicy::getFitnessType() == FitnessType::Push))
 			break;
 	}
 	counter=0;
