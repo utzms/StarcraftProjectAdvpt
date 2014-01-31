@@ -30,7 +30,7 @@ class Push
 			m_Number = number;
 		}
 
-		FitnessType getFitnessType()
+		static FitnessType getFitnessType()
 		{
 			return FitnessType::Push;
 		}
@@ -96,7 +96,7 @@ class Rush
 			m_Number = number;
 		}
 
-		FitnessType getFitnessType()
+		static FitnessType getFitnessType()
 		{
 			return FitnessType::Rush;
 		}

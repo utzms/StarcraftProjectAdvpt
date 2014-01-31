@@ -15,6 +15,7 @@
 #include "Debug.h"
 #include "Technology.h"
 #include "DataReader.h"
+#include "RacePolicy.h"
 
 
 class TechnologyList

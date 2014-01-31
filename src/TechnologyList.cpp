@@ -508,15 +508,57 @@ std::shared_ptr<Technology> TechnologyList::findUnit(std::string key)
 void TechnologyList::initRandomGenerator(size_t seed, std::string SpecialOne, int weight)
 {
 	PROGRESS("RandomGenerator INIT");
+	std::map<std::string, int> tree;
+	std::vector<std::string> req;
 
+	int depth=weight;
+
+	req.push_back(SpecialOne);
+	tree.insert(std::pair<std::string,int>(SpecialOne,weight));
+	if (findUnit(SpecialOne)!=NULL)
+	{
+		if (findBuilding(Protoss::getSupplyProvider())!=NULL)
+		{
+			tree.insert(std::pair<std::string,int>(Protoss::getSupplyProvider(),weight/2));
+		} else if (findBuilding(Terran::getSupplyProvider())!=NULL)
+		{
+			tree.insert(std::pair<std::string,int>(Terran::getSupplyProvider(),weight/2));
+		} else if (findBuilding(Zerg::getSupplyProvider())!=NULL)
+		{
+			tree.insert(std::pair<std::string,int>(Zerg::getSupplyProvider(),weight/2));
+		}
+	}
+
+	//put all requirements with higher weight in list
+	std::map<std::string,int>::iterator findMe;
+	while (depth > 1)
+	{
+		auto tmp = findTechnology(req.at(0));
+		auto reqVec = tmp->getRequirements();
+		findMe = tree.find(tmp->getName());
+		depth = findMe->second-1;
+		for (auto outerVec : reqVec)
+		{
+			for (auto innerVec : outerVec)
+			{
+				std::pair<std::string, int> put(innerVec.first->getName(),depth);
+				req.push_back(innerVec.first->getName());
+				tree.insert(put);
+			}
+		}
+		req.erase(req.begin()+0);
+	}
+	
     for(auto &it : units)
     {
         if (techNames.size()>0)
+			//archon like cases
             if (it.second->getName()==techNames.back())
                 continue;
-        if (it.second->getName()==SpecialOne)
+		//found in req list, then weight it harder
+        if ( (findMe = tree.find(it.second->getName())) != tree.end())
         {
-            for (int i = 0; i < weight; ++i)
+            for (int i = 0; i < findMe->second; ++i)
                 techNames.push_back(it.second->getName());
         } else
         {
@@ -528,9 +570,9 @@ void TechnologyList::initRandomGenerator(size_t seed, std::string SpecialOne, in
         if (techNames.size()>0)
             if (it.second->getName()==techNames.back())
                 continue;
-        if (it.second->getName()==SpecialOne)
+        if ( (findMe = tree.find(it.second->getName())) != tree.end())
         {
-            for (int i = 0; i < weight; ++i)
+            for (int i = 0; i < findMe->second; ++i)
                 techNames.push_back(it.second->getName());
         } else
         {

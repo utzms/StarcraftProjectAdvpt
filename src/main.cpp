@@ -35,30 +35,14 @@ template <typename RacePolicy, typename FitnessPolicy> void writeLogToFile(Build
 
 void startBuildListOptimizer(std::string race, std::string strategy, std::string unit, size_t timeLimit, size_t populationSize)
 {
-    const size_t individualSize = 20;
-    int selectionRate = 64;
+    const size_t individualSize = 30;
+    const int selectionRate = 10;
     const size_t mutationRate = 10;
     const size_t reproductionRate = 25;
     const size_t initPopSize = populationSize;
     const size_t generations = 100;
     const size_t accuracy = 100;
-    const size_t ntargets = 10;
-	bool found=false;
-	while (found == false)
-	{
-        size_t tmpPop=initPopSize;
-        for (size_t i = 0; i < generations; ++i)
-		{
-			tmpPop = tmpPop*selectionRate/accuracy; //select
-			tmpPop = tmpPop*1.25; //mutation, static, as we say its 1/4 
-			tmpPop = tmpPop + tmpPop*reproductionRate/accuracy; //reproduce
-		}
-		if (tmpPop < 100)
-		{
-			++selectionRate;
-		} else 
-			found = true;
-	}
+    const size_t ntargets = 10000;
 	std::cout << "The optimization is done with the following rates:" << std::endl;
 	std::cout << "Selection Rate: " << std::to_string(selectionRate) << std::endl;
 	std::cout << "Mutation Rate: " << std::to_string(mutationRate) << std::endl;
@@ -79,9 +63,9 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
 				std::cerr << "Fehler\t" <<e.what() << std::endl;
 			}
 			std::cout << "Final size of the population: " << opt.getPopulationSize() << std::endl;
-			std::cout << "The top 3 are:" << std::endl;
-			std::cout << opt.getFittestGroup(3) << std::endl;
-            opt.printBest();
+			std::cout << "The top 1 is:" << std::endl;
+			std::cout << opt.getFittestGroup(1) << std::endl;
+            opt.printBest(timeLimit,unit);
             writeLogToFile(opt);
 		} else if (!race.compare("Zerg"))
 		{
@@ -94,9 +78,9 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
 				std::cerr << "Fehler\t" <<e.what() << std::endl;
 			}
 			std::cout << "Final size of the population: " << opt.getPopulationSize() << std::endl;
-			std::cout << "The top 3 are:" << std::endl;
-			std::cout << opt.getFittestGroup(3) << std::endl;
-			opt.printBest();
+			std::cout << "The top 1 is:" << std::endl;
+			std::cout << opt.getFittestGroup(1) << std::endl;
+			opt.printBest(timeLimit,unit);
             writeLogToFile(opt);
 		} else if (!race.compare("Terran"))
 		{
@@ -109,9 +93,9 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
 				std::cerr << "Fehler\t" <<e.what() << std::endl;
 			}
 			std::cout << "Final size of the population: " << opt.getPopulationSize() << std::endl;
-			std::cout << "The top 3 are:" << std::endl;
-			std::cout << opt.getFittestGroup(3) << std::endl;
-			opt.printBest();
+			std::cout << "The top 1 is:" << std::endl;
+			std::cout << opt.getFittestGroup(1) << std::endl;
+			opt.printBest(timeLimit,unit);
             writeLogToFile(opt);
 		} else
 		{
@@ -130,9 +114,9 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
 				std::cerr << "Fehler\t" <<e.what() << std::endl;
 			}
 			std::cout << "Final size of the population: " << opt.getPopulationSize() << std::endl;
-			std::cout << "The top 3 are:" << std::endl;
-			std::cout << opt.getFittestGroup(3) << std::endl;
-            opt.printBest();
+			std::cout << "The top 1 is:" << std::endl;
+			std::cout << opt.getFittestGroup(1) << std::endl;
+            opt.printBest(timeLimit,unit);
             writeLogToFile(opt);
         } else if (!race.compare("Zerg"))
 		{
@@ -145,9 +129,9 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
 				std::cerr << "Fehler\t" <<e.what() << std::endl;
 			}
 			std::cout << "Final size of the population: " << opt.getPopulationSize() << std::endl;
-			std::cout << "The top 3 are:" << std::endl;
-			std::cout << opt.getFittestGroup(3) << std::endl;
-			opt.printBest(); 
+			std::cout << "The top 1 is:" << std::endl;
+			std::cout << opt.getFittestGroup(1) << std::endl;
+			opt.printBest(timeLimit,unit); 
             writeLogToFile(opt);
         } else if (!race.compare("Terran"))
 		{
@@ -160,9 +144,9 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
 				std::cerr << "Fehler\t" <<e.what() << std::endl;
 			}
 			std::cout << "Final size of the population: " << opt.getPopulationSize() << std::endl;
-			std::cout << "The top 3 are:" << std::endl;
-			std::cout << opt.getFittestGroup(3) << std::endl;
-			opt.printBest();
+			std::cout << "The top 1 is:" << std::endl;
+			std::cout << opt.getFittestGroup(1) << std::endl;
+			opt.printBest(timeLimit,unit);
 
             writeLogToFile(opt);
         } else
