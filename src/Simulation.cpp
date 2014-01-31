@@ -305,7 +305,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 {
 	PROGRESS("Simulation::run() starts ");
 
-	std::map<int, string> resultMap;
+    std::map<int, std::string> resultMap;
 
 	std::vector< std::shared_ptr<Worker> >& workerList = _gameState->workerList;
 
@@ -519,7 +519,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 							_gameState->subMinerals(entityCosts.minerals);
 							_gameState->subGas(entityCosts.gas);
 
-							//std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+                            std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 							// write current item to result map
 							resultMap[time] = currentItem;
@@ -545,7 +545,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 						PROGRESS("Simulation::run() Ordering building " << currentItem);
 						buildBuilding(ourWorker, currentItem, entityCosts.buildTime);
 						_buildList->setCurrentItemOk();
-						//std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+                        std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 						// write current item to result map
 						resultMap[time] = currentItem;
@@ -611,7 +611,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
                                         _gameState->subGas(entityCosts.gas);
 
                                         _buildList->setCurrentItemOk();
-                                        //std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+                                        std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 										// write current item to result map
 										resultMap[time] = currentItem;
@@ -643,28 +643,18 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 
 							// first see if it is a reactor building
 							// if not we dont need to bother
-							if (currentItem.find("Reactor") != std::string::npos)
+                            if (buildingForProduction->getName().find("Reactor") != std::string::npos)
 							{
 								// check next item in buildList
-								// for this we need to extract the whole list and find the current item
-								std::vector<std::string> currentList = _buildList->getAsVector();
-								std::vector<std::string>::const_iterator currentItemIterator = std::find(currentList.begin(), currentList.end(), currentItem);
+                                std::string preview = _buildList->sneakPreview();
 
-								if (currentItemIterator != currentList.end())
-								{
-									currentItemIterator++;
-
-									if (currentItemIterator != currentList.end())
-									{
-										if (currentItem.compare(*currentItemIterator) == 0)
-										{
-											// we now know that there are 2 identical units after each other in the build list
-											// and we have a reactor building
-											// so we can produce both
-											doubleProduction = true;
-										}
-									}
-								}
+                                if (preview.compare(currentItem) == 0)
+                                {
+                                    // we now know that there are 2 identical units after each other in the build list
+                                    // and we have a reactor building
+                                    // so we can produce both
+                                    doubleProduction = true;
+                                }
 							}
 						}
 
@@ -690,6 +680,8 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 								_buildList->setCurrentItemOk();
 								_buildList->advance();
 								resultMap[time+1] = currentItem;
+
+                                std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 							}
 						}
 
@@ -703,7 +695,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 						}
 						
 						_buildList->setCurrentItemOk();
-						//std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+                        std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 						// write current item to result map
 						resultMap[time] = currentItem;
@@ -732,7 +724,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 		timeStep();
 	}
 
-	return resultMap;
+    return resultMap;
 }
 
 template <class RacePolicy>

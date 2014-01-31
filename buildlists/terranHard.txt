@@ -20,6 +20,7 @@ TechLabBarracks
 EngineeringBay
 Bunker
 Bunker
+OrbitalCommand
 SupplyDepot
 SupplyDepot
 GhostAcademy
@@ -39,10 +40,11 @@ ReactorBarracks
 ReactorFactory
 ReactorStarport
 Marine
-Marine
 FusionCore
 Viking
 Medivac
 Battlecruiser
 Banshee
 Raven
+Marine
+Marine

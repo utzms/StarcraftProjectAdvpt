@@ -57,10 +57,11 @@
 
 #define PROGRESS(MSG) \
     { \
-		std::stringstream ss;  \
-		ss << MSG; \
-		internal::progressFct(ss.str()); \
+        std::stringstream ss;  \
+        ss << MSG; \
+        internal::progressFct(ss.str()); \
     }
+//#define PROGRESS(MSG)
 
 #else
 

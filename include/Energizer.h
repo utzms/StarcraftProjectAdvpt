@@ -121,6 +121,7 @@ class Energizer
                     if (_muleTimer > 0)
                     {
 						// Project1-Description: "roughly 4 times the yield of a SCV"
+                        PROGRESS("GSU Mule harvests");
                         _gameState->addMinerals(2.8f);
                         _muleTimer--;
                     }

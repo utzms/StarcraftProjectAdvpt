@@ -1,6 +1,6 @@
 Unit			Mineral		Vespene		Supply		BuildTime		BuildFrom											Requirements		Vanish_Req
 SCV				50			0			1			17				CommandCenter,OrbitalCommand,PlanetaryFortress	0					0
-Marine			50			0			1			25				Barracks											0					0
+Marine			50			0			1			25				Barracks,ReactorBarracks											0					0
 Marauder		100			25			2			30				TechLabBarracks										0					0
 Reaper			50			50			1			45				TechLabBarracks										0					0
 Ghost			200			100			2			40				TechLabBarracks										GhostAcademy		0

@@ -75,7 +75,7 @@ public:
         /* Constructor for use in BuildListOptimizer */
         Simulation(std::shared_ptr<BuildList> buildList, const TechnologyList& techList);
 
-        void run();
+        //void run();
         /* run() method for use in BuildListOptimizer */
         std::map<int,std::string> run(int timeLimit);
         ~Simulation();

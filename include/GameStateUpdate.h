@@ -102,6 +102,8 @@ class GameStateUpdate
 
 			PROGRESS("GSU Updating Buildings");
 			//update buildings
+            std::vector< std::shared_ptr<Building> > upgradedBuildingToErase;
+            std::vector< std::shared_ptr<Building> > upgradedBuildingToAdd;
 			for (auto buildingIterator : buildingList)
 			{
 				if (buildingIterator->upgradeTimer == 0)
@@ -109,19 +111,18 @@ class GameStateUpdate
 					PROGRESS("GSU: Building " << buildingIterator->getName() << " timer == 0");
 					if (buildingIterator->upgradeState == Building::UpgradeState::Upgrading)
 					{
-						Building::State tempState = buildingIterator->state;
-						int tempTimer = buildingIterator->timer;
-						std::string unitName = buildingIterator->productionUnitName;
-						Building::ProductionType tempType = buildingIterator->productionType;
 
-						_technologyManager->notifyCreation(buildingIterator->targetUpgradeName);
-						buildingIterator = std::shared_ptr<Building>(new Building(buildingIterator->targetUpgradeName, 0));
+                        upgradedBuildingToErase.push_back( buildingIterator );
 
-						buildingIterator->state = tempState;
-						buildingIterator->timer = tempTimer;
-						buildingIterator->productionUnitName = unitName;
-						buildingIterator->productionType = tempType;
-					}
+                        //instantiate new building
+                        std::shared_ptr<Building> buildingToAdd = std::shared_ptr<Building> (new Building(buildingIterator->targetUpgradeName, 0));
+
+                        buildingToAdd->state = buildingIterator->state;
+                        buildingToAdd->timer = buildingIterator->timer;;
+                        buildingToAdd->productionUnitName = buildingIterator->productionUnitName;
+                        buildingToAdd->productionType = buildingIterator->productionType;
+                        upgradedBuildingToAdd.push_back( buildingToAdd );
+                    }
 				}
 
 				if(buildingIterator->timer == 0)
@@ -195,6 +196,22 @@ class GameStateUpdate
 				}
 			}
 
+            for(auto upgradedBuildingToEraseIterator : upgradedBuildingToErase)
+            {
+                auto buildingIterator = std::find( buildingList.begin(), buildingList.end(), upgradedBuildingToEraseIterator);
+                if(buildingIterator != buildingList.end())
+                {
+                    PROGRESS("GSU Destroyed " << (*buildingIterator)->getName());
+                    buildingList.erase(buildingIterator);
+                    _technologyManager->notifyDestruction((*buildingIterator)->getName());
+                }
+            }
+
+            for (auto upgradedBuildingToAddIterator : upgradedBuildingToAdd)
+            {
+                buildingList.push_back(upgradedBuildingToAddIterator);
+                _technologyManager->notifyCreation(buildingList.back()->getName());
+            }
 		}
 
 

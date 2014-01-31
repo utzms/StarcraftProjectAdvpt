@@ -77,9 +77,22 @@ public:
         _nameList.clear();
         _builtList.clear();
     }
+
     std::string current()
     {
         return *_currentItem;
+    }
+
+    std::string sneakPreview()
+    {
+        if (_currentItem+1 != _nameList.end())
+        {
+            return *(_currentItem+1);
+        }
+        else
+        {
+            return "";
+        }
     }
 
     State advance()

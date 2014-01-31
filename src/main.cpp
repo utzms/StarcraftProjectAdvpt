@@ -8,7 +8,7 @@
 
 #include <stdexcept>
 
-int oldCall(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	if(argc < 2)
 	{
@@ -19,7 +19,7 @@ int oldCall(int argc, char **argv)
 	try
 	{
 		Simulation<Protoss> simulation(argument);
-		simulation.run();
+        simulation.run(1000);
 		return 0;
 	}
 	catch (std::exception &e)
@@ -30,7 +30,7 @@ int oldCall(int argc, char **argv)
 	try
 	{
 		Simulation<Terran> simulation(argument);
-		simulation.run();
+        simulation.run(1000000);
 		return 0;
 	}
 	catch (std::exception &e)
@@ -41,7 +41,7 @@ int oldCall(int argc, char **argv)
 	try
 	{
 		Simulation<Zerg> simulation(argument);
-		simulation.run();
+        simulation.run(200);
 		return 0;
 	}
 	catch (std::exception &e)
@@ -69,7 +69,7 @@ void testTechList()
 }
 
 
-int main(int argc, char *argv[])
+int old(int argc, char *argv[])
 {
     //oldCall(argc, argv);
         const int individualSize = 30;
@@ -83,15 +83,15 @@ int main(int argc, char *argv[])
         std::cout << "Selection Rate: " << std::to_string(selectionRate) << std::endl;
         std::cout << "Mutation Rate: " << std::to_string(mutationRate) << std::endl;
         std::cout << "Reproduction Rate: " << std::to_string(reproductionRate) << std::endl;
-        BuildListOptimizer<Protoss,Debug> opt(accuracy,individualSize);
+        BuildListOptimizer<Terran,Rush> opt(accuracy,individualSize);
         std::cout << "The size of every individual is " << std::to_string(individualSize) << " entries." << std::endl;
         std::cout << "We start with " << std::to_string(initPopSize) << " Individuals." << std::endl;
         auto startTime = std::chrono::system_clock::now().time_since_epoch().count();
         try{
-        opt.initialize("Zealot",10,1000000,initPopSize);
+        opt.initialize("Marine",100,300,initPopSize);
         //std::cout << "Size of the population: " << opt.getPopulationSize() << std::endl;
         //std::cout << opt.getFittestIndividual();
-        opt.optimize("Zealot",10,1000000,generations,reproductionRate,mutationRate,selectionRate);
+        opt.optimize("Marine",100,300,generations,reproductionRate,mutationRate,selectionRate);
         } catch(std::exception &e)
         {
             std::cerr << "Fehler\t" <<e.what() << std::endl;
