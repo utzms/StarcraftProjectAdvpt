@@ -7,8 +7,8 @@
 #include <stdexcept>
 #include <chrono>
 #include <thread>
-
-#include <stdexcept>
+#include <sstream>
+#include <fstream>
 
 template <typename T>
 T pushOrRush(std::string in)
@@ -23,21 +23,31 @@ T pushOrRush(std::string in)
 	}
 	return out;
 }
-
-void startBuildListOptimizer(std::string race, std::string strategy, std::string unit, int timeLimit, int populationSize)
+template <typename RacePolicy, typename FitnessPolicy> void writeLogToFile(BuildListOptimizer<RacePolicy,FitnessPolicy>& opt)
 {
-	const int individualSize = 20;
-	int selectionRate = 15;
-	const int mutationRate = 15;
-	const int reproductionRate = 25;
-	const int initPopSize = populationSize;
-	const int generations = 5;
-	const int accuracy = 100;
+
+    std::ofstream logFile;
+    logFile.open("./StarcraftOptimizer.log");
+    logFile << "The top 10 are:\n";
+    logFile << opt.getFittestGroup(10);
+    logFile.close();
+}
+
+void startBuildListOptimizer(std::string race, std::string strategy, std::string unit, size_t timeLimit, size_t populationSize)
+{
+    const size_t individualSize = 20;
+    int selectionRate = 64;
+    const size_t mutationRate = 10;
+    const size_t reproductionRate = 25;
+    const size_t initPopSize = populationSize;
+    const size_t generations = 100;
+    const size_t accuracy = 100;
+    const size_t ntargets = 10;
 	bool found=false;
 	while (found == false)
 	{
-		int tmpPop=initPopSize;
-		for (int i = 0; i < generations; ++i)
+        size_t tmpPop=initPopSize;
+        for (size_t i = 0; i < generations; ++i)
 		{
 			tmpPop = tmpPop*selectionRate/accuracy; //select
 			tmpPop = tmpPop*1.25; //mutation, static, as we say its 1/4 
@@ -62,8 +72,8 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
 		{
 			BuildListOptimizer<Protoss,Push> opt(accuracy,individualSize);
 			try{
-				opt.initialize(unit,1000,timeLimit,initPopSize);
-				opt.optimize(unit,1000,timeLimit,generations,reproductionRate,mutationRate,selectionRate);
+                opt.initialize(unit,ntargets,timeLimit,initPopSize);
+                opt.optimize(unit,ntargets,timeLimit,generations,reproductionRate,mutationRate,selectionRate);
 			} catch(std::exception &e)
 			{
 				std::cerr << "Fehler\t" <<e.what() << std::endl;
@@ -71,13 +81,14 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
 			std::cout << "Final size of the population: " << opt.getPopulationSize() << std::endl;
 			std::cout << "The top 3 are:" << std::endl;
 			std::cout << opt.getFittestGroup(3) << std::endl;
-			opt.printBest();
+            opt.printBest();
+            writeLogToFile(opt);
 		} else if (!race.compare("Zerg"))
 		{
 			BuildListOptimizer<Zerg,Push> opt(accuracy,individualSize);
 			try{
-				opt.initialize(unit,100,timeLimit,initPopSize);
-				opt.optimize(unit,100,timeLimit,generations,reproductionRate,mutationRate,selectionRate);
+                opt.initialize(unit,ntargets,timeLimit,initPopSize);
+                opt.optimize(unit,ntargets,timeLimit,generations,reproductionRate,mutationRate,selectionRate);
 			} catch(std::exception &e)
 			{
 				std::cerr << "Fehler\t" <<e.what() << std::endl;
@@ -86,12 +97,13 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
 			std::cout << "The top 3 are:" << std::endl;
 			std::cout << opt.getFittestGroup(3) << std::endl;
 			opt.printBest();
+            writeLogToFile(opt);
 		} else if (!race.compare("Terran"))
 		{
 			BuildListOptimizer<Terran,Push> opt(accuracy,individualSize);
 			try{
-				opt.initialize(unit,100,timeLimit,initPopSize);
-				opt.optimize(unit,100,timeLimit,generations,reproductionRate,mutationRate,selectionRate);
+                opt.initialize(unit,ntargets,timeLimit,initPopSize);
+                opt.optimize(unit,ntargets,timeLimit,generations,reproductionRate,mutationRate,selectionRate);
 			} catch(std::exception &e)
 			{
 				std::cerr << "Fehler\t" <<e.what() << std::endl;
@@ -100,6 +112,7 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
 			std::cout << "The top 3 are:" << std::endl;
 			std::cout << opt.getFittestGroup(3) << std::endl;
 			opt.printBest();
+            writeLogToFile(opt);
 		} else
 		{
 			throw std::invalid_argument("No known race");
@@ -110,8 +123,8 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
 		{
 			BuildListOptimizer<Protoss,Rush> opt(accuracy,individualSize);
 			try{
-				opt.initialize(unit,100,timeLimit,initPopSize);
-				opt.optimize(unit,100,timeLimit,generations,reproductionRate,mutationRate,selectionRate);
+                opt.initialize(unit,ntargets,timeLimit,initPopSize);
+                opt.optimize(unit,ntargets,timeLimit,generations,reproductionRate,mutationRate,selectionRate);
 			} catch(std::exception &e)
 			{
 				std::cerr << "Fehler\t" <<e.what() << std::endl;
@@ -119,13 +132,14 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
 			std::cout << "Final size of the population: " << opt.getPopulationSize() << std::endl;
 			std::cout << "The top 3 are:" << std::endl;
 			std::cout << opt.getFittestGroup(3) << std::endl;
-			opt.printBest();
-		} else if (!race.compare("Zerg"))
+            opt.printBest();
+            writeLogToFile(opt);
+        } else if (!race.compare("Zerg"))
 		{
 			BuildListOptimizer<Zerg,Rush> opt(accuracy,individualSize);
 			try{
-				opt.initialize(unit,100,timeLimit,initPopSize);
-				opt.optimize(unit,100,timeLimit,generations,reproductionRate,mutationRate,selectionRate);
+                opt.initialize(unit,ntargets,timeLimit,initPopSize);
+                opt.optimize(unit,ntargets,timeLimit,generations,reproductionRate,mutationRate,selectionRate);
 			} catch(std::exception &e)
 			{
 				std::cerr << "Fehler\t" <<e.what() << std::endl;
@@ -133,13 +147,14 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
 			std::cout << "Final size of the population: " << opt.getPopulationSize() << std::endl;
 			std::cout << "The top 3 are:" << std::endl;
 			std::cout << opt.getFittestGroup(3) << std::endl;
-			opt.printBest();
-		} else if (!race.compare("Terran"))
+			opt.printBest(); 
+            writeLogToFile(opt);
+        } else if (!race.compare("Terran"))
 		{
 			BuildListOptimizer<Terran,Rush> opt(accuracy,individualSize);
 			try{
-				opt.initialize(unit,100,timeLimit,initPopSize);
-				opt.optimize(unit,100,timeLimit,generations,reproductionRate,mutationRate,selectionRate);
+                opt.initialize(unit,ntargets,timeLimit,initPopSize);
+                opt.optimize(unit,ntargets,timeLimit,generations,reproductionRate,mutationRate,selectionRate);
 			} catch(std::exception &e)
 			{
 				std::cerr << "Fehler\t" <<e.what() << std::endl;
@@ -148,7 +163,9 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
 			std::cout << "The top 3 are:" << std::endl;
 			std::cout << opt.getFittestGroup(3) << std::endl;
 			opt.printBest();
-		} else
+
+            writeLogToFile(opt);
+        } else
 		{
 			throw std::invalid_argument("No known race");
 		}
@@ -195,8 +212,8 @@ int main(int argc, char *argv[])
 	std::string strategy;
 	std::string race;
 	std::string unit;
-	int timeLimit = 0;
-	int population=100;
+    int timeLimit = 1200;
+    int population=100000;
 	if (argc < 4)
 	{
 		std::cerr << "Usage: ./bin/runme [Unit] [Strategy] [Timelimit]" << std::endl;
@@ -205,9 +222,11 @@ int main(int argc, char *argv[])
 	{
 		unit = argv[1];
 		strategy = argv[2];
-		timeLimit = atoi(argv[3]);
-		if (argc == 5)
-			population=atoi(argv[4]);
+        timeLimit = atoi(argv[3]);
+        if (argc >= 5) {
+
+                population = atoi(argv[4]);
+        }
 	}
 	race = getRace(unit);
 	std::cout << unit << "\t" << strategy << "\t" << race << std::endl;
@@ -215,8 +234,8 @@ int main(int argc, char *argv[])
 	auto startTime = std::chrono::system_clock::now().time_since_epoch().count();
 	startBuildListOptimizer(race, strategy, unit, timeLimit, population);
 	auto endTime =  std::chrono::system_clock::now().time_since_epoch().count();
-	std::cout << "Required the following time to run: " << (endTime-startTime)*std::chrono::system_clock::period::num/std::chrono::system_clock::period::den << "s" << std::endl;
-	std::cout << "Number of threads used: " << std::to_string(std::thread::hardware_concurrency()) << std::endl;
+    std::cout << "Required the following time to run: " << (endTime-startTime)*std::chrono::system_clock::period::num/std::chrono::system_clock::period::den << "s" << std::endl;
+    std::cout << "Number of threads used: " << std::to_string(std::thread::hardware_concurrency()+1) << std::endl;
 
 	return  0;
 }

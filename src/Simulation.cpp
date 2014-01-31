@@ -140,7 +140,7 @@ void Simulation<RacePolicy>::timeStep()
 
 template <class RacePolicy> std::shared_ptr<Worker> Simulation<RacePolicy>::getAvailableWorker()
 {
-	std::shared_ptr<Worker> ourWorker(nullptr); 
+    std::shared_ptr<Worker> ourWorker(_gameState->workerList[0]);
 	// first check for ready workers, so we only
 	// use workers who are collecting if necessary
 	for (auto workerIterator : _gameState->workerList)
@@ -562,7 +562,10 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 					}
 					else
 					{
-						std::cerr << "No Worker for building found, is that even possible?" << std::endl;
+                        #ifdef DEBUG
+                        std::cerr << "No Worker for building found, is that even possible?" << std::endl;
+                        std::cerr << "Yes, it is possible if all workers are delayed, constructing or collecting vespine gas, this can actually happen in some BuildLists" << std::endl;
+                        #endif
 						break;
 					}
 

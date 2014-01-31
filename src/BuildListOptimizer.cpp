@@ -27,9 +27,9 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
         Individual newOne(fp.rateBuildListHard(res), fp.rateBuildListSoft(res,RacePolicy::getWorker(), a),dnaVec);
 		return newOne;
 	};
-
+    const size_t concurrency = std::thread::hardware_concurrency()+1;
 	size_t availableThreads = std::thread::hardware_concurrency();
-	const unsigned int NUM_THREADS = std::min(availableThreads,nindividuals);
+	const unsigned int NUM_THREADS = std::min(availableThreads+1,nindividuals);
 	vector<size_t>threadID(NUM_THREADS);
 	vector<future<vector<string>>> dnaFutureVec(NUM_THREADS);
 	vector<future<map<int,string>>> resultFutureVec(NUM_THREADS);
@@ -360,7 +360,9 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::crossover(const strin
 		do {
 			if(++count > 1000)
 			{
-				return mPopulation[chooseIndividual()].genes;
+                BuildListGenerator<RacePolicy> buildListGen(techManager.getTechnologyList());
+                buildListGen.initRandomGenerator();
+                return buildListGen.buildOneRandomList(mIndividualSize)->getAsVector();
 			}
 
 			PROGRESS("Try to create valid child");
@@ -460,7 +462,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::mutate(const string t
 			const Individual& oldInd = mPopulation[chooseIndividual()];
 			if(++count > 1000)
 			{
-				return mPopulation[chooseIndividual()].genes;
+                return buildListGen.buildOneRandomList(mIndividualSize)->getAsVector();
 			}
 			newGenes = oldInd.genes;
 			std::uniform_int_distribution<size_t> geneDist(0,newGenes.size()-1);

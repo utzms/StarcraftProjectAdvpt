@@ -82,7 +82,7 @@ inline std::ostream& operator<<(std::ostream& out, const Individual& ind)
 inline std::ostream& operator<<(std::ostream& out, const vector<Individual>& inds)
 {
     for (auto i : inds)
-        out << i;
+        out << i << std::endl;
     return out;
 }
 
