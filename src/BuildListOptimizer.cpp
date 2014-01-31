@@ -1,6 +1,10 @@
 #include "../include/BuildListOptimizer.h"
 
-
+using std::string;
+using std::vector;
+using std::shared_ptr;
+using std::set;
+using std::map;
 using std::pair;
 using std::future;
 using std::async;
@@ -41,7 +45,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 	size_t finished=0;
 	std::future_status status;
 
-	for (int i = 0; i < NUM_THREADS; ++i)
+    for (size_t i = 0; i < NUM_THREADS; ++i)
 	{
 		dnaFutureVec[i] = async(std::launch::async,genBuildList, mTechManager);
 		threadID[i] = started;
@@ -49,7 +53,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 	}
 	while (finished < nindividuals)
 	{
-		for (int i = 0; i < NUM_THREADS; ++i)
+        for (size_t i = 0; i < NUM_THREADS; ++i)
 		{
 			try
 			{
@@ -84,7 +88,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 	std::cout << "New buildlists finished" << std::endl;
 
 	finished = started = 0;
-	for (int i = 0; i < NUM_THREADS; ++i)
+    for (size_t i = 0; i < NUM_THREADS; ++i)
 	{
 		resultFutureVec[i] = async(std::launch::async,runSimulation,dnaVec.at(started));
 		threadID[i] = started;
@@ -93,7 +97,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 
 	while (finished < nindividuals)
 	{
-		for (int i = 0; i < NUM_THREADS; ++i)
+        for (size_t i = 0; i < NUM_THREADS; ++i)
 		{
 			try
 			{
@@ -128,7 +132,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 	std::cout << "Simulations done" << std::endl;
 
 	finished = started = 0;
-	for (int i = 0; i < NUM_THREADS; ++i)
+    for (size_t i = 0; i < NUM_THREADS; ++i)
 	{
 		individualFutureVec[i] = async(std::launch::async,rateIndividual,simRes[started],dnaVec.at(started), fitnessPolicy);
 		threadID[i] = started;
@@ -136,7 +140,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 	}
 	while (finished < nindividuals)
 	{
-		for (int i = 0; i < NUM_THREADS; ++i)
+        for (size_t i = 0; i < NUM_THREADS; ++i)
 		{
 			try
 			{
