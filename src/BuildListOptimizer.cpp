@@ -111,7 +111,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 					}
 				} else
 				{
-					std::cout << "Simulation not yet ready " << finished+i << std::endl;
+                    PROGRESS("Simulation not yet ready " << finished+i);
 				}
 			} catch(std::system_error &e)
 			{
@@ -319,6 +319,7 @@ std::cout << "Individuals created" << std::endl;
 std::cerr << "Failed to start thread for " << std::to_string(threadFailures) << " times." << std::endl;
 #endif
 */
+
 }
 
 	template <class RacePolicy, class FitnessPolicy>
