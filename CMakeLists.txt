@@ -16,7 +16,7 @@ endif(CMAKE_COMPILER_IS_GNUCXX)
 
 # Default build type
 if ( NOT CMAKE_BUILD_TYPE )
-    set ( CMAKE_BUILD_TYPE Debug CACHE STRING "Build Types: Debug Release"  FORCE )
+    set ( CMAKE_BUILD_TYPE Release CACHE STRING "Build Types: Debug Release"  FORCE )
 endif()
 set_property( CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS Debug Release )
 

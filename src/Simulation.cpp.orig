@@ -140,7 +140,7 @@ void Simulation<RacePolicy>::timeStep()
 
 template <class RacePolicy> std::shared_ptr<Worker> Simulation<RacePolicy>::getAvailableWorker()
 {
-	std::shared_ptr<Worker> ourWorker(nullptr); 
+    std::shared_ptr<Worker> ourWorker(_gameState->workerList[0]);
 	// first check for ready workers, so we only
 	// use workers who are collecting if necessary
 	for (auto workerIterator : _gameState->workerList)
@@ -305,7 +305,11 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 {
 	PROGRESS("Simulation::run() starts ");
 
+<<<<<<< HEAD
+	std::map<int, std::string> resultMap;
+=======
     std::map<int, std::string> resultMap;
+>>>>>>> origin/testMe
 
 	std::vector< std::shared_ptr<Worker> >& workerList = _gameState->workerList;
 
@@ -524,6 +528,9 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 							// write current item to result map
 							resultMap[time] = currentItem;
 
+							// write current item to result map
+							resultMap[time] = currentItem;
+
 							// continue to the next item in the build list
 							continue;
 						}
@@ -539,13 +546,16 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 					// it is a building, so we need a worker
 					std::shared_ptr<Worker> ourWorker = getAvailableWorker();
 
-								// we have a worker, let's build something!
+					// we have a worker, let's build something!
 					if (ourWorker)
 					{
 						PROGRESS("Simulation::run() Ordering building " << currentItem);
 						buildBuilding(ourWorker, currentItem, entityCosts.buildTime);
 						_buildList->setCurrentItemOk();
                         std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+
+						// write current item to result map
+						resultMap[time] = currentItem;
 
 						// write current item to result map
 						resultMap[time] = currentItem;
@@ -562,7 +572,10 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 					}
 					else
 					{
-						std::cerr << "No Worker for building found, is that even possible?" << std::endl;
+                        #ifdef DEBUG
+                        std::cerr << "No Worker for building found, is that even possible?" << std::endl;
+                        std::cerr << "Yes, it is possible if all workers are delayed, constructing or collecting vespine gas, this can actually happen in some BuildLists" << std::endl;
+                        #endif
 						break;
 					}
 
@@ -611,7 +624,11 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
                                         _gameState->subGas(entityCosts.gas);
 
                                         _buildList->setCurrentItemOk();
+<<<<<<< HEAD
+                                        //std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+=======
                                         std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+>>>>>>> origin/testMe
 
 										// write current item to result map
 										resultMap[time] = currentItem;
@@ -643,6 +660,30 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 
 							// first see if it is a reactor building
 							// if not we dont need to bother
+<<<<<<< HEAD
+							if (currentItem.find("Reactor") != std::string::npos)
+							{
+								// check next item in buildList
+								// for this we need to extract the whole list and find the current item
+								std::vector<std::string> currentList = _buildList->getAsVector();
+								std::vector<std::string>::const_iterator currentItemIterator = std::find(currentList.begin(), currentList.end(), currentItem);
+
+								if (currentItemIterator != currentList.end())
+								{
+									currentItemIterator++;
+
+									if (currentItemIterator != currentList.end())
+									{
+										if (currentItem.compare(*currentItemIterator) == 0)
+										{
+											// we now know that there are 2 identical units after each other in the build list
+											// and we have a reactor building
+											// so we can produce both
+											doubleProduction = true;
+										}
+									}
+								}
+=======
                             if (buildingForProduction->getName().find("Reactor") != std::string::npos)
 							{
 								// check next item in buildList
@@ -655,6 +696,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
                                     // so we can produce both
                                     doubleProduction = true;
                                 }
+>>>>>>> origin/testMe
 							}
 						}
 
@@ -680,8 +722,11 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 								_buildList->setCurrentItemOk();
 								_buildList->advance();
 								resultMap[time+1] = currentItem;
+<<<<<<< HEAD
+=======
 
                                 std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+>>>>>>> origin/testMe
 							}
 						}
 
@@ -695,7 +740,11 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 						}
 						
 						_buildList->setCurrentItemOk();
+<<<<<<< HEAD
+						//std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+=======
                         std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+>>>>>>> origin/testMe
 
 						// write current item to result map
 						resultMap[time] = currentItem;
@@ -724,7 +773,12 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 		timeStep();
 	}
 
+<<<<<<< HEAD
+	resultMap[time] = "Time";
+	return resultMap;
+=======
     return resultMap;
+>>>>>>> origin/testMe
 }
 
 template <class RacePolicy>

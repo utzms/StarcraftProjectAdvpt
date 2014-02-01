@@ -17,6 +17,6 @@ FusionCore	 		150 		150 	65 		0		SCV,Starport											0
 TechLabBarracks		50			25		25 		0		Barracks												0
 TechLabFactory		50			25		25		0		Factory													0
 TechLabStarport		50			25		25		0		Starport												0
-ReactorBarracks		50			50		50 		0		Barracks												0
+ReactorBarracks		50			50		50 		0		0												Barracks
 ReactorFactory		50			50		50		0		Factory													0
 ReactorStarport		50			50		50		0		Starport												0

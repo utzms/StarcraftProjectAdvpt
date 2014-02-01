@@ -20,6 +20,7 @@ TechLabBarracks
 EngineeringBay
 Bunker
 Bunker
+OrbitalCommand
 SupplyDepot
 SupplyDepot
 GhostAcademy
@@ -46,3 +47,5 @@ Medivac
 Battlecruiser
 Banshee
 Raven
+Marine
+Marine

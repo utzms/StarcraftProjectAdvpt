@@ -111,6 +111,7 @@ class GameState
         {
             _energy = value;
         }
+
 };
 
 #endif // _GAMESTATE_H_
