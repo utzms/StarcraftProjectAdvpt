@@ -369,6 +369,11 @@ public:
                         fulfilled = true;
                       std::pair<bool, std::vector<std::string> > res;
                       checkAndGetVanishing(entityName,res);
+                      if(res.first == false)
+                      {
+                          throw std::runtime_error("@TechnologyManager::isBuildListPossible: checkTechnologyRequirements returned true, but checkAndGetVanishing() false for the same entity name, something went terribly wrong.");
+
+                      }
                         for(std::string name : res.second)
                         {
                                 notifyDestruction(name);
