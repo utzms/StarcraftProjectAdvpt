@@ -5,7 +5,7 @@ project ( StarcraftSimulation )
 
 # Compiler Flags
 
-set( CMAKE_CXX_FLAGS "-std=c++11 -pthread -Wall" )
+set( CMAKE_CXX_FLAGS "-g -std=c++11 -pthread -Wall" )
 
 
 if(CMAKE_COMPILER_IS_GNUCXX)
