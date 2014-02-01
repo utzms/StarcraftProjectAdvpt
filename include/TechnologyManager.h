@@ -395,6 +395,7 @@ public:
                     if(checkTechnologyRequirements(tech))
                     {
                         fulfilled = true;
+						/*
                       std::pair<bool, std::vector<std::string> > res;
                       checkAndGetVanishing(techVec,res);
                       if(res.first == false)
@@ -406,6 +407,7 @@ public:
                         {
                                 notifyDestruction(name);
                         }
+						*/
                         notifyCreation(entityName);
                         if(!entityName.compare(RacePolicy::getMainBuilding()))
                         {
