@@ -71,55 +71,117 @@ std::shared_ptr<BuildList> BuildListGenerator<RacePolicy>::buildOneRandomList(in
 			{
 				in = copyFrom.getRandomTechnology();
 				std::vector<std::shared_ptr<Technology>> tmp = localTester->findTechnology(in);
+				if (in == "Larva")
+					continue;
+				std::vector<std::string> killed;
+				bool fulfilled = false;
+				std::shared_ptr<Technology> itseMe = tmp.at(0);
 				for (unsigned int j=0;j<tmp.size();++j)
 				{
-					checked=localTester->checkTechnologyRequirements(tmp[j]);
-					if (checked == true)
-					{
-						if(!in.compare(RacePolicy::getMainBuilding()))
-						{   
-							supply += 10; 
-						}   
-						else if(!in.compare(RacePolicy::getSupplyProvider()))
-						{   
-							supply += 8;
-						} else
-						{   
-							supply -= tmp[j]->getSupplyCost();
-							if (supply < 0)
-							{   
-								checked = false;
-							} else
-                            {
-                                checked = true;
-                                break;
-                            }
-                        }
-                    }
-                    break;
-                }
-            } while (checked == false);
-            std::pair<bool, std::vector<std::string> > res;
-            std::vector<std::shared_ptr<Technology>> techVec = localTester->findTechnology(in);
-            localTester->checkAndGetVanishing(techVec,res);
-            if(res.first == false)
-            {
-                throw std::runtime_error("@BuildListGenerator::buildOneRandomList: checkTechnologyRequirements returned true, but checkAndGetVanishing() false for the same entity name, something went terribly wrong.");
+					//checked=localTester->checkTechnologyRequirements(tmp[j]);
+					std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType>>> requirements = tmp[j]->getRequirements();
+					itseMe = tmp[j];
 
-            }
-            for(std::string name : res.second)
-            {
-                localTester->notifyDestruction(name);
-            }
-            localTester->notifyCreation(in);
-            stringList.push_back(in);
-        }
-        //shouldnt reach this one
+					//std::cout << "\n" << in << " " << requirements.size() << std::endl;
+					for(auto redundantRequirements : requirements)
+					{
+						//std::cout << "\t" << redundantRequirements.size() << std::endl;
+						fulfilled = false;
+						for(auto requirement : redundantRequirements)
+						{ 
+							std::string name = requirement.first->getName();
+						//	std::cout << "\t\t" << name;
+							if (requirement.second == RequirementType::Vanishing)
+							{
+								if (localTester->entityExists(name))
+								{
+									killed.push_back(name);
+									localTester->notifyDestruction(name);
+									fulfilled = true;
+								} else
+								{
+						//			std::cout << "\t not" <<std::endl;
+									fulfilled = false;
+									break;
+								}
+							} else if (localTester->entityExists(name))
+							{
+								fulfilled = true;
+								break;
+							} else
+							{
+						//		std::cout << "\t not yet" << std::endl;
+							}
+						}
+						if(!fulfilled)
+						{
+							for (auto it : killed)
+							{
+								localTester->notifyCreation(it);
+							}
+							break;
+						}
+					}
+					if (fulfilled == true)
+					{
+					//	std::cout << "\t\t OK" << std::endl;
+						break;
+					}
+				}
+				//if (fulfilled==false)
+				//	std::cout << "\t\t NO" << std::endl;
+				checked = fulfilled;
+				if (checked == true)
+				{
+					if(!in.compare(RacePolicy::getMainBuilding()))
+					{   
+						supply += 10; 
+					}   
+					else if(!in.compare(RacePolicy::getSupplyProvider()))
+					{   
+						supply += 8;
+					} else
+					{   
+						supply -= itseMe->getSupplyCost();
+						if (supply < 0)
+						{   
+							for (auto it : killed)
+							{
+								localTester->notifyCreation(it);
+							}
+							killed.clear();
+							checked = false;
+						} else
+						{
+							checked = true;
+							break;
+						}
+					}
+				}
+			} while (checked == false);
+			/*
+			   std::pair<bool, std::vector<std::string> > res;
+			   std::vector<std::shared_ptr<Technology>> techVec = localTester->findTechnology(in);
+			   localTester->checkAndGetVanishing(techVec,res);
+			   if(res.first == false)
+			   {
+			   throw std::runtime_error("@BuildListGenerator::buildOneRandomList: checkTechnologyRequirements returned true, but checkAndGetVanishing() false for the same entity name, something went terribly wrong.");
+
+			   }
+			   for(std::string name : res.second)
+			   {
+			   localTester->notifyDestruction(name);
+			   }
+			 */
+			localTester->notifyCreation(in);
+			stringList.push_back(in);
+		}
+		//shouldnt reach this one
 		if (checkBuildListPossibility(stringList)==false)
 		{
-			std::cerr << "Nicht gut, kaputte RandomList" << std::endl;
-			for (unsigned int j=0;j<stringList.size();++j)
-				std::cout << stringList.at(j) << std::endl;
+			   std::cerr << "Nicht gut, kaputte RandomList" << std::endl;
+			   for (unsigned int j=0;j<stringList.size();++j)
+			   std::cout << stringList.at(j) << std::endl;
 		}
 	} while (checkBuildListPossibility(stringList) == false);
 	list = std::make_shared<BuildList>(stringList);

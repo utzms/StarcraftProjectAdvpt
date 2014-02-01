@@ -35,12 +35,12 @@ template <typename RacePolicy, typename FitnessPolicy> void writeLogToFile(Build
 
 void startBuildListOptimizer(std::string race, std::string strategy, std::string unit, size_t timeLimit, size_t populationSize)
 {
-    const size_t individualSize = 30;
+    const size_t individualSize = 50;
     const int selectionRate = 10;
     const size_t mutationRate = 10;
     const size_t reproductionRate = 25;
     const size_t initPopSize = populationSize;
-    const size_t generations = 100;
+    const size_t generations = 1;
     const size_t accuracy = 100;
     const size_t ntargets = 10000;
 	std::cout << "The optimization is done with the following rates:" << std::endl;

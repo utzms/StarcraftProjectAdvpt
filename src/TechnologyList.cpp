@@ -520,12 +520,15 @@ void TechnologyList::initRandomGenerator(size_t seed, std::string SpecialOne, in
 		if (findBuilding(Protoss::getSupplyProvider())!=NULL)
 		{
 			tree.insert(std::pair<std::string,int>(Protoss::getSupplyProvider(),weight/2));
+			tree.insert(std::pair<std::string,int>(Protoss::getWorker(),weight));
 		} else if (findBuilding(Terran::getSupplyProvider())!=NULL)
 		{
 			tree.insert(std::pair<std::string,int>(Terran::getSupplyProvider(),weight/2));
+			tree.insert(std::pair<std::string,int>(Terran::getWorker(),weight));
 		} else if (findBuilding(Zerg::getSupplyProvider())!=NULL)
 		{
 			tree.insert(std::pair<std::string,int>(Zerg::getSupplyProvider(),weight/2));
+			tree.insert(std::pair<std::string,int>(Zerg::getWorker(),weight));
 		}
 	}
 

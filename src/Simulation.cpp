@@ -494,6 +494,7 @@ std::multimap<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 								if (buildingIterator->getName().compare(vanishingRequirements[0]) == 0)
 								{
 									buildingToBeUpgraded = buildingIterator;
+									break;
 								}
 							}
 
@@ -562,7 +563,7 @@ std::multimap<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 					}
 					else
 					{
-						std::cerr << "No Worker for building found, is that even possible?" << std::endl;
+						//std::cerr << "No Worker for building found, is that even possible?" << std::endl;
 						break;
 					}
 

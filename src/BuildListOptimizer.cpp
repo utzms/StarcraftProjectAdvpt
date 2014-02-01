@@ -19,7 +19,16 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
     {
         shared_ptr<BuildList> buildList = std::make_shared<BuildList>(dna);
         Simulation<RacePolicy> a(buildList, techList);
-        return a.run(timeLimit);
+		try
+		{
+        	return a.run(timeLimit);
+		} catch (std::exception &e)
+		{
+			std::cout << e.what() << std::endl;
+			for(auto i : dna)
+				std::cout << i << std::endl;
+			return multimap<int,string>();
+		}
     };
 
     auto rateIndividual = [=] (multimap<int, string> res, vector<string> dnaVec, FitnessPolicy fp) -> Individual
@@ -29,6 +38,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 		return newOne;
 	};
 	size_t availableThreads = std::thread::hardware_concurrency();
+	availableThreads++;
 	const unsigned int NUM_THREADS = std::min(availableThreads+1,nindividuals);
 	vector<size_t>threadID(NUM_THREADS);
 	vector<future<vector<string>>> dnaFutureVec(NUM_THREADS);
