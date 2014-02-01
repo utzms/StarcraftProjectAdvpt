@@ -314,6 +314,34 @@ public:
             }
         }
         res.first = false;
+    }
+
+    void checkAndGetVanishing(std::vector<std::shared_ptr<Technology> > techVec, std::pair<bool, std::vector<std::string> >& res)
+    {
+        if (techVec.size() == 0)
+        {
+            throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
+        }
+        for (const auto& tech : techVec)
+        {
+            if (checkTechnologyRequirements(tech))
+            {
+                res.first = true;
+                std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementType> > > requirements = tech->getRequirements();
+                for (const auto& redundantRequirements : requirements)
+                {
+                    for (const auto& requirement : redundantRequirements)
+                    {
+                        if (requirement.second == RequirementType::Vanishing)
+                        {
+                            (res.second).push_back(requirement.first->getName());
+                        }
+                    }
+                }
+                return;
+            }
+        }
+        res.first = false;
 
     }
 
@@ -368,7 +396,7 @@ public:
                     {
                         fulfilled = true;
                       std::pair<bool, std::vector<std::string> > res;
-                      checkAndGetVanishing(entityName,res);
+                      checkAndGetVanishing(techVec,res);
                       if(res.first == false)
                       {
                           throw std::runtime_error("@TechnologyManager::isBuildListPossible: checkTechnologyRequirements returned true, but checkAndGetVanishing() false for the same entity name, something went terribly wrong.");

@@ -90,19 +90,31 @@ std::shared_ptr<BuildList> BuildListGenerator<RacePolicy>::buildOneRandomList(in
 							{   
 								checked = false;
 							} else
-							{
-								checked = true;
-								break;
-							}
-						} 
-					}
-					break;
-				}
-			} while (checked == false);
-			localTester->notifyCreation(in);
-			stringList.push_back(in);
-		}
-		//shouldnt reach this one
+                            {
+                                checked = true;
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                }
+            } while (checked == false);
+            std::pair<bool, std::vector<std::string> > res;
+            std::vector<std::shared_ptr<Technology>> techVec = localTester->findTechnology(in);
+            localTester->checkAndGetVanishing(techVec,res);
+            if(res.first == false)
+            {
+                throw std::runtime_error("@BuildListGenerator::buildOneRandomList: checkTechnologyRequirements returned true, but checkAndGetVanishing() false for the same entity name, something went terribly wrong.");
+
+            }
+            for(std::string name : res.second)
+            {
+                localTester->notifyDestruction(name);
+            }
+            localTester->notifyCreation(in);
+            stringList.push_back(in);
+        }
+        //shouldnt reach this one
 		if (checkBuildListPossibility(stringList)==false)
 		{
 			std::cerr << "Nicht gut, kaputte RandomList" << std::endl;
