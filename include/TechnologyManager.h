@@ -324,7 +324,41 @@ public:
         }
         for (const auto& tech : techVec)
         {
-            if (checkTechnologyRequirements(tech))
+            res.second.clear();
+            if(tech->getName() == "Archon")
+            {
+                    if(checkTechnologyRequirements(tech))
+                    {
+                        res.first = true;
+                        std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementType> > > requirements = tech->getRequirements();
+                        for (const auto& redundantRequirements : requirements)
+                        {
+                            for (const auto& requirement : redundantRequirements)
+                            {
+                                if(checkTechnologyRequirements(tech) == false && res.first==true)
+                                {
+                                        notifyCreation((res.second).back());
+                                        (res.second).pop_back();
+                                        res.first = false;
+                                }
+                                else if (requirement.second == RequirementType::Vanishing && res.first == true)
+                                {
+                                    (res.second).push_back(requirement.first->getName());
+                                    notifyDestruction(requirement.first->getName());
+
+                                }
+                            }
+                            for(auto it : res.second)
+                            {
+                                notifyCreation(it);
+                            }
+                        }
+                        if (res.first==true)
+                          return;
+
+                 }
+            }
+            else if (checkTechnologyRequirements(tech))
             {
                 res.first = true;
                 std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementType> > > requirements = tech->getRequirements();
@@ -335,6 +369,7 @@ public:
                         if (requirement.second == RequirementType::Vanishing)
                         {
                             (res.second).push_back(requirement.first->getName());
+
                         }
                     }
                 }
