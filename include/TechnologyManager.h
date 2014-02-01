@@ -367,6 +367,12 @@ public:
                     if(checkTechnologyRequirements(tech))
                     {
                         fulfilled = true;
+                      std::pair<bool, std::vector<std::string> > res;
+                      checkAndGetVanishing(entityName,res);
+                        for(std::string name : res.second)
+                        {
+                                notifyDestruction(name);
+                        }
                         notifyCreation(entityName);
                         if(!entityName.compare(RacePolicy::getMainBuilding()))
                         {
