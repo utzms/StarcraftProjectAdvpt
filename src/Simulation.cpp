@@ -301,11 +301,11 @@ Simulation<RacePolicy>::Simulation(std::shared_ptr<BuildList> buildList, const T
 /* run() method for use in BuildListOptimizer */
 
 template <class RacePolicy>
-std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
+std::multimap<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 {
 	PROGRESS("Simulation::run() starts ");
 
-    std::map<int, std::string> resultMap;
+    std::multimap<int, std::string> resultMap;
 
 	std::vector< std::shared_ptr<Worker> >& workerList = _gameState->workerList;
 
@@ -522,7 +522,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
                             //std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 							// write current item to result map
-							resultMap[time] = currentItem;
+                            resultMap.insert(std::make_pair(time, currentItem));
 
 							// continue to the next item in the build list
 							continue;
@@ -548,7 +548,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
                         //std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 						// write current item to result map
-						resultMap[time] = currentItem;
+                        resultMap.insert(std::make_pair(time, currentItem));
 
 						if (vanishingZergWorker)
 						{
@@ -614,7 +614,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
                                         //std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 										// write current item to result map
-										resultMap[time] = currentItem;
+                                        resultMap.insert(std::make_pair(time, currentItem));
 
                                         PROGRESS("morphCounter reached vanishingSize:" << vanishingRequirements.size() );
                                         break;
@@ -679,7 +679,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 
 								_buildList->setCurrentItemOk();
 								_buildList->advance();
-								resultMap[time+1] = currentItem;
+                                resultMap.insert(std::make_pair(time, currentItem));
 
                                 //std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 							}
@@ -698,7 +698,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
                         //std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 						// write current item to result map
-						resultMap[time] = currentItem;
+                        resultMap.insert(std::make_pair(time, currentItem));
 					}
 					else
 					{
