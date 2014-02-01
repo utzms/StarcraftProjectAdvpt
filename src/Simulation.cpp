@@ -519,7 +519,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 							_gameState->subMinerals(entityCosts.minerals);
 							_gameState->subGas(entityCosts.gas);
 
-                            std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+                            //std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 							// write current item to result map
 							resultMap[time] = currentItem;
@@ -545,7 +545,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 						PROGRESS("Simulation::run() Ordering building " << currentItem);
 						buildBuilding(ourWorker, currentItem, entityCosts.buildTime);
 						_buildList->setCurrentItemOk();
-                        std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+                        //std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 						// write current item to result map
 						resultMap[time] = currentItem;
@@ -611,7 +611,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
                                         _gameState->subGas(entityCosts.gas);
 
                                         _buildList->setCurrentItemOk();
-                                        std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+                                        //std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 										// write current item to result map
 										resultMap[time] = currentItem;
@@ -681,7 +681,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 								_buildList->advance();
 								resultMap[time+1] = currentItem;
 
-                                std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+                                //std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 							}
 						}
 
@@ -695,7 +695,7 @@ std::map<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 						}
 						
 						_buildList->setCurrentItemOk();
-                        std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
+                        //std::cout << currentItem << " (" << time/60 << ":" << time%60 << ")" << std::endl;
 
 						// write current item to result map
 						resultMap[time] = currentItem;

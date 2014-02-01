@@ -70,9 +70,9 @@ class GameStateUpdate
 				auto unitIterator = std::find(_gameState->unitList.begin(), _gameState->unitList.end(), vanishingUnitsIterator);
 				if(unitIterator != unitList.end())
 				{
-					PROGRESS("GSU Destroyed " << (*unitIterator)->getName());
-					unitList.erase(unitIterator);
+					PROGRESS("GSU Destroyed " << (*unitIterator)->getName());					
 					_technologyManager->notifyDestruction((*unitIterator)->getName());					
+                    unitList.erase(unitIterator);
 				}
 			}
 
@@ -201,9 +201,9 @@ class GameStateUpdate
                 auto buildingIterator = std::find( buildingList.begin(), buildingList.end(), upgradedBuildingToEraseIterator);
                 if(buildingIterator != buildingList.end())
                 {
-                    PROGRESS("GSU Destroyed " << (*buildingIterator)->getName());
-                    buildingList.erase(buildingIterator);
+                    PROGRESS("GSU Destroyed " << (*buildingIterator)->getName());                    
                     _technologyManager->notifyDestruction((*buildingIterator)->getName());
+                    buildingList.erase(buildingIterator);
                 }
             }
 
