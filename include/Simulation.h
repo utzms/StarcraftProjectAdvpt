@@ -77,7 +77,7 @@ public:
 
         //void run();
         /* run() method for use in BuildListOptimizer */
-        std::map<int,std::string> run(int timeLimit);
+        std::multimap<int,std::string> run(int timeLimit);
         ~Simulation();
 
 };

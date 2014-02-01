@@ -5,6 +5,7 @@ using std::vector;
 using std::shared_ptr;
 using std::set;
 using std::map;
+using std::multimap;
 using std::pair;
 using std::future;
 using std::async;
@@ -14,14 +15,14 @@ template<class RacePolicy, class FitnessPolicy>
 inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const string target, FitnessPolicy& fitnessPolicy, const size_t nindividuals, std::function<vector<string>(TechnologyManager<RacePolicy>)> genBuildList, const int timeLimit)
 {
     const TechnologyList& techList = mTechManager.getTechnologyList();
-    auto runSimulation = [=] (vector<string> dna) -> map<int, string>
+    auto runSimulation = [=] (vector<string> dna) -> multimap<int, string>
     {
         shared_ptr<BuildList> buildList = std::make_shared<BuildList>(dna);
         Simulation<RacePolicy> a(buildList, techList);
         return a.run(timeLimit);
     };
 
-    auto rateIndividual = [=] (map<int,string> res, vector<string> dnaVec, FitnessPolicy fp) -> Individual
+    auto rateIndividual = [=] (multimap<int, string> res, vector<string> dnaVec, FitnessPolicy fp) -> Individual
     {
         auto a = mTechManager.getEntityRequirements(target);
         Individual newOne(fp.rateBuildListHard(res), fp.rateBuildListSoft(res,RacePolicy::getWorker(), a),dnaVec);
@@ -31,10 +32,10 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 	const unsigned int NUM_THREADS = std::min(availableThreads+1,nindividuals);
 	vector<size_t>threadID(NUM_THREADS);
 	vector<future<vector<string>>> dnaFutureVec(NUM_THREADS);
-	vector<future<map<int,string>>> resultFutureVec(NUM_THREADS);
+    vector<future<multimap<int, string>>> resultFutureVec(NUM_THREADS);
 	vector<future<Individual>> individualFutureVec(NUM_THREADS);
 	vector<vector<string>> dnaVec(nindividuals);
-	vector<map<int,string>> simRes(nindividuals);
+    vector<multimap<int, string>> simRes(nindividuals);
 
 #ifdef DEBUG
 	int threadFailures = 0;
@@ -478,7 +479,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::initializeAndOptimize(const 
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::addIndividual(const string target, const size_t ntargets, const int timeLimit, shared_ptr<BuildList> buildList )
 {
 	FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
-	map<int,string> simRes = Simulation<RacePolicy>(buildList, mTechManager.getTechnologyList()).run(timeLimit);
+    multimap<int, string> simRes = Simulation<RacePolicy>(buildList, mTechManager.getTechnologyList()).run(timeLimit);
 	mPopulation.push_back(Individual(fitnessPolicy.rateBuildListHard(simRes),
 				fitnessPolicy.rateBuildListSoft(simRes, RacePolicy::getWorker(), mTechManager.getEntityRequirements(target)), buildList->getAsVector()));
 }
@@ -525,7 +526,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::printBest(int timeLimit, std
 	std::multimap<int,std::string> finishOrder;
 
     Simulation<RacePolicy> sim(bList, techList);
-	std::map<int,string> simRes = sim.run(timeLimit);
+    std::multimap<int, string> simRes = sim.run(timeLimit);
 	std::vector<std::string> output;
 
 	for (auto it : simRes)

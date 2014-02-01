@@ -36,7 +36,7 @@ class Push
 		}
 
 		//returns the rating of the buildlist counting hard constraints
-        int rateBuildListHard(std::map<int, std::string> &resultList)
+        int rateBuildListHard(std::multimap<int, std::string> &resultList)
 		{
 			int rating = 0;
 			//count targets in the list
@@ -56,7 +56,7 @@ class Push
 		}
 
 		//returns the rating of the buildlist counting soft contraints
-        int rateBuildListSoft(std::map<int, std::string> &resultList, std::string worker, std::vector<std::string> requirements)
+        int rateBuildListSoft(std::multimap<int, std::string> &resultList, std::string worker, std::vector<std::string> requirements)
 		{
 			//number of workers, number of production buildings...
 			int rating = 0;
@@ -102,7 +102,7 @@ class Rush
 		}
 
 		//returns the rating of the buildlist counting hard constraints
-        int rateBuildListHard(std::map<int, std::string> &resultList)
+        int rateBuildListHard(std::multimap<int, std::string> &resultList)
 		{
 			int rating = 0;
 			int count = 0;
@@ -137,7 +137,7 @@ class Rush
 		}
 
 		//returns the rating of the buildlist counting soft constraints
-        int rateBuildListSoft(std::map<int, std::string> &resultList, std::string worker, std::vector<std::string> requirements)
+        int rateBuildListSoft(std::multimap<int, std::string> &resultList, std::string worker, std::vector<std::string> requirements)
 		{
 			//number of workers, number of production buildings...
 			int rating = 0;
