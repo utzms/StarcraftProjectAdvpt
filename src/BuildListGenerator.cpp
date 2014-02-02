@@ -58,6 +58,7 @@ std::shared_ptr<BuildList> BuildListGenerator<RacePolicy>::buildOneRandomList(in
     PROGRESS("BuildListGenerator::buildOneRandomList()");
 	std::vector<std::string> stringList;
 	std::shared_ptr<BuildList> list;
+		bool out=true;
 	do
 	{
 		localTester = new TechnologyManager<RacePolicy>(this->copyFrom);
@@ -152,13 +153,13 @@ std::shared_ptr<BuildList> BuildListGenerator<RacePolicy>::buildOneRandomList(in
 			stringList.push_back(in);
 		}
 		//shouldnt reach this one
-		if (checkBuildListPossibility(stringList)==false)
+		if ((out=checkBuildListPossibility(stringList))==false)
 		{
 			   std::cerr << "Nicht gut, kaputte RandomList" << std::endl;
 			   for (unsigned int j=0;j<stringList.size();++j)
 			   std::cout << stringList.at(j) << std::endl;
 		}
-	} while (checkBuildListPossibility(stringList) == false);
+	} while (out == false);
 	list = std::make_shared<BuildList>(stringList);
 
 	return list;

@@ -73,10 +73,8 @@ private:
 
     inline bool checkTechnologyRequirements(std::shared_ptr<Technology> technology)
     {
-
         std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > requirements = technology->getRequirements();
         bool fulfilled = false;
-
         for(auto redundantRequirements : requirements)
         {
             fulfilled = true;
@@ -110,7 +108,7 @@ private:
 			{
 				if (it.second > getEntityCount(it.first))
 				{
-					std::cout << "\t    missing:" << it.first << std::endl;
+				//	std::cout << "\t    missing:" << it.first << std::endl;
 					return false;
 				}
 			}
@@ -325,7 +323,7 @@ public:
 
     void checkAndGetVanishingRequirements(std::shared_ptr<Technology> tech, std::pair<bool, std::vector<std::string> >& res)
 	{
-		std::cout << "\t" << tech->getName() << std::endl;
+		//std::cout << "\t" << tech->getName() << std::endl;
 		if (TechnologyManager::checkTechnologyRequirements(tech))
 		{
 			res.first = true;
@@ -336,7 +334,7 @@ public:
 				{
 					if (requirement.second == RequirementType::Vanishing)
 					{
-						std::cout << "\t\t\t" << requirement.first->getName() << std::endl;
+						//std::cout << "\t\t\t" << requirement.first->getName() << std::endl;
 						(res.second).push_back(requirement.first->getName());
 					}
 				}
@@ -605,7 +603,9 @@ public:
 
 	int getEntityCount(std::string name)
 	{
-		return mExistenceMap.count(name);
+		if (mExistenceMap.count(name) == 0)
+			return 0;
+		return mExistenceMap[name];
 	}
 
 	bool entityExists(std::string name)
