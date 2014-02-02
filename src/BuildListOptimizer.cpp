@@ -552,26 +552,28 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::printBest(int timeLimit, std
 		std::pair<int,std::string> in(it.first+tech->getBuildTime(),it.second);
 		finishOrder.insert(in);
 
-		if (target.compare(it.second) == 0)
-			++targetCount;
 		if ((target.compare(it.second) == 0) && (FitnessPolicy::getFitnessType() == FitnessType::Push))
 			break;
 	}
 	counter=0;
 	for (auto it : finishOrder)
 	{
+		if (target.compare(it.second) == 0 && it.first<=timeLimit)
+			++targetCount;
 		std::stringstream sstream;
 		sstream << "\t\t" << std::setw(4) << std::to_string(it.first) << std::setw(21) << it.second;
 		std::string tmp = sstream.str();
 
 		output.at(counter) += tmp;
-		++counter;
+		if (it.first<=timeLimit)
+			++counter;
 	}
+	output.erase(output.begin()+counter,output.end());
 	std::cout << "sorted by: " << std::endl;
 	std::cout << std::setw(22) << "starting time:" << "\t\t" << std::setw(22) << "finished time:" << std::endl;
 	for (size_t i = 0; i < output.size(); ++i)
 	{
 		std::cout << output.at(i) << std::endl;
 	}
-	std::cout << "We produced " << targetCount << " " << target << "s" << std::endl;
+	std::cout << "We finished " << targetCount << " " << target << "s in " << std::to_string(timeLimit) << "s" << std::endl;
 }
