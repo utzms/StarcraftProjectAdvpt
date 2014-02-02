@@ -560,6 +560,8 @@ void TechnologyList::initRandomGenerator(size_t seed, std::string SpecialOne, in
 			//archon like cases
             if (it.second->getName()==techNames.back())
                 continue;
+		if (it.second->getName() == "Larva")
+			continue;
 		//found in req list, then weight it harder
         if ( (findMe = tree.find(it.second->getName())) != tree.end())
         {

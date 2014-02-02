@@ -35,9 +35,9 @@ template <typename RacePolicy, typename FitnessPolicy> void writeLogToFile(Build
 
 void startBuildListOptimizer(std::string race, std::string strategy, std::string unit, size_t timeLimit, size_t populationSize)
 {
-    const size_t individualSize = 50;
+    size_t individualSize = 40;
     const int selectionRate = 10;
-    const size_t mutationRate = 20;
+    const size_t mutationRate = 10;
     const size_t reproductionRate = 25;
     const size_t initPopSize = populationSize;
     const size_t generations = 100;
@@ -69,6 +69,7 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
             writeLogToFile(opt);
 		} else if (!race.compare("Zerg"))
 		{
+    		individualSize = 100;
 			BuildListOptimizer<Zerg,Push> opt(accuracy,individualSize);
 			try{
                 opt.initialize(unit,ntargets,timeLimit,initPopSize);
@@ -120,6 +121,7 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
             writeLogToFile(opt);
         } else if (!race.compare("Zerg"))
 		{
+    		individualSize = 100;
 			BuildListOptimizer<Zerg,Rush> opt(accuracy,individualSize);
 			try{
                 opt.initialize(unit,ntargets,timeLimit,initPopSize);
@@ -197,7 +199,7 @@ int main(int argc, char *argv[])
 	std::string race;
 	std::string unit;
     int timeLimit = 1200;
-    int population=100000;
+    int population=120000;
 	if (argc < 4)
 	{
 		std::cerr << "Usage: ./bin/runme [Unit] [Strategy] [Timelimit]" << std::endl;
