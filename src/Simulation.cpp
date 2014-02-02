@@ -724,6 +724,8 @@ std::multimap<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 		time++;
 		timeStep();
 	}
+	
+    resultMap.insert(std::make_pair(time, "Time"));
 
     return resultMap;
 }

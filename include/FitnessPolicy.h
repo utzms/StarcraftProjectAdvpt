@@ -115,7 +115,7 @@ class Rush
 				if (i.second.compare("Time")==0)
 				{
 					//calculate a score, how long for how many targets it needed
-					rating = rating*10000/lastTime;
+					rating = rating*100000/lastTime;
 					break;
 				}
 				if(m_Target.compare(i.second) == 0)
