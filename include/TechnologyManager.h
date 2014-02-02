@@ -79,7 +79,7 @@ private:
 
         for(auto redundantRequirements : requirements)
         {
-            fulfilled = false;
+            fulfilled = true;
 			std::map<std::string, int> vanishMap;
             for(auto requirement : redundantRequirements)
             {
@@ -110,14 +110,16 @@ private:
 			{
 				if (it.second > getEntityCount(it.first))
 				{
+					std::cout << "\t    missing:" << it.first << std::endl;
 					return false;
 				}
 			}
-            
+            fulfilled = true;
 			for(auto requirement : redundantRequirements)
             {
 				if (requirement.second != RequirementType::Vanishing)
 				{
+					fulfilled=false;
 					if (entityExists((requirement.first)->getName()))
 					{
 						fulfilled=true;
@@ -334,7 +336,7 @@ public:
 				{
 					if (requirement.second == RequirementType::Vanishing)
 					{
-						std::cout << "\t\t" << requirement.first->getName() << std::endl;
+						std::cout << "\t\t\t" << requirement.first->getName() << std::endl;
 						(res.second).push_back(requirement.first->getName());
 					}
 				}
