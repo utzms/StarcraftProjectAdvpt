@@ -518,6 +518,20 @@ void TechnologyList::initRandomGenerator(size_t seed, std::string SpecialOne, in
 
 	//put all requirements with higher weight in list
 	std::map<std::string,int>::iterator findMe;
+	if (findUnit(SpecialOne)!=NULL)
+	{
+		if (findBuilding(Protoss::getSupplyProvider())!=NULL)
+		{
+			tree.insert(std::pair<std::string,int>(Protoss::getSupplyProvider(),weight/2));
+		} else if (findBuilding(Terran::getSupplyProvider())!=NULL)
+		{
+			tree.insert(std::pair<std::string,int>(Terran::getSupplyProvider(),weight/2));
+		} else if (findBuilding(Zerg::getSupplyProvider())!=NULL)
+		{
+			tree.insert(std::pair<std::string,int>(Zerg::getSupplyProvider(),weight/2));
+		}
+	}
+	//depth=0;
 	int maxRuns=50;
 	while (depth > 1)
 	{
@@ -539,22 +553,6 @@ void TechnologyList::initRandomGenerator(size_t seed, std::string SpecialOne, in
 		req.erase(req.begin()+0);
 	}
 
-	if (findUnit(SpecialOne)!=NULL)
-	{
-		if (findBuilding(Protoss::getSupplyProvider())!=NULL)
-		{
-			tree.insert(std::pair<std::string,int>(Protoss::getSupplyProvider(),weight/2));
-			tree.insert(std::pair<std::string,int>(Protoss::getWorker(),weight/2));
-		} else if (findBuilding(Terran::getSupplyProvider())!=NULL)
-		{
-			tree.insert(std::pair<std::string,int>(Terran::getSupplyProvider(),weight/2));
-			tree.insert(std::pair<std::string,int>(Terran::getWorker(),weight/2));
-		} else if (findBuilding(Zerg::getSupplyProvider())!=NULL)
-		{
-			tree.insert(std::pair<std::string,int>(Zerg::getSupplyProvider(),weight/2));
-			tree.insert(std::pair<std::string,int>(Zerg::getWorker(),weight/2));
-		}
-	}
 	
     for(auto &it : units)
     {

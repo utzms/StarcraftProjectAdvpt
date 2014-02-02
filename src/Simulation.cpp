@@ -500,7 +500,7 @@ std::multimap<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 
 							if (!buildingToBeUpgraded)
 							{
-								throw std::runtime_error("Simulation::run() Couldn't find building in building list when trying to upgrade");
+								throw std::runtime_error("Simulation::run() Couldn't find building in building list when trying to upgrade" +std::to_string(time) +" " + buildingToBeUpgraded->getName());
 							}
 
 							buildingToBeUpgraded->upgradeTimer = entityCosts.buildTime;
