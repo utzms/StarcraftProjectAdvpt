@@ -89,7 +89,7 @@ std::shared_ptr<BuildList> BuildListGenerator<RacePolicy>::buildOneRandomList(in
 							std::string name = requirement.first->getName();
 							if (requirement.second == RequirementType::Vanishing)
 							{
-								if (localTester->entityExists(name))
+                                if (localTester->checkIfEntityExists(name))
 								{
 									killed.push_back(name);
 									localTester->notifyDestruction(name);
@@ -99,7 +99,7 @@ std::shared_ptr<BuildList> BuildListGenerator<RacePolicy>::buildOneRandomList(in
 									fulfilled = false;
 									break;
 								}
-							} else if (localTester->entityExists(name))
+                            } else if (localTester->checkIfEntityExists(name))
 							{
 								fulfilled = true;
 								break;

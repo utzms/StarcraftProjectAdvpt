@@ -373,7 +373,7 @@ std::multimap<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 			{
 				if (larvaTimer >= 15)
 				{
-					std::vector<std::string> larvaBuildings = _technologyManager->getBuildingsForUnitProduction("Larva");
+                    std::vector<std::string> larvaBuildings = _technologyManager->getProductionBuildingsForName("Larva");
 
 					std::shared_ptr<Building> larvaBuildingInGameState(nullptr);
 
@@ -575,7 +575,7 @@ std::multimap<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 					PROGRESS("Simulation::run() Trying unit " << currentItem);
 
 					// get the buildings this unit can be built from
-					std::vector<std::string> buildings = _technologyManager->getBuildingsForUnitProduction(currentItem);
+                    std::vector<std::string> buildings = _technologyManager->getProductionBuildingsForName(currentItem);
 					std::shared_ptr<Building> buildingForProduction;
 					// check if any of them are ready
 					bool buildingReady = false;
