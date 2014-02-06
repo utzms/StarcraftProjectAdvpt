@@ -33,7 +33,7 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::generateAndRate(const
 
     auto rateIndividual = [=] (multimap<int, string> res, vector<string> dnaVec, FitnessPolicy fp) -> Individual
     {
-        auto a = mTechManager.getEntityRequirements(target);
+        auto a = mTechManager.getRequirementsForName(target);
         Individual newOne(fp.rateBuildListHard(res), fp.rateBuildListSoft(res,RacePolicy::getWorker(), a),dnaVec);
 		return newOne;
 	};
@@ -361,11 +361,11 @@ inline void BuildListOptimizer<RacePolicy, FitnessPolicy>::select(const size_t s
 	template <class RacePolicy, class FitnessPolicy>
 BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(const size_t accuracy, const size_t individualSize)
 {
-	if(accuracy <= 0)
+    if(accuracy == 0)
 	{
 		throw std::invalid_argument("@BuildListOptimizer::BuildListOptimizer(size_t accuracy, size_t individualSize): The accuracy must be greater than zero. The value passed is: "+std::to_string(accuracy));
 	}
-	if(individualSize <= 0)
+    if(individualSize == 0)
 	{
 		throw std::invalid_argument("@BuildListOptimizer::BuildListOptimizer(size_t accuracy, size_t individualSize): The size of the individuals must be greater than zero. The value passed is: "+std::to_string(accuracy));
 	}
@@ -382,19 +382,16 @@ BuildListOptimizer<RacePolicy, FitnessPolicy>::BuildListOptimizer(const size_t a
 void BuildListOptimizer<RacePolicy, FitnessPolicy>::initialize(const string target, const size_t ntargets, const int timeLimit, const size_t initPopSize)
 {
 
-	if(!mTechManager.technologyExists(target))
-	{
-		throw std::invalid_argument("@BuildListOptimizer::initialize: "+target+" is not existent in the tech tree.");
-	}
-	else if(ntargets <= 0)
+
+    if(ntargets == 0)
 	{
 		throw std::invalid_argument("@BuildListOptimizer::initialize: The number of targets that shall be produced must be greater than zero. The passed value is: "+std::to_string(ntargets));
 	}
-	else if(timeLimit <= 0)
+    else if(timeLimit == 0)
 	{
 		throw std::invalid_argument("@BuildListOptimizer::initialize: The time limit mst be greater than zero. The passed value is: "+std::to_string(timeLimit));
 	}
-	else if(initPopSize <= 0)
+    else if(initPopSize == 0)
 	{
 		throw std::invalid_argument("@BuildListOptimizer::initialize: The initial population size must be greater zero. The passed value is: "+std::to_string(initPopSize));
 	}
@@ -434,19 +431,16 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::optimize(const string target
 
 	size_t variableSelect = selectionRate; 
 	int subtrahend=1;
-	if(!mTechManager.technologyExists(target))
-	{
-		throw std::invalid_argument("@BuildListOptimizer::optimize: "+target+" is not existent in the tech tree.");
-	}
-	else if(ntargets <= 0)
+
+    if(ntargets == 0)
 	{
 		throw std::invalid_argument("@BuildListOptimizer::optimize: The number of targets that shall be produced must be greater than zero. The passed value is: "+std::to_string(ntargets));
 	}
-	else if(timeLimit <= 0)
+    else if(timeLimit == 0)
 	{
 		throw std::invalid_argument("@BuildListOptimizer::optimize: The time limit must be greater than zero. The passed value is: "+std::to_string(timeLimit));
 	}
-	else if(generations <= 0)
+    else if(generations == 0)
 	{
 		throw std::invalid_argument("@BuildListOptimizer::optimize: The number of generations must be greater than zero. The passed value is: "+std::to_string(generations));
 	}
@@ -491,7 +485,7 @@ void BuildListOptimizer<RacePolicy, FitnessPolicy>::addIndividual(const string t
 	FitnessPolicy fitnessPolicy(target, timeLimit, ntargets);
     multimap<int, string> simRes = Simulation<RacePolicy>(buildList, mTechManager.getTechnologyList()).run(timeLimit);
 	mPopulation.push_back(Individual(fitnessPolicy.rateBuildListHard(simRes),
-				fitnessPolicy.rateBuildListSoft(simRes, RacePolicy::getWorker(), mTechManager.getEntityRequirements(target)), buildList->getAsVector()));
+                fitnessPolicy.rateBuildListSoft(simRes, RacePolicy::getWorker(), mTechManager.getRequirementsForName(target)), buildList->getAsVector()));
 }
 
 /* get the group of size number of the fittest individuals, together with their corresponding fitness value */

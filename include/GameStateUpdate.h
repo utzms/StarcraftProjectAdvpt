@@ -133,7 +133,7 @@ class GameStateUpdate
 						PROGRESS("GSU: Building " << buildingIterator->getName() << " has produced");
 						bool doubleProduction = (buildingIterator->state == Building::State::ProducingDouble);
 
-						Costs unitCosts = _technologyManager->getEntityCosts(buildingIterator->productionUnitName);
+                        Costs unitCosts = _technologyManager->getCostsForName(buildingIterator->productionUnitName);
 
                         if (buildingIterator->productionType == Building::ProductionType::WorkerOrder)
 						{
@@ -187,7 +187,7 @@ class GameStateUpdate
 						PROGRESS("GSU: Building " << buildingIterator->getName() << " has been constructed");
 						_technologyManager->notifyCreation(buildingIterator->getName());
 
-						Costs buildingCosts = _technologyManager->getEntityCosts(buildingIterator->getName());
+                        Costs buildingCosts = _technologyManager->getCostsForName(buildingIterator->getName());
 						_gameState->addSupplyMax(buildingCosts.supply);
 					}
 

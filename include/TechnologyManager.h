@@ -32,12 +32,12 @@ private:
     TechnologyList mTechList;
     std::map<std::string,int> mExistenceMap;
 
-    inline void addExistenceEntries(void)
+    inline void createExistenceEntries(void)
     {
         const auto& techSet = mTechList.getTechnologySet();
         if(techSet.size() <= 0)
         {
-            throw std::logic_error("@TechnologyManager::addExistenceEntries: There are currently no entries to add!");
+            throw std::logic_error("@TechnologyManager::createExistenceEntries: There are currently no entries to add!");
         }
         for(std::string name : techSet)
         {
@@ -71,71 +71,11 @@ private:
         }
     }
 
-    inline bool checkTechnologyRequirements(std::shared_ptr<Technology> technology)
-    {
-        std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > requirements = technology->getRequirements();
-        bool fulfilled = false;
-        for(auto redundantRequirements : requirements)
-        {
-            fulfilled = true;
-			std::map<std::string, int> vanishMap;
-            for(auto requirement : redundantRequirements)
-            {
-				std::map<std::string, int>::iterator it;
-				if (requirement.second == RequirementType::Vanishing)
-				{
-					std::string name = (requirement.first)->getName();
-					if (entityExists(name))
-					{
-						fulfilled=true;
-						if ((it=vanishMap.find(name)) == vanishMap.end())
-						{
-							std::pair<std::string, int> input(name,1);
-							vanishMap.insert(input);
-						} else
-						{
-							++((*it).second);
-						}
-					} else
-					{
-						fulfilled=false;
-						break;
-					}
-				}
-            }
-            if(!fulfilled) return false;
-			for (auto it : vanishMap)
-			{
-				if (it.second > getEntityCount(it.first))
-				{
-				//	std::cout << "\t    missing:" << it.first << std::endl;
-					return false;
-				}
-			}
-            fulfilled = true;
-			for(auto requirement : redundantRequirements)
-            {
-				if (requirement.second != RequirementType::Vanishing)
-				{
-					fulfilled=false;
-					if (entityExists((requirement.first)->getName()))
-					{
-						fulfilled=true;
-						break;
-					}
-				}
-            }
-            if(!fulfilled) return false;
-        }
-        return true;
-    }
-
     inline void constructExistenceMap()
     {
-        addExistenceEntries();
-        initializeExistence();
+        this->createExistenceEntries();
+        this->initializeExistence();
     }
-
 
     inline void resetExistence(void)
     {
@@ -145,51 +85,124 @@ private:
         }
     }
 
-    inline bool checkTechnologyCosts(std::shared_ptr<Technology> technology)
+    inline bool checkCosts(std::shared_ptr<Technology> technology)
     {
+        if(mGameState == false || mGameState.use_count() == 0)
+        {
+                throw std::logic_error("TechnologyManager::checkCosts: There is no internal GameState, Costs can not be checked here");
+        }
         if(technology->getMineralsCost() > mGameState->getMinerals() ||
                 technology->getGasCost() > mGameState->getGas() )
         {
             return false;
         }
-        else if(!checkIfNameIsBuilding(technology->getName()) && technology->getSupplyCost() > mGameState->getAvailableSupply())
+        else if(!this->checkIfNameIsBuilding(technology->getName()) && technology->getSupplyCost() > mGameState->getAvailableSupply())
         {
             return false;
         }
 
         return true;
     }
-    inline bool checkTechnology(std::shared_ptr<Technology> technology)
+
+    inline bool checkRequirements(std::shared_ptr<Technology> technology)
     {
-        if(checkTechnologyCosts(technology))
+        std::vector<std::vector<std::pair<std::shared_ptr<Technology>,RequirementType> > > requirements = technology->getRequirements();
+        bool fulfilled = false;
+        for(auto redundantRequirements : requirements)
         {
-            return checkTechnologyRequirements(technology);
+            fulfilled = true;
+            std::map<std::string, int> vanishMap;
+            for(auto requirement : redundantRequirements)
+            {
+                std::map<std::string, int>::iterator it;
+                if (requirement.second == RequirementType::Vanishing)
+                {
+                    std::string name = (requirement.first)->getName();
+                    if (entityExists(name))
+                    {
+                        fulfilled=true;
+                        if ((it=vanishMap.find(name)) == vanishMap.end())
+                        {
+                            std::pair<std::string, int> input(name,1);
+                            vanishMap.insert(input);
+                        } else
+                        {
+                            ++((*it).second);
+                        }
+                    } else
+                    {
+                        fulfilled=false;
+                        break;
+                    }
+                }
+            }
+            if(!fulfilled) return false;
+            for (auto it : vanishMap)
+            {
+                if (it.second > this->getExistenceCountForName(it.first))
+                {
+                //	std::cout << "\t    missing:" << it.first << std::endl;
+                    return false;
+                }
+            }
+            fulfilled = true;
+            for(auto requirement : redundantRequirements)
+            {
+                if (requirement.second != RequirementType::Vanishing)
+                {
+                    fulfilled=false;
+                    if (this->entityExists((requirement.first)->getName()))
+                    {
+                        fulfilled=true;
+                        break;
+                    }
+                }
+            }
+            if(!fulfilled) return false;
+        }
+        return true;
+    }
+
+    inline bool checkEverything(std::shared_ptr<Technology> technology)
+    {
+        if(this->checkCosts(technology))
+        {
+            return this->checkRequirements(technology);
         }
         return false;
     }
 
     inline void initTechnologyList(void)
     {
-        if(!InitTechTree<RacePolicy>(&mTechList).initTechTree())
+        if(!InitTechTree<RacePolicy>(&(this->mTechList)).initTechTree())
         {
             throw std::runtime_error("@TechnologyManager::initTechnologyListTechnologyList: initTechTree failed, something went terribly wrong!");
         }
-        mTechList.initTechnologySet();
+        this->mTechList.initTechnologySet();
     }
 
 public:
 
+    //Standard Constructor
+    TechnologyManager()
+    {
+        initTechnologyList();
+
+        this->constructExistenceMap();
+
+        PROGRESS("TechnologyManager: Standard Constructor");
+    }
 
     TechnologyManager(std::shared_ptr<GameState> initialGameState)
         :mGameState(initialGameState)
     {
         //PROGRESS("TM Constructor");
-        if(!mGameState)
+        if(!this->mGameState)
         {
             throw std::invalid_argument("Can not pass nullptr as initial argument");
         }
-        initTechnologyList();
-        constructExistenceMap();
+        this->initTechnologyList();
+        this->constructExistenceMap();
 
         PROGRESS("TechnologyManager: Constructor with GameState as argument");
     }
@@ -197,12 +210,12 @@ public:
     TechnologyManager(std::shared_ptr<GameState> initialGameState, const TechnologyList& techList)
         :mGameState(initialGameState)
     {
-        if(!mGameState)
+        if(!this->mGameState)
         {
             throw std::invalid_argument("Can not pass nullptr as initial argument");
         }
-        mTechList = techList;
-        constructExistenceMap();
+        this->mTechList = techList;
+        this->constructExistenceMap();
 
         PROGRESS("TechnologyManager: Constructor with TechnologyList and GameState as argument");
 
@@ -211,9 +224,8 @@ public:
     //only for BuildListGenerator designed
     TechnologyManager(TechnologyList &techList)
     {
-        mTechList = techList;
-        mGameState = std::make_shared<GameState>();
-        constructExistenceMap();
+        this->mTechList = techList;
+        this->constructExistenceMap();
 
         PROGRESS("TechnologyManager: Constructor with Technology List as argument");
     }
@@ -221,9 +233,8 @@ public:
     //only for BuildListGenerator designed
     TechnologyManager(const TechnologyList &techList)
     {
-        mTechList = techList;
-        mGameState = std::make_shared<GameState>();
-        constructExistenceMap();
+        this->mTechList = techList;
+        this->constructExistenceMap();
 
         PROGRESS("TechnologyManager: Constructor with Technology List as argument");
     }
@@ -234,42 +245,29 @@ public:
 
     TechnologyManager(TechnologyManager<RacePolicy>& techManager)
     {
-        mTechList = techManager.mTechList;
-        mGameState = techManager.mGameState;
-        mExistenceMap = techManager.mExistenceMap;
-        resetExistence();
-        initializeExistence();
+        this->mTechList = techManager.mTechList;
+        this->mExistenceMap = techManager.mExistenceMap;
+        this->resetExistence();
+        this->initializeExistence();
 
         PROGRESS("TechnologyManager: Copy Constructor");
     }
 
     TechnologyManager(const TechnologyManager<RacePolicy>& techManager)
     {
-        mTechList = techManager.mTechList;
-        mGameState = techManager.mGameState;
-        mExistenceMap = techManager.mExistenceMap;
-        mExistenceMap = techManager.mExistenceMap;
-        resetExistence();
-        initializeExistence();
+        this->mTechList = techManager.mTechList;
+        this->mExistenceMap = techManager.mExistenceMap;
+        this->resetExistence();
+        this->initializeExistence();
 
         PROGRESS("TechnologyManager: Copy Constructor");
     }
 
 
-    //Standard Constructor
-    TechnologyManager()
-    {
-        initTechnologyList();
-        mGameState = std::make_shared<GameState>();
 
-        constructExistenceMap();
+    ~TechnologyManager(){PROGRESS("TM Destructor");}
 
-        PROGRESS("TechnologyManager: Standard Constructor");
-    }
-
-    ~TechnologyManager(){/*PROGRESS("TM Destructor")*/;}
-
-    inline std::vector< std::shared_ptr<Technology> > findTechnology(std::string entityName)
+    std::vector< std::shared_ptr<Technology> > getTechnologyForName(std::string entityName)
     {
         const auto& technology = mTechList.findBuilding(entityName);
         if(technology == nullptr)
@@ -282,26 +280,21 @@ public:
         }
     }
 
-    bool technologyExists(std::string name)
-    {    
-        return mExistenceMap.count(name) > 0 ? true : false;
-    }
-
     const TechnologyList& getTechnologyList()
     {
         return mTechList;
     }
 
-    void checkAndGetVanishing(std::string entityName, std::pair<bool, std::vector<std::string> >& res)
+    void checkEverythingAndGetVanishing(std::string entityName, std::pair<bool, std::vector<std::string> >& res)
     {
-        std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName);
+        std::vector<std::shared_ptr<Technology>> techVec = this->getTechnologyForName(entityName);
         if (techVec.size() == 0)
         {
             throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
         }
         for (const auto& tech : techVec)
         {
-            if (TechnologyManager::checkTechnology(tech))
+            if (this->checkEverything(tech))
             {
                 res.first = true;
                 std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementType> > > requirements = tech->getRequirements();
@@ -321,10 +314,10 @@ public:
         res.first = false;
     }
 
-    void checkAndGetVanishingRequirements(std::shared_ptr<Technology> tech, std::pair<bool, std::vector<std::string> >& res)
+    void checkRequirementsAndGetVanishing(std::shared_ptr<Technology> tech, std::pair<bool, std::vector<std::string> >& res)
 	{
 		//std::cout << "\t" << tech->getName() << std::endl;
-		if (TechnologyManager::checkTechnologyRequirements(tech))
+        if (checkRequirements(tech))
 		{
 			res.first = true;
 			std::vector<std::vector<std::pair<std::shared_ptr<Technology>, RequirementType> > > requirements = tech->getRequirements();
@@ -407,9 +400,9 @@ public:
 	}
 	 */
 
-	std::vector<std::string> getEntityRequirements(std::string entityName)
+    std::vector<std::string> getRequirementsForName(std::string entityName)
 	{
-		std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::findTechnology(entityName);
+        std::vector<std::shared_ptr<Technology>> techVec = TechnologyManager::getTechnologyForName(entityName);
 		if (techVec.size() == 0)
 		{
 			throw std::invalid_argument("The requested Entity is not existent in the Tech Tree");
@@ -437,7 +430,7 @@ public:
 		float supply = 4;
 		for(std::string entityName : buildList)
 		{
-			std::vector<std::shared_ptr<Technology>> techVec = findTechnology(entityName);
+            std::vector<std::shared_ptr<Technology>> techVec = this->getTechnologyForName(entityName);
 			if(techVec.empty())
 			{
 				return false;
@@ -448,16 +441,16 @@ public:
 				if(checkIfNameIsBuilding(entityName) || tech->getSupplyCost() <= supply)
 				{
 					std::pair<bool,std::vector<std::string>> vanishPair;
-					checkAndGetVanishingRequirements(tech, vanishPair);
+                    this->checkRequirementsAndGetVanishing(tech, vanishPair);
 
 					if(vanishPair.first == true)
 					{
 						fulfilled = true;
 						for(std::string name : vanishPair.second)
 						{
-							notifyDestruction(name);
+                            this->notifyDestruction(name);
 						}
-						notifyCreation(entityName);
+                        this->notifyCreation(entityName);
 						if(!entityName.compare(RacePolicy::getMainBuilding()))
 						{
 							supply += 10;
@@ -551,15 +544,15 @@ public:
 		return result;
 	}
 
-	Costs getEntityCosts(std::string entityName)
+    Costs getCostsForName(std::string entityName)
 	{
 		std::shared_ptr<Technology> technology;
 
-		if (checkIfNameIsBuilding(entityName))
+        if (this->checkIfNameIsBuilding(entityName))
 		{
 			technology = mTechList.findBuilding(entityName);
 		}
-		else if (checkIfNameIsUnit(entityName))
+        else if (this->checkIfNameIsUnit(entityName))
 		{
 			technology = mTechList.findUnit(entityName);
 		}
@@ -601,32 +594,27 @@ public:
 		return buildings;
 	}
 
-	int getEntityCount(std::string name)
+    int getExistenceCountForName(std::string name)
 	{
 		if (mExistenceMap.count(name) == 0)
 			return 0;
 		return mExistenceMap[name];
 	}
 
-	bool entityExists(std::string name)
+    bool entityExists(std::string name)
 	{
-		if(mExistenceMap.count(name) == 0)
+        if(mExistenceMap.count(name) == 0)
 		{
-			throw std::invalid_argument("@TechnologyManager::entityExists: "+name+" is not part of the tech tree.");
+            throw std::invalid_argument("@TechnologyManager::entityExists: "+name+" is not part of the tech tree.");
 		}
 
 		auto it = mExistenceMap.find(name);
 		if(it->second < 0)
 		{
-			throw std::range_error("@TechnologyManager::entityExists: The internal existence count for "+name+" reached a negative value. Something went terribly wrong");
+            throw std::range_error("@TechnologyManager::entityExists: The internal existence count for "+name+" reached a negative value. Something went terribly wrong");
 		}
 		return it->second > 0 ? true : false;
 
-	}
-
-	bool buildingExists(std::string buildingName)
-	{
-		return entityExists(buildingName);
 	}
 
 };

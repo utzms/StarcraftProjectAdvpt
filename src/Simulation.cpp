@@ -214,7 +214,7 @@ Simulation<RacePolicy>::Simulation(std::string buildListFilename)
 	_gameState->buildingList.push_back(std::shared_ptr<Building>(new Building(RacePolicy::getMainBuilding(), 0)));
 	_gameState->buildingList.back()->state = Building::State::Ready;
 
-	int supplyToAdd = _technologyManager->getEntityCosts(RacePolicy::getMainBuilding()).supply;	
+    int supplyToAdd = _technologyManager->getCostsForName(RacePolicy::getMainBuilding()).supply;
 	_technologyManager->notifyCreation(RacePolicy::getMainBuilding());
 
 	// again special zerg handling
@@ -272,7 +272,7 @@ Simulation<RacePolicy>::Simulation(std::shared_ptr<BuildList> buildList, const T
 	_gameState->buildingList.push_back(std::shared_ptr<Building>(new Building(RacePolicy::getMainBuilding(), 0)));
 	_gameState->buildingList.back()->state = Building::State::Ready;
 
-	int supplyToAdd = _technologyManager->getEntityCosts(RacePolicy::getMainBuilding()).supply;	
+    int supplyToAdd = _technologyManager->getCostsForName(RacePolicy::getMainBuilding()).supply;
 	_technologyManager->notifyCreation(RacePolicy::getMainBuilding());
 
 	// again special zerg handling
@@ -450,7 +450,7 @@ std::multimap<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 
 			// check the requirements
 			std::pair<bool, std::vector<std::string> > techRequirements;
-			_technologyManager->checkAndGetVanishing(currentItem, techRequirements);
+            _technologyManager->checkEverythingAndGetVanishing(currentItem, techRequirements);
 
 			// if we do not meet the requirements ...
 			if (!techRequirements.first)
@@ -465,7 +465,7 @@ std::multimap<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 				PROGRESS("Simulation::run() Requirements of " << currentItem << " OK");
 
 				// get the costs for game state manipulation and build time
-				Costs entityCosts = _technologyManager->getEntityCosts(currentItem);
+                Costs entityCosts = _technologyManager->getCostsForName(currentItem);
 
 				// otherwise, we find out if the item is a unit or a building
 				if (_technologyManager->checkIfNameIsBuilding(currentItem))
@@ -665,7 +665,7 @@ std::multimap<int, std::string> Simulation<RacePolicy>::run(int timeLimit)
 						
 						if (doubleProduction)
 						{
-							Costs nextCosts = _technologyManager->getEntityCosts(currentItem);
+                            Costs nextCosts = _technologyManager->getCostsForName(currentItem);
 
 							if (_gameState->getGas() >= nextCosts.gas &&
 								_gameState->getMinerals() >= nextCosts.minerals &&

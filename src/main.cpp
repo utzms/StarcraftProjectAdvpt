@@ -42,7 +42,7 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
     const size_t initPopSize = populationSize;
     const size_t generations = 100;
     const size_t accuracy = 100;
-    const size_t ntargets = 10000;
+    const size_t ntargets = 100000;
 	std::cout << "The optimization is done with the following rates:" << std::endl;
 	std::cout << "Selection Rate: " << std::to_string(selectionRate) << std::endl;
 	std::cout << "Mutation Rate: " << std::to_string(mutationRate) << std::endl;
@@ -69,7 +69,7 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
             writeLogToFile(opt);
 		} else if (!race.compare("Zerg"))
 		{
-    		individualSize = 100;
+    		individualSize = 80;
 			BuildListOptimizer<Zerg,Push> opt(accuracy,individualSize);
 			try{
                 opt.initialize(unit,ntargets,timeLimit,initPopSize);
@@ -121,7 +121,7 @@ void startBuildListOptimizer(std::string race, std::string strategy, std::string
             writeLogToFile(opt);
         } else if (!race.compare("Zerg"))
 		{
-    		individualSize = 100;
+    		individualSize = 80;
 			BuildListOptimizer<Zerg,Rush> opt(accuracy,individualSize);
 			try{
                 opt.initialize(unit,ntargets,timeLimit,initPopSize);

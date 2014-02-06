@@ -71,7 +71,7 @@ std::shared_ptr<BuildList> BuildListGenerator<RacePolicy>::buildOneRandomList(in
 			do
 			{
 				in = copyFrom.getRandomTechnology();
-				std::vector<std::shared_ptr<Technology>> tmp = localTester->findTechnology(in);
+                std::vector<std::shared_ptr<Technology>> tmp = localTester->getTechnologyForName(in);
 				if (in == "Larva")
 					continue;
 				std::vector<std::string> killed;
