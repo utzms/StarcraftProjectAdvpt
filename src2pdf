@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
-astyle --style=allman -xL --recursive "/home/josch/Projects/sc2_optimizer/src/*.cpp" "/home/josch/Projects/sc2_optimizer/include/*.h*"
+astyle --style=allman -xL --mode=c --recursive "/home/josch/Projects/sc2_optimizer/src/*.cpp" "/home/josch/Projects/sc2_optimizer/include/*.h*"
 enscript --file-align=1 --font=Courier7 --highlight --color --pretty-print=cpp --line-numbers -o - `find . -name '*.cpp'` | ps2pdf - sources.pdf
 enscript --file-align=1 --font=Courier7 --highlight --color --pretty-print=cpp --line-numbers -o - `find . -name '*.h*'` | ps2pdf - includes.pdf
