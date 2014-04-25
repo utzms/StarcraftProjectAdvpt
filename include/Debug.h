@@ -1,3 +1,6 @@
+// This header was taken from the NuSiF exercise skeleton!
+// Why rewrite :)
+
 #ifndef DEBUG_H
 #define DEBUG_H
 
@@ -53,11 +56,12 @@
 
 
 #define PROGRESS(MSG) \
-	{ \
-		std::stringstream ss;  \
-		ss << MSG; \
-		internal::progressFct(ss.str()); \
-	}
+    { \
+        std::stringstream ss;  \
+        ss << MSG; \
+        internal::progressFct(ss.str()); \
+    }
+//#define PROGRESS(MSG)
 
 #else
 

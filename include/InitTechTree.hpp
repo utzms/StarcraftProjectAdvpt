@@ -29,7 +29,9 @@ class InitTechTree : private TechTree
 				tech->initBuildingList(TechTree::buildingPath1());
 				if (!(tech->isInitialized()))
 				{
+#ifdef DEBUG
 					std::cerr << "Will try another Path" << std::endl;
+#endif
 					tech->initBuildingList(TechTree::buildingPath2());
 					tech->initUnitList(TechTree::unitPath2());
 				} else

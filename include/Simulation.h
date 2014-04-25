@@ -3,13 +3,16 @@
 
 #include <vector>
 #include <stdexcept>
+#include <map>
 
 #include "BuildList.h"
 #include "GameState.h"
 #include "ResourceManager.h"
+#include "TechnologyList.h"
 #include "TechnologyManager.h"
 #include "StartingConfiguration.h"
 #include "Entity.h"
+#include "Energizer.h"
 #include "GameStateUpdate.h"
 #include "Debug.h"
 /** Main class designed for managing and controlling the Simulation.
@@ -24,48 +27,57 @@
  *
  */
 
+
+
+
 template <class RacePolicy>
 class Simulation
 {
-	private:
-		//BuildList& _buildList;
-		BuildList *_buildList;
+
+private:
+        //BuildList& _buildList;
+        std::shared_ptr <BuildList> _buildList;
 
         std::shared_ptr<GameState>       _gameState; /**< State of the whole game, containing all Entities and parameters */
-		std::shared_ptr<ResourceManager> _resourceManager; /**< Object that is responsible for updating the all resources at the end of each timestep */
-		std::shared_ptr<TechnologyManager<RacePolicy>> _technologyManager; /**< Object that is responsible for updating the all technologies at the end of each timestep */
-		std::shared_ptr<StartingConfiguration> _startingConfiguration;
+        std::shared_ptr<ResourceManager> _resourceManager; /**< Object that is responsible for updating the all resources at the end of each timestep */
+        std::shared_ptr<TechnologyManager<RacePolicy>> _technologyManager; /**< Object that is responsible for updating the all technologies at the end of each timestep */
+        std::shared_ptr<StartingConfiguration> _startingConfiguration;
         std::shared_ptr<GameStateUpdate<RacePolicy>> _gameStateUpdate;
+        std::shared_ptr<Energizer<RacePolicy>> _energizer;
         /**< Calling this function proceeds to the next timestep */
-		TechnologyManager<Zerg> _techManagerZerg;
-		TechnologyManager<Protoss> _techManagerProtoss;
-		TechnologyManager<Terran> _techManagerTerran;
+        TechnologyManager<Zerg> _techManagerZerg;
+        TechnologyManager<Protoss> _techManagerProtoss;
+        TechnologyManager<Terran> _techManagerTerran;
 
         void buildBuilding(std::shared_ptr<Worker> workerForBuilding, std::string name ,int time);
 
-        void produceUnit(std::vector<std::string> buildingNames, std::string unitName, int time,Building::ProductionType type);
+        void produceUnit(std::shared_ptr<Building> buildingForProduction, std::string unitName, int time,Building::ProductionType type, bool doubleProduction = false);
+
+        void removeUnit(std::shared_ptr<Unit> unitForRemoval, std::string unitName);
+        void removeWorker(std::shared_ptr<Worker> unitForRemoval, std::string unitName);
+
+        void morphUnit(std::shared_ptr<Unit> unitForMorphing, int morphTime, std::string morphTargetName);
 
         void timeStep();
 
-	public:
+        std::shared_ptr<Worker> getAvailableWorker();
+
+public:
         /** Function starting the Simulation.
          *
          * After calling this function all required objects, including the whole GameState, the TechnologyManager and ResourceManager, are created.
-         * Next the Simulation is started by entering the first timestep and proceded 
+         * Next the Simulation is started by entering the first timestep and proceded
          * by executing all necessary actions in an arbitrary amount of timesteps until the GameState fits to the specifed goal.
          */
-        Simulation(std::string buildListFilename,
-					std::shared_ptr<GameState> gameState,
-					std::shared_ptr<ResourceManager> resourceManager,
-					std::shared_ptr<TechnologyManager<RacePolicy>> technologyManager,
-					std::shared_ptr<StartingConfiguration> startingConfiguration,
-					std::shared_ptr<GameStateUpdate<RacePolicy>> gameStateUpdate
-					);
 
-		Simulation(std::string buildListFilename);
+        Simulation(std::string buildListFilename);
 
-        void run();
+        /* Constructor for use in BuildListOptimizer */
+        Simulation(std::shared_ptr<BuildList> buildList, const TechnologyList& techList);
 
+        //void run();
+        /* run() method for use in BuildListOptimizer */
+        std::map<int,std::string> run(int timeLimit);
         ~Simulation();
 
 };

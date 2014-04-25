@@ -9,6 +9,8 @@
 // and we have separate lists of the workers, buildings and units
 // in the GameState anyhow
 
+//TODO: This class is not virtual!!
+
 class Entity
 {   
     private:

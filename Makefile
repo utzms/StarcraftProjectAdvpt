@@ -2,13 +2,15 @@
 .PHONY: pathmaker clean
 
 CC=g++
-OPT=-std=c++11 -Wall -Wshadow -Wextra -pedantic
-LIBS=
+OPT= -g -O2 -std=c++11 #-Wall -Wshadow -Wextra -pedantic
+LIBS=-fopenmp
 INCPATH=./include/
 SRCPATH=./src/
-INC=-I$(INCPATH)
+INC=-I$(INCPATH) -I$(SRCPATH)
 BINPATH=./bin/
 OBJPATH=./obj/
+
+#OPT += -O2
 
 objects=$(SRCPATH)main.cpp\
 		$(OBJPATH)debug.o\
@@ -17,14 +19,20 @@ objects=$(SRCPATH)main.cpp\
 		$(OBJPATH)technology.o\
 		$(OBJPATH)simulation.o\
 		$(OBJPATH)technologylist.o\
+		$(OBJPATH)buildlistgenerator.o\
+		$(INCPATH)FitnessPolicy.h\
 		$(INCPATH)InitTechTree.hpp
 
 out=$(OBJPATH)worker.o\
 		$(OBJPATH)building.o\
 		$(OBJPATH)technologyManager.o\
+		$(OBJPATH)buildlistoptimizer.o\
 
 all: OPT += -DNDEBUG
 all: exe
+
+debug_deep: OPT += -DDEBUG_DEEP
+debug_deep: debug
 
 debug: OPT += -DDEBUG
 debug: exe
@@ -34,9 +42,6 @@ pathmaker:
 
 exe: pathmaker $(objects)
 	$(CC) $(OPT) $(INC) $(LIBS) -o $(BINPATH)runme $(objects)
-
-#exe: pathmaker $(SRCPATH)main.cpp $(OBJPATH)simulation.o $(OBJPATH)gameState.o $(OBJPATH)worker.o $(OBJPATH)building.o $(OBJPATH)technologyManager.o $(OBJPATH)dataReader.o $(OBJPATH)technology.o $(OBJPATH)technologylist.o $(INCPATH)InitTechTree.hpp
-#	$(CC) $(OPT) $(INC) $(LIBS) -o $(BINPATH)runme $(SRCPATH)main.cpp $(OBJPATH)simulation.o $(OBJPATH)gameState.o $(OBJPATH)worker.o $(OBJPATH)building.o $(OBJPATH)technologyManager.o $(OBJPATH)dataReader.o $(OBJPATH)technology.o $(OBJPATH)technologylist.o $(INCPATH)InitTechTree.hpp
 
 $(OBJPATH)debug.o: $(INCPATH)Debug.h $(SRCPATH)Debug.cpp
 	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)debug.o $(SRCPATH)Debug.cpp
@@ -66,8 +71,13 @@ $(OBJPATH)technologylist.o: $(INCPATH)TechnologyList.h $(SRCPATH)TechnologyList.
 	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)technologylist.o $(SRCPATH)TechnologyList.cpp
 
 $(OBJPATH)resourcemanager.o: $(SRCPATH)ResourceManager.cpp $(INCPATH)ResourceManager.h
-	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)resourcemanager.o $(SRCPATH)ResourceManager.cpp	
+	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)resourcemanager.o $(SRCPATH)ResourceManager.cpp
 
+$(OBJPATH)buildlistgenerator.o: $(INCPATH)BuildListGenerator.h $(SRCPATH)BuildListGenerator.cpp
+	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)buildlistgenerator.o $(SRCPATH)BuildListGenerator.cpp
+
+$(OBJPATH)buildlistoptimizer.o: $(INCPATH)BuildListOptimizer.h $(SRCPATH)BuildListOptimizer.cpp
+	$(CC) $(OPT) $(INC) $(LIBS) -c -o $(OBJPATH)buildlistoptimizer.o $(SRCPATH)BuildListOptimizer.cpp
 
 clean:
 	rm -rf $(OBJPATH) $(BINPATH)

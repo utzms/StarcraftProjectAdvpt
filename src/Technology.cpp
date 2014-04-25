@@ -32,7 +32,7 @@ Technology::Technology(std::string nameIn, float min, float gas, float supply, i
 	TechCosts.gas=gas;
 	TechCosts.supply=supply;
 	TechCosts.buildTime=buildTime;
-	existence = false;
+	existenceCount = 0;
 }
 
 void Technology::addRequirement(std::pair<std::shared_ptr<Technology>,RequirementType> newRequirement)
@@ -78,9 +78,19 @@ void Technology::setBuildTime(int time)
 	TechCosts.buildTime=time;
 }   
 
-void Technology::setExistence(bool state)
+void Technology::setExistence(int state)
 {
-	existence = state;
+	existenceCount = state;
+}   
+
+void Technology::incExistence()
+{
+	++existenceCount;
+}
+
+void Technology::decExistence()
+{
+	--existenceCount;
 }   
 
 std::string Technology::getName(void)
@@ -111,7 +121,7 @@ int Technology::getBuildTime(void)
 
 bool Technology::exists(void)
 {
-	return existence;
+	return (existenceCount>0 ? true : false);
 }
 
 std::ostream& operator<< (std::ostream& os, const Technology& tech)
@@ -132,7 +142,7 @@ std::ostream& operator<< (std::ostream& os, const Technology& tech)
 		if (tech.requirements[it][j].second == RequirementType::Existence)
 		{
 			tmp = &tmp1;
-		} else if (tech.requirements[it][j].second == RequirementType::Vanishing)
+		} else if (tech.requirements[it][j].second == RequirementType::ForProduction)
 		{
 			tmp = &tmp2;
 		} else
@@ -155,15 +165,15 @@ std::ostream& operator<< (std::ostream& os, const Technology& tech)
 	os << std::setw(30) << tmp1;
 	os << std::setw(30) << tmp2;
 	os << std::setw(30) << tmp3;
+#endif
 	os << std::setw(15);
-	if (tech.existence)
+	if (tech.existenceCount>0)
 	{
-		os << "Exists";
+		os << "Exists(" << tech.existenceCount << ")";
 	} else 
 	{
 		os << "No Instance";
 	}
-#endif
 
 	return os;
 }
